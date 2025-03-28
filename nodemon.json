@@ -1,0 +1,12 @@
+{
+  "watch": [
+    "src/**/*.ts",
+    "src/views/**/*.ejs"
+  ],
+  "ignore": [
+    "dist"
+  ],
+  "ext": "ts,ejs",
+  "exec": "ts-node ./src/server.ts",
+  "delay": 1000
+}

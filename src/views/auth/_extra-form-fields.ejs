@@ -1,0 +1,16 @@
+<div class="form-row">
+  <div class="form-item">
+    <label for="name">Name</label>
+    <input type="text" id="name" name="name" required value="" autocomplete="new-name">
+  </div>
+</div>
+<div class="form-row">
+  <div class="form-item">
+    <label for="name">Facility</label>
+    <select name="facility">
+      <% data?.facilities.forEach(item=> { %>
+        <option label="<%= item.name %>" value="<%= item.id %>">
+      <% }) %>
+    </select>
+  </div>
+</div>

@@ -1,0 +1,16 @@
+import dotenv from "dotenv";
+if (process.env.NODE_ENV !== "production") {
+  dotenv.config();
+}
+
+const PORT = +(process.env.PORT || 3000);
+const MONGODB_URL = process.env.MONGODB_URL || "";
+const SESSION_SECRET = process.env.SESSION_SECRET || "mysecret";
+// const JWT_KEY = process.env.SESSION_SECRET || "verystrongkey";
+
+export default {
+  MONGODB_URL,
+  PORT,
+  SESSION_SECRET,
+  // JWT_KEY,
+};

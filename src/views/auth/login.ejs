@@ -1,0 +1,9 @@
+<h2 class="page-header">Login</h2>
+<form action="/auth/login" method="POST" autocomplete="off">
+  <input autocomplete="false" name="hidden" type="text" style="display:none;">
+  <%- include('_form-fields') %>
+    <div class="form-row form-row-end btn-row">
+      <button class="btn btn-primary" type="submit">Login</button>
+      <a class="btn btn-danger" href="/auth/register">Register</a>
+    </div>
+</form>

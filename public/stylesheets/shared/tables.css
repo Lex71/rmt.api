@@ -1,0 +1,60 @@
+:root {
+  --table-cover-width: 200px;
+  --table-cover-width-large: 325px;
+  --table-cover-aspect-ratio: 0.75;
+}
+
+.table-cover {
+  width: var(--table-cover-width);
+  height: calc(var(--table-cover-width) / var(--table-cover-aspect-ratio));
+}
+
+.table-cover-large {
+  --table-cover-width: var(--table-cover-width-large);
+}
+
+.table-grid {
+  display: grid;
+  justify-content: center;
+  grid-gap: 2rem;
+  grid-template-columns: repeat(auto-fill, var(--table-cover-width));
+}
+
+.table-grid-large {
+  grid-template-columns: repeat(auto-fill, var(--table-cover-width-large));
+}
+
+.table-details {
+  display: flex;
+}
+
+.table-details-label {
+  font-size: 1.2rem;
+  font-weight: 500;
+  align-self: flex-start;
+}
+
+.table-details-grid {
+  display: grid;
+  align-content: flex-start;
+  align-items: center;
+  grid-gap: 1rem;
+  grid-template-columns: auto auto;
+}
+
+.table-details-btn-grid {
+  display: grid;
+  justify-items: flex-start;
+  align-items: flex-start;
+  align-content: flex-start;
+  grid-template-areas:
+    "edit delete"
+    "author author";
+  grid-gap: .5rem;
+  margin-top: .5rem;
+}
+
+.table-details-author-button {
+  grid-area: author;
+  justify-self: stretch;
+}

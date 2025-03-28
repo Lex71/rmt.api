@@ -12,16 +12,71 @@
   "type": "commonjs",
   "main": "server.ts",
   "scripts": {
+    "dev-nodemon": "nodemon",
+    "dev": "tsx --watch src/server.ts",
+    "dev:staging": "tsx --watch --env-file .env.staging src/server.ts",
+    "dev:prod": "tsx --watch --env-file .env.production src/server.ts",
     "start": "node dist/server.js",
-    "build": "tsc",
-    "test": "jest"
+    "build-old": "tsc",
+    "build": "tsc -p tsconfig.build.json",
+    "test:run": "vitest --run",
+    "test:ui": "vitest --ui",
+    "coverage": "vitest run --coverage",
+    "type-check": "tsc --noEmit",
+    "lint": "eslint .",
+    "lint:fix": "eslint --fix .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "test-vitest": "vitest",
+    "prepare": "husky"
   },
   "devDependencies": {
+    "@eslint/js": "^9.22.0",
+    "@types/bcrypt": "^5.0.2",
+    "@types/ejs": "^3.1.5",
     "@types/express": "^5.0.0",
+    "@types/express-ejs-layouts": "^2.5.4",
+    "@types/express-flash": "^0.0.5",
+    "@types/express-session": "^1.18.1",
+    "@types/method-override": "^3.0.0",
+    "@types/mongoose": "^5.11.96",
     "@types/node": "^22.13.10",
-    "typescript": "^5.8.2"
+    "@types/passport": "^1.0.17",
+    "@types/passport-local": "^1.0.38",
+    "@types/yup": "^0.29.14",
+    "dotenv": "^16.4.7",
+    "eslint": "^9.22.0",
+    "eslint-plugin-perfectionist": "^4.10.1",
+    "husky": "^9.1.7",
+    "lint-staged": "^15.5.0",
+    "nodemon": "^3.1.9",
+    "prettier": "^3.5.3",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.19.3",
+    "typescript": "^5.8.2",
+    "typescript-eslint": "^8.27.0"
   },
   "dependencies": {
-    "express": "^4.21.2"
+    "bcrypt": "^5.1.1",
+    "ejs": "^3.1.10",
+    "express": "^4.21.2",
+    "express-ejs-layouts": "^2.5.1",
+    "express-flash": "^0.0.2",
+    "express-session": "^1.18.1",
+    "method-override": "^3.0.0",
+    "mongoose": "^8.12.1",
+    "passport": "^0.7.0",
+    "passport-local": "^1.0.0",
+    "yup": "^1.6.1"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": [
+      "eslint",
+      "prettier --check"
+    ],
+    "*.{json,yml,yaml,md}": [
+      "prettier --check"
+    ]
   }
 }

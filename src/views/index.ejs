@@ -1,0 +1,5 @@
+<h1>Hi <%= data.user.name %>
+</h1>
+
+<h2 class="page-header">Recently Added Facilities</h2>
+<%- include('partials/facilityGrid', { data: data.facilities, large: true }) %>

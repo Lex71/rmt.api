@@ -1,0 +1,72 @@
+:root {
+  --facility-width: 30%;
+  --facility-cover-width: 200px;
+  --facility-cover-width-large: 325px;
+  --facility-cover-aspect-ratio: 0.75;
+}
+
+.facility-cover {
+  width: var(--facility-cover-width);
+  height: calc(var(--facility-cover-width) / var(--facility-cover-aspect-ratio));
+}
+
+.facility-cover-large {
+  --facility-cover-width: var(--facility-cover-width-large);
+}
+
+.facility-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.facility-name, .facility-address {
+  font-size: 1.5rem;
+
+}
+
+.facility-grid {
+  display: grid;
+  justify-content: center;
+  grid-gap: 2rem;
+  grid-template-columns: repeat(auto-fill, var(--facility-width));
+}
+
+/* .facility-grid-large {
+  grid-template-columns: repeat(auto-fill, var(--facility-cover-width-large));
+} */
+
+.facility-details {
+  display: flex;
+}
+
+.facility-details-label {
+  font-size: 1.2rem;
+  font-weight: 500;
+  align-self: flex-start;
+}
+
+.facility-details-grid {
+  display: grid;
+  align-content: flex-start;
+  align-items: center;
+  grid-gap: 1rem;
+  grid-template-columns: auto auto;
+}
+
+.facility-details-btn-grid {
+  display: grid;
+  justify-items: flex-start;
+  align-items: flex-start;
+  align-content: flex-start;
+  grid-template-areas:
+    "edit delete"
+    "facility facility";
+  grid-gap: .5rem;
+  margin-top: .5rem;
+}
+
+.facility-details-author-button {
+  grid-area: author;
+  justify-self: stretch;
+}

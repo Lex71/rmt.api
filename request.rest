@@ -1,0 +1,41 @@
+POST http://localhost:3000/auth/register
+content-type: application/json
+
+{
+  "name": "a",
+  "email": "a@a",
+  "password": "a"
+}
+
+###
+
+POST http://localhost:3000/auth/login
+content-type: application/json
+
+{
+  "email": "test1@mail.com",
+  "password": "Test1!!!"
+}
+
+###
+GET http://localhost:3000/facilities?address=1&pippo=5
+
+###
+
+POST http://localhost:3000/users
+Content-Type: application/json
+
+{
+  "name": "Kyle",
+  "password": "password"
+}
+
+###
+
+POST http://localhost:3000/users/login
+Content-Type: application/json
+
+{
+  "name": "Kyle",
+  "password": "password"
+}
