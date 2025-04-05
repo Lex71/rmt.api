@@ -1,0 +1,10 @@
+<div class="form-row">
+  <div class="form-item">
+    <label for="name">Status</label>
+    <select name="status" required>
+      <% for(const [k, v] of Object.entries(data?.status_enum)) { %>
+        <option label="<%= k %>" value="<%= v %>"></option>
+        <% } %>
+    </select>
+  </div>
+</div>

@@ -1,4 +1,3 @@
-import { comparePassword, hashPassword } from "../utils/helpers";
 // import bcrypt from "bcrypt";
 // import jwt from "jsonwebtoken";
 import {
@@ -10,50 +9,57 @@ import {
   Types,
 } from "mongoose";
 
+import { comparePassword, hashPassword } from "../utils/helpers";
+
 enum Role {
   ADMIN = "admin",
   USER = "user",
 }
 
 export interface IUser extends Document {
-  name: string;
   email: string;
-  password: string;
-  role: Role;
   // roles: Role[];
   facility?: Types.ObjectId;
+  name: string;
+  password: string;
+  role: Role;
   // tokens: { token: string }[];
 }
 
-export interface IUserMethods {
+interface IUserMethods {
   // generateAuthToken(): Promise<string>;
-  toJSON(): IUser;
+  toJSON(): Partial<IUser>;
 }
 
-interface UserModel extends Model<IUser, {}, IUserMethods> {
+interface UserModel extends Model<IUser, object, IUserMethods> {
   findByCredentials(
     email: string,
     password: string,
   ): Promise<HydratedDocument<IUser, IUserMethods>>;
 }
 
-const userSchema = new Schema<IUser, UserModel, IUserMethods>({
-  name: { type: String, trim: true, required: true },
-  email: { type: String, trim: true, unique: true, required: true },
-  password: { type: String, required: true },
-  // tokens: [{ token: { type: String, required: true } }],
-});
+const userSchema = new Schema<IUser, UserModel, IUserMethods>(
+  {
+    email: { required: true, trim: true, type: String, unique: true },
+    facility: { ref: "Facility", type: Schema.Types.ObjectId },
+    name: { required: true, trim: true, type: String },
+    password: { required: true, type: String },
+    role: { default: Role.USER, enum: Object.values(Role), type: String },
+    // tokens: [{ token: { type: String, required: true } }],
+  },
+  { timestamps: true },
+);
 
-userSchema.add({
+/* userSchema.add({
   // single string
-  role: { type: String, enum: Object.values(Role), default: Role.USER },
+  role: { default: Role.USER, enum: Object.values(Role), type: String },
   // array of strings
   // roles: [{ type: String, enum: Object.values(Role), default: Role.USER }],
-});
+}); */
 
-userSchema.add({
-  facility: { type: Schema.Types.ObjectId, ref: "Facility" },
-});
+/* userSchema.add({
+  facility: { ref: "Facility", type: Schema.Types.ObjectId },
+}); */
 
 userSchema.pre("save", async function (next) {
   if (this.isModified("password")) {
@@ -74,15 +80,20 @@ userSchema.pre("save", async function (next) {
 //   return token;
 // };
 
-userSchema.methods.toJSON = function () {
-  const user = this as IUser;
-  const userObject = user.toObject();
+userSchema.methods.toJSON = function (): Partial<IUser> {
+  // const user = this as IUser;
+  const user = this as HydratedDocument<IUser> & IUser;
+  // const userObject = user.toObject();
+  const userObject: Partial<IUser> = user.toObject();
   delete userObject.password;
   // delete userObject.tokens;
   return userObject;
 };
 
-userSchema.statics.findByCredentials = async (email, password) => {
+userSchema.statics.findByCredentials = async (
+  email: string,
+  password: string,
+) => {
   const user = await User.findOne({ email });
   if (!user) {
     return null;

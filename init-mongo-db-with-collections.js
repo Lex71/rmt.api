@@ -46,13 +46,8 @@ db.createUser({
 // db = new Mongo().getDB("testDB");
 db.createCollection("facilities", { capped: false });
 db.createCollection("users", { capped: false });
-/* 
-db.facilities.insert([
-  {
-    name: "Facility 1",
-    address: "Address 1",
-  },
-]); */
+db.createCollection("tables", { capped: false });
+db.createCollection("reservations", { capped: false });
 // db.createCollection("test", { capped: false });
 
 db.users.insert([
@@ -63,6 +58,34 @@ db.users.insert([
     role: "admin",
   },
 ]);
+
+/* db.getCollection("facilities").insertOne({
+  name: "Facility 1",
+  address: "Address 1",
+  tasks: [],
+});
+
+const f1 = db
+  .getCollection("facilities")
+  .find({
+    name: "Facility 1",
+  })
+  .next();
+
+db.tables.insertOne({
+  name: "Table 1 of" + f1.name,
+  description: "Big Table",
+  seats: 12,
+  facility: f1._id,
+});
+
+const t1 = db
+  .getCollection("tables")
+  .find({
+    facility: f1._id,
+  })
+  .next();
+console.log(JSON.stringify(t1)); */
 /* (async function () {
   const saltRounds = 10;
   const password = "admin";

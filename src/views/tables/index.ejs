@@ -1,24 +1,35 @@
-<h2 class="page-header">Search Book</h2>
-<form action="/books" method="GET">
+<h2 class="page-header">Search Tables</h2>
+<form action="/tables" method="GET">
   <div class="form-row">
     <div class="form-item">
-      <label>Title</label>
-      <input type="text" name="title" value="<%= searchOptions.title %>">
+      <label>Name</label>
+      <input type="text" name="name" value="<%= searchOptions?.name %>">
     </div>
-  </div>
-  <div class="form-row">
+  <!-- </div>
+  <div class="form-row"> -->
     <div class="form-item">
-      <label>Published After</label>
-      <input type="date" name="publishedAfter" value="<%= searchOptions.publishedAfter %>">
-    </div>
-    <div class="form-item">
-      <label>Published Before</label>
-      <input type="date" name="publishedBefore" value="<%= searchOptions.publishedBefore %>">
+      <label>Seats</label>
+      <input type="number" name="seats" value="<%= searchOptions?.seats %>">
     </div>
   </div>
   <div class="form-row form-row-end">
     <button class="btn btn-primary" type="submit">Search</button>
   </div>
 </form>
-<br>
-<%- include('../partials/bookGrid', { books: books, large: true }) %>
+<br />
+<% data.forEach(item=> { %>
+  <div class="table-row">
+    <div class="table-name">
+      <%= item.name %>
+    </div>
+    <div class="btn-row">
+      <a class="btn btn-primary" href="/tables/<%= item._id %>">View</a>
+      <a class="btn btn-primary" href="/tables/<%= item._id %>/edit">Edit</a>
+      <%- include('../partials/deleteForm', { url: `/tables/${item._id}` }) %>
+    </div>
+  </div>
+  <% }) %>
+
+  <hr />
+
+<!--  include('../partials/tableGrid', { data, large: true })  -->

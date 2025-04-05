@@ -1,7 +1,8 @@
 import { NextFunction, Request, Response } from "express";
 import passport from "passport";
-import User from "../models/user";
-import { find as allFacilities } from "../services/facilityService";
+
+import User, { IUser } from "../models/user";
+import { find } from "../services/facilityService";
 // import { hashPassword } from "../utils/helpers";
 // enable these for jwt auth
 // const RefreshToken = require("../models/RefreshToken");
@@ -16,14 +17,14 @@ export const newLogin = (_req: Request, res: Response) => {
 
 export const newRegister = async (req: Request, res: Response) => {
   try {
-    const facilities = await allFacilities();
+    const facilities = await find();
     if (facilities.length === 0) {
       req.flash("error", "Cannot register: no facilities available");
       res.redirect("/auth/login");
     } else {
       res.render("auth/register", {
-        layout: "layouts/auth",
         data: { facilities },
+        layout: "layouts/auth",
       });
     }
   } catch {
@@ -33,12 +34,14 @@ export const newRegister = async (req: Request, res: Response) => {
 };
 
 // session / cookie auth
-export const passportLogin = () =>
-  passport.authenticate("local", {
-    successRedirect: "/",
-    failureRedirect: "/auth/login",
+export const passportLogin = () => {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+  return passport.authenticate("local", {
     failureFlash: true,
+    failureRedirect: "/auth/login",
+    successRedirect: "/",
   });
+};
 
 export const registerUser = async (
   req: Request,
@@ -46,24 +49,25 @@ export const registerUser = async (
   // next: NextFunction,
 ) => {
   try {
+    const body = req.body as Partial<IUser>;
     // check email is not used
-    if (await User.findOne({ email: req.body.email })) {
+    if (await User.findOne({ email: body.email })) {
       throw new Error("An user with that email is already registered");
     }
     // const hashedPassword = await hashPassword(req.body.password);
     const user = new User({
-      name: req.body.name,
-      email: req.body.email,
-      // password: hashedPassword, // the Model has a pre hook to has the password
-      password: req.body.password,
-      facility: req.body.facility,
+      email: body.email,
+      facility: body.facility, // the ._id of the facility model
+      name: body.name,
+      // password: hashedPassword, // the Model has a pre hook to hash the password
+      password: body.password,
     });
     await user.save();
     res.redirect("/auth/login");
-  } catch (err: any) {
+  } catch {
     // next(err);
     // console.log(err);
-    req.flash("error", err.message);
+    req.flash("error", "Cannot register user");
     // load fresh form...
     res.redirect("/auth/register");
     // OR if you want to keep (wrong) inputs:
@@ -74,13 +78,15 @@ export const registerUser = async (
 export const logoutUser = (req: Request, res: Response, next: NextFunction) => {
   req.logOut((err) => {
     if (err) {
-      return next(err);
+      next(err);
+      return;
     }
     res.redirect("/");
   });
   // req.logOut(function (err) {
   //   if (err) {
-  //     return next(err);
+  //     next(err);
+  //     return;
   //   }
   //   res.redirect("/auth/login");
   // });

@@ -221,7 +221,7 @@
           </svg></a> -->
           <a href="/">Reserve My Table</a>
       </li>
-      <% if(data.user.role === "admin") { %>
+      <% if(user.role === "admin") { %>
         <li class="nav-item">
           <a href="/facilities">Facilities</a>
         </li>
@@ -235,9 +235,15 @@
         <li class="nav-item">
           <a href="/tables/new">Add Table</a>
         </li>
+        <li class="nav-item">
+          <a href="/reservations">Reservations</a>
+        </li>
+        <li class="nav-item">
+          <a href="/reservations/new">Add Reservation</a>
+        </li>
       <% } %>
       <li class="nav-item">
-        <form action="/auth/logout?_method=DELETE" method="POST">
+        <form action="/auth/logout/?_method=DELETE" method="POST">
           <button class="btn" type="submit">Log Out</button>
         </form>
       </li>

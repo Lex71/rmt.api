@@ -39,3 +39,7 @@ Content-Type: application/json
   "name": "Kyle",
   "password": "password"
 }
+
+###
+GET http://localhost:3000/reservations/tables?date=2025-04-02&time=20:00&delay=89&facility=67ead7c4c8c556d2c551e945
+Content-Type: application/json

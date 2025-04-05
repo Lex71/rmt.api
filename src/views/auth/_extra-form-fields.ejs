@@ -7,9 +7,9 @@
 <div class="form-row">
   <div class="form-item">
     <label for="name">Facility</label>
-    <select name="facility">
-      <% data?.facilities.forEach(item=> { %>
-        <option label="<%= item.name %>" value="<%= item.id %>">
+    <select name="facility" required>
+      <% data?.facilities.forEach(facility=> { %>
+        <option label="<%= facility.name %>" value="<%= facility._id %>"></option>
       <% }) %>
     </select>
   </div>

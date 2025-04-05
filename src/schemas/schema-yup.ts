@@ -53,13 +53,13 @@ export default {
 */
 
 export const userSchema = yup.object({
-  name: yup.string().min(3, "Name must be at least 3 characters"),
   // .required("Name is required")
   email: yup
     .string()
     //.email("Invalid email")
     .required("Email is required")
     .matches(EMAIL_REGEX, "Invalid email format"),
+  name: yup.string().min(3, "Name must be at least 3 characters"),
   password: yup
     .string()
     .matches(
@@ -83,22 +83,22 @@ export const userSchema = yup.object({
 // });
 
 const facilitySchema = yup.object({
-  name: yup
-    .string()
-    .min(2, "Too Short!")
-    .max(50, "Too Long!")
-    .required("Required name")
-    .matches(/^[a-zA-Z]+$/, "Invalid name format"),
   address: yup
     .string()
     .min(2, "Too Short!")
     .max(100, "Too Long!")
     .required("Required address")
     .matches(/^[a-zA-Z0-9-\s,.\\/()]+$/, "Invalid address format"),
+  name: yup
+    .string()
+    .min(2, "Too Short!")
+    .max(50, "Too Long!")
+    .required("Required name")
+    .matches(/^[a-zA-Z]+$/, "Invalid name format"),
 });
 
 export default {
   "auth/register": userSchema,
   // "auth/login": authSchema,
   facilities: facilitySchema,
-} as { [key: string]: yup.ObjectSchema<yup.AnyObject> };
+} as Record<string, yup.ObjectSchema<yup.AnyObject>>;

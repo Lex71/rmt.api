@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 // import * as yup from "yup";
-import { ValidationError } from "yup";
+import { AnyObject, ValidationError } from "yup";
+
 import schemas from "../schemas/schema-yup";
 
 /**
@@ -10,7 +11,7 @@ import schemas from "../schemas/schema-yup";
  * @param {ValidationError} errors Yup validation errors
  * @returns {Record<string, string>} Validation errors
  */
-const transformYupErrorsIntoObject = (
+/* const transformYupErrorsIntoObject = (
   errors: ValidationError,
 ): Record<string, string> => {
   const validationErrors: Record<string, string> = {};
@@ -22,11 +23,11 @@ const transformYupErrorsIntoObject = (
   });
 
   return validationErrors;
-};
+}; */
 const transformYupErrorsIntoHTMLString = (errors: ValidationError): string => {
-  let validationErrors: string = "";
+  let validationErrors = "";
 
-  errors.inner.forEach((error: any) => {
+  errors.inner.forEach((error: ValidationError) => {
     if (error.path !== undefined) {
       validationErrors += "<li>" + error.errors[0] + "</li>";
     }
@@ -35,7 +36,7 @@ const transformYupErrorsIntoHTMLString = (errors: ValidationError): string => {
   return validationErrors;
 };
 
-const transformYupErrorsIntoString = (errors: ValidationError): string => {
+/* const transformYupErrorsIntoString = (errors: ValidationError): string => {
   let validationErrors: string = "";
 
   errors.inner.forEach((error: any) => {
@@ -45,19 +46,19 @@ const transformYupErrorsIntoString = (errors: ValidationError): string => {
   });
 
   return validationErrors ? `<ul>${validationErrors}</ul>` : "";
-};
+}; */
 
 const validate =
   // (schema: yup.Schema) =>
   function (path: string) {
-    const schema = schemas[path];
-
-    if (!schema) {
+    if (!Object.keys(schemas).includes(path)) {
       throw new Error(`Schema not found for path: ${path}`);
     }
 
+    const schema = schemas[path];
+
     return async (req: Request, res: Response, next: NextFunction) => {
-      const body = req.body;
+      const body = req.body as AnyObject;
       // const { name, email } = req.body;
       try {
         await schema.validate(body, { abortEarly: false });
@@ -69,7 +70,7 @@ const validate =
         console.log(err);
         req.flash("error", err);
         // since I don't redirect, simply flash immediately
-        res.render("auth/register", { data: { user: { ...req.body } } });
+        res.render("auth/register", { user: { ...body } });
       }
     };
   };

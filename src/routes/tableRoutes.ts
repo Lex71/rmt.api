@@ -1,156 +1,40 @@
-const express = require("express");
+import express from "express";
+
+import {
+  createTable,
+  editTable,
+  getTable,
+  getTables,
+  newTable,
+  removeTable,
+  updateTable,
+} from "../controllers/tableController";
+import { checkAuthenticated } from "../middlewares/auth";
+// const imageMimeTypes = ["image/jpeg", "image/png", "images/gif"];
+
 const router = express.Router();
-const Book = require("../models/book");
-const Author = require("../models/author");
-const imageMimeTypes = ["image/jpeg", "image/png", "images/gif"];
+
+// Define routes
 
 // All Tables Route
-router.get("/", async (req, res) => {
-  let query = Book.find();
-  if (req.query.title != null && req.query.title != "") {
-    query = query.regex("title", new RegExp(req.query.title, "i"));
-  }
-  if (req.query.publishedBefore != null && req.query.publishedBefore != "") {
-    query = query.lte("publishDate", req.query.publishedBefore);
-  }
-  if (req.query.publishedAfter != null && req.query.publishedAfter != "") {
-    query = query.gte("publishDate", req.query.publishedAfter);
-  }
-  try {
-    const tables = await query.exec();
-    res.render("tables/index", {
-      tables: tables,
-      searchOptions: req.query,
-    });
-  } catch {
-    res.redirect("/");
-  }
-});
+router.get("/", checkAuthenticated, getTables);
 
-// New Book Route
-router.get("/new", async (req, res) => {
-  renderNewPage(res, new Book());
-});
+// New Table Route
+router.get("/new", checkAuthenticated, newTable);
 
-// Create Book Route
-router.post("/", async (req, res) => {
-  const book = new Book({
-    title: req.body.title,
-    author: req.body.author,
-    publishDate: new Date(req.body.publishDate),
-    pageCount: req.body.pageCount,
-    description: req.body.description,
-  });
-  saveCover(book, req.body.cover);
+// Show Table Route
+router.get("/:id", checkAuthenticated, getTable);
 
-  try {
-    const newBook = await book.save();
-    res.redirect(`tables/${newBook.id}`);
-  } catch {
-    renderNewPage(res, book, true);
-  }
-});
+// Edit Table Route
+router.get("/:id/edit", checkAuthenticated, editTable);
 
-// Show Book Route
-router.get("/:id", async (req, res) => {
-  try {
-    const book = await Book.findById(req.params.id).populate("author").exec();
-    res.render("tables/show", { book: book });
-  } catch {
-    res.redirect("/");
-  }
-});
+// Create Table Route
+router.post("/", checkAuthenticated, createTable);
 
-// Edit Book Route
-router.get("/:id/edit", async (req, res) => {
-  try {
-    const book = await Book.findById(req.params.id);
-    renderEditPage(res, book);
-  } catch {
-    res.redirect("/");
-  }
-});
+// Update Table Route
+router.put("/:id", checkAuthenticated, updateTable);
 
-// Update Book Route
-router.put("/:id", async (req, res) => {
-  let book;
+// Delete Table Route
+router.delete("/:id", checkAuthenticated, removeTable);
 
-  try {
-    book = await Book.findById(req.params.id);
-    book.title = req.body.title;
-    book.author = req.body.author;
-    book.publishDate = new Date(req.body.publishDate);
-    book.pageCount = req.body.pageCount;
-    book.description = req.body.description;
-    if (req.body.cover != null && req.body.cover !== "") {
-      saveCover(book, req.body.cover);
-    }
-    await book.save();
-    res.redirect(`/tables/${book.id}`);
-  } catch {
-    if (book != null) {
-      renderEditPage(res, book, true);
-    } else {
-      res.redirect("/");
-    }
-  }
-});
-
-// Delete Book Page
-router.delete("/:id", async (req, res) => {
-  let book;
-  try {
-    book = await Book.findById(req.params.id);
-    await book.deleteOne();
-    res.redirect("/tables");
-  } catch {
-    if (book != null) {
-      res.render("tables/show", {
-        book: book,
-        messages: "Could not remove book",
-      });
-    } else {
-      res.redirect("/");
-    }
-  }
-});
-
-async function renderNewPage(res, book, hasError = false) {
-  renderFormPage(res, book, "new", hasError);
-}
-
-async function renderEditPage(res, book, hasError = false) {
-  renderFormPage(res, book, "edit", hasError);
-}
-
-async function renderFormPage(res, book, form, hasError = false) {
-  try {
-    const authors = await Author.find({});
-    const params = {
-      authors: authors,
-      book: book,
-      imageMimeTypes,
-    };
-    if (hasError) {
-      if (form === "edit") {
-        params.messages = "Error Updating Book";
-      } else {
-        params.messages = "Error Creating Book";
-      }
-    }
-    res.render(`tables/${form}`, params);
-  } catch {
-    res.redirect("/tables");
-  }
-}
-
-function saveCover(book, coverEncoded) {
-  if (coverEncoded == null) return;
-  const cover = JSON.parse(coverEncoded);
-  if (cover != null && imageMimeTypes.includes(cover.type)) {
-    book.coverImage = Buffer.from(cover.data, "base64");
-    book.coverImageType = cover.type;
-  }
-}
-
-module.exports = router;
+export default router;

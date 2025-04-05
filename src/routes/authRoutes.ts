@@ -1,5 +1,9 @@
 import express from "express";
-import passport from "passport";
+
+// TODO: import theese for jwt auth
+// loginUser,
+// refreshToken,
+// whoami,
 import {
   logoutUser,
   newLogin,
@@ -7,16 +11,8 @@ import {
   passportLogin,
   registerUser,
 } from "../controllers/authController";
-// TODO: import theese for jwt auth
-// loginUser,
-// refreshToken,
-// whoami,
-
 import { checkAuthenticated, checkNotAuthenticated } from "../middlewares/auth";
-
 import validate from "../middlewares/validator";
-
-import { NextFunction, Request, Response } from "express";
 
 const router = express.Router();
 

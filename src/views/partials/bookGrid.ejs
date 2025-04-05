@@ -1,9 +1,0 @@
-<% bookCoverClass = locals.large ? 'table-cover-large' : '' %>
-<% bookGridClass = locals.large ? 'table-grid-large' : '' %>
-<div class="table-grid <%= bookGridClass %>">
-  <% books.forEach(book => { %>
-    <a href="/books/<%= book.id %>">
-      <img class="table-cover <%= bookCoverClass %>" src="<%= book.coverImagePath %>">
-    </a>
-  <% }) %>
-</div>

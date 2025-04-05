@@ -1,0 +1,41 @@
+<h2 class="page-header">New Reservation</h2>
+<script type="text/javascript">
+  var availableTables = JSON.parse('<%- JSON.stringify(tables) %>');
+  // Init a timeout variable to be used below
+  let timeout = null;
+  function setAvailableTables (seats) {
+    clearTimeout(timeout);
+    // document.querySelector('.available-tables').innerHTML = '';
+    // document.querySelector('#total-seats').innerHTML = 0;
+    // if(!seats) return;
+    timeout = setTimeout(function () {
+      document.querySelector('.available-tables').innerHTML = '';
+      document.querySelector('#total-seats').innerHTML = 0;
+      if (!seats) return;
+      availableTables.filter(item => item.seats >= seats).forEach(item => {
+        document.querySelector('.available-tables').innerHTML += `
+        <div class="available-table">
+          <input class="table-checkbox" type="checkbox" name="tables[]" value="${item._id}" data-seats="${item.seats}" onchange="setTotalSeats(this.checked, this.dataset.seats)">
+          <div class="table-name">${item.name}</div>
+          <div class="table-seats">${item.seats}</div>
+        </div>
+      `
+      });
+    }, 1000);
+    
+  }
+  function setTotalSeats (checked, seats) {
+    if(checked) {
+      document.querySelector('#total-seats').innerHTML = parseInt(document.querySelector('#total-seats').innerHTML) + parseInt(seats);
+    } else {
+      document.querySelector('#total-seats').innerHTML = parseInt(document.querySelector('#total-seats').innerHTML) - parseInt(seats);
+    }
+  }
+</script>
+<form action="/reservations" method="POST">
+  <%- include('_form-fields') %>
+  <div class="form-row form-row-end btn-row">
+    <button class="btn btn-primary" type="submit">Create</button>
+    <a class="btn btn-danger" href="/reservations">Cancel</a>
+  </div>
+</form>

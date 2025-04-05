@@ -1,0 +1,45 @@
+<h2 class="page-header">Search Reservations</h2>
+<form action="/reservations" method="GET">
+  <div class="form-row">
+    <div class="form-item">
+      <label>Name</label>
+      <input type="text" name="name" value="<%= searchOptions?.name %>">
+    </div>
+  <!-- </div>
+  <div class="form-row"> -->
+    <div class="form-item">
+      <label>Date</label>
+      <input type="date" name="date" value="<%= searchOptions?.date %>">
+    </div>
+    <div class="form-item">
+      <label>Phone</label>
+      <input type="tel" name="tel" value="<%= searchOptions?.date %>">
+    </div>
+  </div>
+  <div class="form-row form-row-end">
+    <button class="btn btn-primary" type="submit">Search</button>
+  </div>
+</form>
+<br />
+<% data.forEach(item=> { %>
+  <div class="table-row">
+    <div class="table-name">
+      <%= item.date %>, <%= item.time %>
+    </div>
+    <div class="table-name">
+      <%= item.name %>
+    </div>
+    <div class="table-address">
+      <%= item.status %>
+    </div>
+    <div class="btn-row">
+      <a class="btn btn-primary" href="/reservations/<%= item._id %>">View</a>
+      <a class="btn btn-primary" href="/reservations/<%= item._id %>/edit">Edit</a>
+      <%- include('../partials/deleteForm', { url: `/reservations/${item._id}` }) %>
+    </div>
+  </div>
+  <% }) %>
+
+  <hr />
+
+<!--  include('../partials/tableGrid', { data, large: true })  -->

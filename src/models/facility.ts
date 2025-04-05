@@ -17,53 +17,97 @@
 
 import {
   CallbackError,
+  CallbackWithoutResultAndOptionalError,
   Document,
   HydratedDocument,
-  // HydratedDocument,
   model,
-  Model,
+  PopulatedDoc,
   Schema,
 } from "mongoose";
-import Table, { ITable } from "./table";
 
 import { QueryOptions } from "../types/index";
+import Table, { ITable } from "./table";
 
-// 1. Create an interface representing a document in MongoDB.
-export interface IFacility extends Document {
-  name: string;
-  address: string;
-}
-
-export interface IFacilityMethods {
-  // generateAuthToken(): Promise<string>;
-  toJSON(): IFacility;
-}
-
-interface UserModel extends Model<IFacility, {}, IFacilityMethods> {
-  // findByCredentials(
-  //   email: string,
-  //   password: string,
-  // ): Promise<HydratedDocument<IFacility, IFacilityMethods>>;
-}
-
-export type FacilitySearchOptionsType = {
-  query?: Partial<Omit<QueryOptions<IFacility>, "_id">>; // Optional search query, all searchable fields except _id
+export interface FacilitySearchOptionsType {
   // query?: Partial<QueryOptions<IFacility>>; // Optional search query, all searchable fields except _id
   // query?: Partial<QueryOptions<IQueryFacility>>; // Optional search query, all searchable fields except _id
   page?: number; // Optional page number for pagination
   pageSize?: number; // Optional page size for pagination
+  query?: Partial<Omit<QueryOptions<IFacility>, "_id">>; // Optional search query, all searchable fields except _id
   sortBy?: string; // Optional field to sort by
   sortOrder?: "asc" | "desc"; // Optional sort order, ascending or descending
-};
+}
+
+// 1. Create an interface representing a document in MongoDB.
+export interface IFacility extends Document {
+  address: string;
+  name: string;
+  tables: PopulatedDoc<ITable>[];
+}
+
+/* interface IFacilityMethods {
+  // generateAuthToken(): Promise<string>;
+  toJSON(): IFacility;
+} */
+
+/* interface FacilityModelType extends Model<IFacility, object, IFacilityMethods> {
+ // so far there are no custom methods, so the interface is empty -> declare a typ
+} */
+// type FacilityModelType = Model<IFacility, object, IFacilityMethods>;
 
 // 2. Create a Schema corresponding to the document interface.
-const facilitySchema: Schema = new Schema({
-  name: { type: String, required: true },
-  address: { type: String, required: true },
-});
+/* const facilitySchema: Schema = new Schema(
+  {
+    address: { required: true, type: String },
+    name: { required: true, type: String },
+  },
+  { timestamps: true },
+); */
+
+const facilitySchema = new Schema(
+  {
+    address: { required: true, type: String },
+    name: { required: true, type: String },
+    tables: [{ ref: "Table", type: Schema.Types.ObjectId }],
+    // tables: { ref: "Table", type: [Schema.Types.ObjectId] },
+  },
+  {
+    // methods: {
+    //   toJSON() {
+    //     const facility = this as HydratedDocument<IFacility> & IFacility;
+    //     const facilityObject = facility.toObject();
+    //     // delete facilityObject._id;
+    //     return facilityObject;
+    //   },
+    // },
+    pre: {
+      // check for existing reference on Table before 'remove'
+      deleteOne: function (next: CallbackWithoutResultAndOptionalError) {
+        Table.find(
+          {
+            facility: (
+              this as unknown as HydratedDocument<IFacility> & IFacility
+            ).id,
+          },
+          // (err: CallbackError | undefined, tables: HydratedDocument<ITable>[]) => {
+          (err: CallbackError | undefined, tables: ITable[]) => {
+            if (err) {
+              next(err);
+            } else if (tables.length > 0) {
+              next(new Error("This facility has tables still"));
+            } else {
+              next();
+            }
+          },
+        );
+      },
+    },
+    timestamps: true,
+  },
+);
 
 // check for existing reference on Table before 'remove'
-facilitySchema.pre<IFacility>("deleteOne", function (next) {
+/* facilitySchema.pre<IFacility>("deleteOne", function (next) {
   Table.find(
     { facility: this.id },
     // (err: CallbackError | undefined, tables: HydratedDocument<ITable>[]) => {
@@ -77,16 +121,21 @@ facilitySchema.pre<IFacility>("deleteOne", function (next) {
       }
     },
   );
-});
+}); */
 
-facilitySchema.methods.toJSON = function () {
-  const facility = this as IFacility;
+/* facilitySchema.methods.toJSON = function () {
+  const facility = this as HydratedDocument<IFacility> & IFacility;
   const facilityObject = facility.toObject();
   // delete facilityObject._id;
   return facilityObject;
-};
+}; */
 
 // 3. Create a Model.
 // const Facility: Model<IFacility> = model<IFacility>("Facility", facilitySchema);
-const Facility = model<IFacility, UserModel>("Facility", facilitySchema);
+/* const Facility = model<IFacility, FacilityModelType>(
+  "Facility",
+  facilitySchema,
+); */
+const Facility = model("Facility", facilitySchema);
+
 export default Facility;

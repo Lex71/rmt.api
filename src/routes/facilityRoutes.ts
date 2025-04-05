@@ -1,4 +1,5 @@
 import express from "express";
+
 import {
   createFacility,
   editFacility,
@@ -8,14 +9,9 @@ import {
   removeFacility,
   updateFacility,
 } from "../controllers/facilityController";
-
 import { checkAuthenticated, isAdmin } from "../middlewares/auth";
-
-import ssrErrorHandler from "../middlewares/ssrErrorHandler";
-
-import validate from "../middlewares/validator";
-
-import { Request, Response } from "express";
+// import ssrErrorHandler from "../middlewares/ssrErrorHandler";
+// import validate from "../middlewares/validator";
 
 const router = express.Router();
 
@@ -23,9 +19,6 @@ const router = express.Router();
 
 // All Facilities Route
 router.get("/", checkAuthenticated, getFacilities);
-// router.get("/", (req: Request, res: Response) => {
-//   res.send({ name: req.query.name });
-// });
 
 // New Facility Route
 router.get("/new", isAdmin, newFacility);
@@ -37,15 +30,7 @@ router.get("/:id", checkAuthenticated, getFacility);
 router.get("/:id/edit", isAdmin, editFacility);
 
 // Create Facility Route
-router.post(
-  "/",
-  isAdmin,
-  createFacility,
-  // ssrErrorHandler({
-  //   render: "facilities/new",
-  //   messages: "Error creating Facility",
-  // }),
-);
+router.post("/", isAdmin, createFacility);
 
 // Update Facility Route
 router.put("/:id", isAdmin, updateFacility);

@@ -18,8 +18,8 @@ export const find = async (
   // return facilities;
   try {
     return await User.find(searchOptions);
-  } catch (err) {
-    throw err;
+  } catch {
+    throw new Error("User not found");
   }
 };
 
@@ -27,21 +27,21 @@ export const findById = async (id: string): Promise<IUser | null> => {
   try {
     // return await Facility.findById(id);
     return await User.findById(id);
-  } catch (err) {
-    throw new Error("Facility not found");
+  } catch {
+    throw new Error("User not found");
   }
 };
 
 export const findByEmail = async (email: string): Promise<IUser | null> => {
   try {
     return await User.findOne({ email });
-  } catch (err) {
+  } catch {
     throw new Error("User not found");
   }
 };
 
 export const create = async (user: Partial<IUser>) => {
-  const { name, email, password } = user;
+  const { email, name, password } = user;
   if (!name || !email || !password) {
     return {
       error: "Please provide all the required fields",
@@ -59,17 +59,17 @@ export const create = async (user: Partial<IUser>) => {
   // const user: HydratedDocument<IUser> = new User({
 
   try {
-    const newUser = new User({ name, email, password });
+    const newUser = new User({ email, name, password });
     return await newUser.save();
-  } catch (err) {
+  } catch {
     throw new Error("Cannot create User");
   }
 };
 
 export const remove = async (id: string) => {
   try {
-    return await User.deleteOne({ id });
-  } catch (err) {
+    return await User.deleteOne({ _id: id });
+  } catch {
     throw new Error("Cannot deleteOne: User not found");
   }
 };

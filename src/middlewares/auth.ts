@@ -4,7 +4,8 @@ import { NextFunction, Request, Response } from "express";
 
 function checkAuthenticated(req: Request, res: Response, next: NextFunction) {
   if (req.isAuthenticated()) {
-    return next();
+    next();
+    return;
   }
 
   res.redirect("/auth/login");
@@ -16,14 +17,16 @@ function checkNotAuthenticated(
   next: NextFunction,
 ) {
   if (req.isAuthenticated()) {
-    return res.redirect("/");
+    res.redirect("/");
+    return;
   }
   next();
 }
 
 function isAdmin(req: Request, res: Response, next: NextFunction) {
   if (req.isAuthenticated() && req.user.role === "admin") {
-    return next();
+    next();
+    return;
   }
 
   res.redirect("/auth/login");

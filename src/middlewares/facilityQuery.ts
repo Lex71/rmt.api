@@ -13,7 +13,7 @@ import { NextFunction, Request, Response } from "express";
 const facilityQuery = (routes: RegExp[]) => {
   return (req: Request, _res: Response, next: NextFunction) => {
     if (routes.some((route) => route.test(req.path))) {
-      if (!req.query.facility && req.user && req.user.facility) {
+      if (!req.query.facility && req.user?.facility) {
         req.query.facility = req.user.facility;
       }
     }

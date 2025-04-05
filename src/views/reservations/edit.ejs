@@ -1,0 +1,10 @@
+<h2 class="page-header">Edit Reservation</h2>
+<form action="/reservations/<%= data._id %>/?_method=PUT" method="POST">
+  <%- include('_form-fields') %>
+  <%- include('_extra-form-fields') %>
+
+  <div class="form-row form-row-end btn-row">
+    <a class="btn btn-danger" href="/reservations">Cancel</a>
+    <button class="btn btn-primary" type="submit">Update</button>
+  </div>
+</form>

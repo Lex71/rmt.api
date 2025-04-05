@@ -1,12 +1,13 @@
 import mongoose from "mongoose";
+
 import config from "../config/config";
 
 const dbOptions = {
   // autoReconnect: true,
+  heartbeatFrequencyMS: 1000,
   // reconnectTries: 30,
   // poolSize: 10,
-  serverSelectionTimeoutMS: 5000,
-  heartbeatFrequencyMS: 1000,
+  serverSelectionTimeoutMS: 2000,
 };
 /* await mongoose.connect(config.MONGODB_URL, dbOptions);
 const db = mongoose.connection;
@@ -21,8 +22,17 @@ const connectDB = async () => {
     // const f = await Facility.find();
     // console.log(f);
     const db = mongoose.connection;
-    db.on("error", (error) => console.error(error));
-    db.once("open", () => console.log("Connected to Mongoose"));
+    db.on("error", (error) => {
+      console.error(error);
+    });
+    db.once("open", () => {
+      console.log("Connected to Mongoose");
+    });
+    /* console.log("starting session");
+    const session = await db.startSession();
+    console.log("session started", session);
+    await session.endSession(); */
+    return;
   } catch (error) {
     console.log(error);
   }

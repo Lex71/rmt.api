@@ -1,0 +1,36 @@
+
+<input type="hidden" name="facility" value="<%= facility._id %>">
+<div class="form-row">
+  <div class="form-item">
+    <label>Date</label>
+    <input type="date" name="date" value="<%= data?.date %>">
+  </div>
+  <div class="form-item">
+    <label>Time</label>
+    <input type="time" name="time" value="<%= data?.time %>" min="12:00" max="22:00">
+  </div>
+  <div class="form-item">
+    <label>Seats</label>
+    <input type="number" name="seats" value="<%= data?.seats %>" min="2" oninput="setAvailableTables(this.value)">
+  </div>
+</div>
+
+<h3>Available Tables</h3>
+<div class="available-tables"></div>
+<div class="total-seats">Total seats: <span id="total-seats">0</span></div>
+
+
+<div class="form-row">
+  <div class="form-item">
+    <label>Name</label>
+    <input type="text" name="name" value="<%= data?.name %>">
+  </div>
+  
+</div>
+
+<div class="form-row">
+  <div class="form-item">
+    <label>Phone</label>
+    <input type="tel" name="phone" value="<%= data?.phone %>">
+  </div>
+</div>

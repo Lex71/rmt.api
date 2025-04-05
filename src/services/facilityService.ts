@@ -1,58 +1,37 @@
-import { name } from "ejs";
 import Facility, {
   FacilitySearchOptionsType,
   IFacility,
 } from "../models/facility";
-
-// const facilities: IFacility[] = [];
+import { ITable } from "../models/table";
 
 export const findById = async (id: string) => {
   try {
     // return await Facility.findById(id);
-    return await Facility.findById(id).populate("tables");
-  } catch (err) {
+    return await Facility.findById(id)
+      .populate<{ tables: ITable[] }>("tables")
+      .orFail();
+  } catch {
     throw new Error("Facility not found");
   }
 };
 
-/* export const find = async (searchOptions: FacilitySearchOptionsType) => {
-  // return facilities;
-  console.log(searchOptions);
-  try {
-    let query = Facility.find();
-    if (
-      searchOptions.query != null &&
-      Object.keys(searchOptions.query).length
-    ) {
-      for (const [k, v] of Object.entries(searchOptions.query)) {
-        console.log(k, v);
-        query = query.regex(k, v as RegExp);
-      }
-    }
-    // return await Facility.find(searchOptions.query as any);
-    return await query.exec();
-  } catch (err) {
-    throw new Error("Cannot find Facilities");
-  }
-}; */
 export const find = async (searchOptions?: FacilitySearchOptionsType) => {
   try {
     let query = Facility.find();
     // add regex filters to query
     if (
-      searchOptions != null &&
-      searchOptions.query != null &&
+      searchOptions?.query != null &&
       Object.keys(searchOptions.query).length
     ) {
       for (const [k, v] of Object.entries(searchOptions.query)) {
-        if (v != null && v != "") {
-          query = query.regex(k, new RegExp(v.toString(), "i"));
+        if (typeof v === "string" && v != "") {
+          query = query.regex(k, new RegExp(v, "i"));
         }
       }
     }
 
     return await query.exec();
-  } catch (err) {
+  } catch {
     throw new Error("Cannot find Facilities");
   }
 };
@@ -72,21 +51,21 @@ export const create = async (body: IFacility) => {
     // renderNewPage(res, facility, true);
     throw err;
   } */
-  const { name, address } = body;
+  const { address, name } = body;
 
-  const facility: IFacility = new Facility({
-    name,
+  const facility = new Facility({
     address,
+    name,
   });
 
   try {
     return await facility.save();
-  } catch (err) {
+  } catch {
     throw new Error("Cannot create Facility");
   }
 };
 
-export const update = async (id: string, body: IFacility) => {
+export const update = async (id: string, body: Partial<IFacility>) => {
   // let facility: IFacility | null = null;
   // try {
   //   facility = await Facility.findById(id);
@@ -100,16 +79,16 @@ export const update = async (id: string, body: IFacility) => {
   //   throw new Error("Cannot update: Facility not found");
   // }
   try {
-    return await Facility.findOneAndUpdate({ id }, body);
-  } catch (err) {
+    return await Facility.findByIdAndUpdate(id, body, { new: true });
+  } catch {
     throw new Error("Cannot update: Facility not found");
   }
 };
 
 export const remove = async (id: string) => {
   try {
-    return await Facility.deleteOne({ id });
-  } catch (err) {
+    return await Facility.deleteOne({ _id: id });
+  } catch {
     throw new Error("Cannot deleteOne: Facility not found");
   }
 };

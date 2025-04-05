@@ -16,14 +16,15 @@
     <button class="btn btn-primary" type="submit">Search</button>
   </div>
 </form>
-<br>
+<br />
 <% data.forEach(item => { %>
   <div class="facility-row">
     <div class="facility-name"><%= item.name %></div>
+    <div class="facility-address"><%= item.address %></div>
     <div class="btn-row">
-      <a class="btn btn-primary" href="/facilities/<%= item.id %>">View</a>
-      <a class="btn btn-primary" href="/facilities/<%= item.id %>/edit">Edit</a>
-      <%- include('../partials/deleteForm', { url: `/facilities/${item.id}` }) %>
+      <a class="btn btn-primary" href="/facilities/<%= item._id %>">View</a>
+      <a class="btn btn-primary" href="/facilities/<%= item._id %>/edit">Edit</a>
+      <%- include('../partials/deleteForm', { url: `/facilities/${item._id}` }) %>
     </div>
   </div>
 <% }) %>
