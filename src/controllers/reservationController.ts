@@ -42,7 +42,7 @@ export const getReservations = async (req: Request, res: Response) => {
       data: reservations,
       // facility: req.user?.facility,
       searchOptions: { ...req.query },
-      // user: new User(req.user).toJSON(),
+      user: new User(req.user).toJSON(),
     });
   } catch {
     res.redirect("/");
@@ -55,7 +55,7 @@ export const getReservation = async (req: Request, res: Response) => {
     res.render("reservations/show", {
       data: reservation,
       // facility: req.user?.facility,
-      // user: new User(req.user).toJSON(),
+      user: new User(req.user).toJSON(),
     });
   } catch (err) {
     console.log(err);
@@ -112,7 +112,7 @@ export const editReservation = async (req: Request, res: Response) => {
       // facility: new User(req.user).facility,
       facility: req.user?.facility,
       status_enum: Status,
-      // user: new User(req.user).toJSON(),
+      user: new User(req.user).toJSON(),
     });
     // renderEditPage(req, res, table);
   } catch {
@@ -131,7 +131,7 @@ export const newReservation = async (req: Request, res: Response) => {
     // facility: new User(req.user).facility,
     facility: req.user?.facility,
     tables,
-    // user: new User(req.user).toJSON(),
+    user: new User(req.user).toJSON(),
   });
   // renderNewPage(req, res, new Table());
 };

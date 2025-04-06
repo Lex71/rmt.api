@@ -1,3 +1,6 @@
+<div class="form-row form-row-end">
+  <a class="btn btn-primary" href="/reservations/new">Add Reservation</a>
+</div>
 <h2 class="page-header">Search Reservations</h2>
 <form action="/reservations" method="GET">
   <div class="form-row">
@@ -22,14 +25,14 @@
 </form>
 <br />
 <% data.forEach(item=> { %>
-  <div class="table-row">
-    <div class="table-name">
+  <div class="table-details">
+    <div class="table-date">
       <%= item.date %>, <%= item.time %>
     </div>
     <div class="table-name">
       <%= item.name %>
     </div>
-    <div class="table-address">
+    <div class="table-status">
       <%= item.status %>
     </div>
     <div class="btn-row">

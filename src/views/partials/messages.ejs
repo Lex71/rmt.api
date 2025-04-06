@@ -3,3 +3,9 @@
     <%- messages.error %>
   </div>
 <% } %>
+<script>
+  // remove innerHTML in .error-message after 5 seconds
+  setTimeout(() => {
+    document.querySelector(".error-message").innerHTML = "";
+  }, 5000)
+</script>

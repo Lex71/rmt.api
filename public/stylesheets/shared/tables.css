@@ -21,7 +21,7 @@
   margin-bottom: 1rem;
 }
 
-.table-name, .table-seats, .table-description {
+.table-date, .table-name, .table-seats, .table-status, .table-description {
   font-size: 1.2rem;
 
 }
@@ -39,6 +39,8 @@
 
 .table-details {
   display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
 }
 
 .table-details-label {
@@ -89,11 +91,20 @@
   border-radius: 0.5rem;
 }
 .table-checkbox {
-  flex: 0 1 2%; 
+  flex: 0 1 auto; 
+}
+.table-date {
+  flex: 1 0 auto; 
 }
 .table-name {
-  flex: 3 1 50%; 
+  flex: 1 0 auto; 
+}
+.table-description {
+  flex: 1 0 auto; 
+}
+.table-status {
+  flex: 1 0 auto; 
 }
 .table-seats {
-  flex: 1 1 10%;
+  flex: 1 0 auto;
 }

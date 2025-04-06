@@ -2,8 +2,9 @@
   <div class="form-item">
     <label for="name">Status</label>
     <select name="status" required>
-      <% for(const [k, v] of Object.entries(data?.status_enum)) { %>
-        <option label="<%= k %>" value="<%= v %>"></option>
+      <% for(const [k, v] of Object.entries(status_enum)) { %>
+
+        <option label="<%= k %>" value="<%= v %>" <% if(v === data?.status) { %>selected<% } %>></option>
         <% } %>
     </select>
   </div>

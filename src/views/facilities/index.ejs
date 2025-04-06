@@ -1,3 +1,6 @@
+<div class="form-row form-row-end">
+  <a class="btn btn-primary" href="/facilities/new">Add Facility</a>
+</div>
 <h2 class="page-header">Search Facilities</h2>
 <form action="/facilities" method="GET">
   <div class="form-row">
@@ -16,7 +19,6 @@
     <button class="btn btn-primary" type="submit">Search</button>
   </div>
 </form>
-<br />
 <% data.forEach(item => { %>
   <div class="facility-row">
     <div class="facility-name"><%= item.name %></div>
