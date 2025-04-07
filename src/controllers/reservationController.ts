@@ -1,12 +1,12 @@
 import { Request, Response } from "express";
+// import moment from "moment";
 
-import config from "../config/config";
 import Reservation, {
   IReservation,
   ReservationSearchOptionsType,
   Status,
 } from "../models/reservation";
-import { TableSearchOptionsType } from "../models/table";
+// import { TableSearchOptionsType } from "../models/table";
 import User from "../models/user";
 import {
   create,
@@ -16,7 +16,7 @@ import {
   remove,
   update,
 } from "../services/reservationService";
-import { find as findTables } from "../services/tableService";
+// import { find as findTables } from "../services/tableService";
 import { ApplicationError } from "../utils/errors";
 
 export const getReservations = async (req: Request, res: Response) => {
@@ -88,16 +88,17 @@ export const createReservation = async (req: Request, res: Response) => {
     });
     res.redirect(`reservations/${newReservation._id.toString()}`);
   } catch {
-    const searchOptions: TableSearchOptionsType = {};
-    searchOptions.query = { facility: req.user?.facility };
-    const tables = await findTables(searchOptions);
+    // const searchOptions: TableSearchOptionsType = {};
+    // searchOptions.query = { facility: req.user?.facility };
+    // const tables = await findTables(searchOptions);
     req.flash("error", "Cannot create reservation");
     res.render("reservations/new", {
+      adjust: 0,
       data: { date, name, phone, seats, time },
       // facility: new User(req.user).facility,
       facility: req.user?.facility,
-      tables,
-      // user: new User(req.user).toJSON(),
+      tables: [], // there is an ajax fetch call to getReservableTables
+      user: new User(req.user).toJSON(),
       // messages: "Error creating Reservation",
     });
     // renderNewPage(req, res, table, true);
@@ -120,29 +121,29 @@ export const editReservation = async (req: Request, res: Response) => {
   }
 };
 
-export const newReservation = async (req: Request, res: Response) => {
-  const searchOptions: TableSearchOptionsType = {};
-  searchOptions.query = { facility: req.user?.facility };
+export const newReservation = (req: Request, res: Response) => {
+  // const searchOptions: TableSearchOptionsType = {};
+  // searchOptions.query = { facility: req.user?.facility };
   // initially send all tables
   // TODO make ajax call from client to getReservableTables, so here send an empty array
-  const tables = await findTables(searchOptions);
+  // const tables = await findTables(searchOptions);
   res.render("reservations/new", {
+    adjust: 0,
     data: new Reservation(),
     // facility: new User(req.user).facility,
     facility: req.user?.facility,
-    tables,
+    tables: [], // there is an ajax fetch call to getReservableTables
     user: new User(req.user).toJSON(),
   });
   // renderNewPage(req, res, new Table());
 };
 
 export const getReservableTables = async (req: Request, res: Response) => {
-  const DELAY = config.AVERAGE_STAYING_TIME;
   // const facility = new User(req.user).facility;
-  const delay =
-    req.query.delay != null && req.query.delay != ""
-      ? parseInt(req.query.delay as string)
-      : DELAY;
+  const adjust =
+    req.query.adjust != null && req.query.adjust != ""
+      ? parseInt(req.query.adjust as string)
+      : 0;
   const { date, time } = req.query;
   // handle req.query
   const searchOptions: ReservationSearchOptionsType = {};
@@ -163,8 +164,8 @@ export const getReservableTables = async (req: Request, res: Response) => {
   }
 
   try {
-    const data = await findAvailableTables(delay, searchOptions);
-    res.status(200).json({ data });
+    const at = await findAvailableTables(adjust, searchOptions);
+    res.status(200).json({ data: at });
     // res.status(200).json({ message: "OK!" });
   } catch {
     throw new ApplicationError(403, "Cannot get reservable tables");

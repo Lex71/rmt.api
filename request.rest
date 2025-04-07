@@ -41,5 +41,8 @@ Content-Type: application/json
 }
 
 ###
-GET http://localhost:3000/reservations/tables?date=2025-04-02&time=20:00&delay=89&facility=67ead7c4c8c556d2c551e945
+
+# delay: 75 -> no busy tables
+# delay: 90 -> t6 busy table
+GET http://localhost:3000/reservations/tables?date=2025-04-04&time=17:30&adjust=15facility=67ead7c4c8c556d2c551e945
 Content-Type: application/json

@@ -1,16 +1,28 @@
 <h2 class="page-header">New Reservation</h2>
-<script type="text/javascript">
+
+<script>
   var availableTables = JSON.parse('<%- JSON.stringify(tables) %>');
   // Init a timeout variable to be used below
-  let timeout = null;
-  function setAvailableTables (seats) {
-    clearTimeout(timeout);
+  let timeout1 = null;
+  let timeout2 = null;
+  let timeout3 = null;
+  
+  // on document ready, id date is null, set the date value to moment().format('yyyy-MM-dd')
+  document.addEventListener('DOMContentLoaded', function () {
+    if (document.querySelector('input[name="date"]').value == '') {
+      document.querySelector('input[name="date"]').value = moment().format('YYYY-MM-DD');
+    }
+  });
+  
+  function renderAvailableTables() {
+    clearTimeout(timeout1);
     // document.querySelector('.available-tables').innerHTML = '';
     // document.querySelector('#total-seats').innerHTML = 0;
     // if(!seats) return;
-    timeout = setTimeout(function () {
+    timeout1 = setTimeout(function () {
       document.querySelector('.available-tables').innerHTML = '';
       document.querySelector('#total-seats').innerHTML = 0;
+      const seats = document.querySelector('input[name="seats"]').value;
       if (!seats) return;
       availableTables.filter(item => item.seats >= seats).forEach(item => {
         document.querySelector('.available-tables').innerHTML += `
@@ -22,10 +34,60 @@
       `
       });
     }, 1000);
-    
   }
-  function setTotalSeats (checked, seats) {
-    if(checked) {
+
+  function renderAdjustedTime() {
+    clearTimeout(timeout2);
+    // document.querySelector('.available-tables').innerHTML = '';
+    // document.querySelector('#total-seats').innerHTML = 0;
+    // if(!seats) return;
+    timeout2 = setTimeout(function () {
+      // document.querySelector('#adjusted-time').innerHTML = 0;
+      const time = document.querySelector('input[name="time"]').value;
+      const adjust = parseInt(document.querySelector('input[name="adjust"]').value);
+      if (!adjust && !time) return;
+      console.log(time, adjust);
+      document.querySelector('#adjusted-time').innerHTML = moment(time, "HH:mm").add(adjust, "minutes").format("HH:mm");
+    }, 1000);
+  }
+
+  function fetchAvailableTables() {
+    const date = document.querySelector('input[name="date"]').value;
+    const time = document.querySelector('input[name="time"]').value;
+    const adjust = document.querySelector('input[name="adjust"]').value;
+    const facility = document.querySelector('input[name="facility"]').value;
+    if (time == '' || date == '') return [];
+    clearTimeout(timeout3);
+    // document.querySelector('.available-tables').innerHTML = '';
+    // document.querySelector('#total-seats').innerHTML = 0;
+    // if(!seats) return;
+    timeout3 = setTimeout(async function () {
+      // fetch
+      const url = `http://localhost:3000/reservations/tables?date=${date}&time=${time}&adjust=${adjust}&facility=${facility}`;
+      console.log(url);
+      try {
+        const response = await fetch(url, {
+          method: 'GET',
+        });
+        if (!response.ok) {
+          // throw new Error(`Response status: ${response.status}`);
+          document.querySelector("#adjusted-time").innerHTML = `Response status: ${response.status}`;
+        }
+
+        const json = await response.json();
+        console.log(json);
+        // set the list of available tables
+        availableTables = json.data;
+        // draw the available tables
+        renderAvailableTables();
+      } catch (error) {
+        console.error(error.message);
+      }
+    }, 1000);
+
+  }
+  function setTotalSeats(checked, seats) {
+    if (checked) {
       document.querySelector('#total-seats').innerHTML = parseInt(document.querySelector('#total-seats').innerHTML) + parseInt(seats);
     } else {
       document.querySelector('#total-seats').innerHTML = parseInt(document.querySelector('#total-seats').innerHTML) - parseInt(seats);

@@ -1,6 +1,7 @@
 import moment from "moment";
 import { MongooseError, Types } from "mongoose";
 
+import config from "../config/config";
 import Facility from "../models/facility";
 import Reservation, {
   IReservation,
@@ -32,10 +33,10 @@ export const find = async (searchOptions?: ReservationSearchOptionsType) => {
       for (const [k, v] of Object.entries(searchOptions.query)) {
         if (typeof v === "string" && v != "") {
           switch (reservationSchema.path(k).instance) {
-            case "Date":
-              // query = query.where(k, new Date(v));
-              query = query.where(k, v);
-              break;
+            // case "Date":
+            //   // query = query.where(k, new Date(v));
+            //   query = query.where(k, v);
+            //   break;
             case "Number":
               query = query.where(k, Number(v));
               break;
@@ -54,9 +55,10 @@ export const find = async (searchOptions?: ReservationSearchOptionsType) => {
 };
 
 export const findAvailableTables = async (
-  delay: number,
+  adjust: number,
   searchOptions?: ReservationSearchOptionsType,
 ) => {
+  const DELAY: number = config.AVERAGE_STAYING_TIME;
   try {
     let query = Reservation.find();
     // .populate<{ tables: Types.ObjectId[] }>(
@@ -77,16 +79,16 @@ export const findAvailableTables = async (
         } */
         if (typeof v === "string" && v != "") {
           switch (reservationSchema.path(k).instance) {
-            case "Date":
-              // query = query.where(k, new Date(v));
-              // no need to filter by exact time, but afterwards by custom logic
-              if (k === "time") {
-                booking_time = v;
-                break;
-              }
-              query = query.where(k, v);
-              // query = query.where(k, new Date(v));
-              break;
+            // case "Date":
+            //   // query = query.where(k, new Date(v));
+            //   // no need to filter by exact time, but afterwards by custom logic
+            //   if (k === "time") {
+            //     booking_time = v;
+            //     break;
+            //   }
+            //   query = query.where(k, v);
+            //   // query = query.where(k, new Date(v));
+            //   break;
             case "Number":
               query = query.where(k, Number(v));
               break;
@@ -94,6 +96,10 @@ export const findAvailableTables = async (
               // query = query.regex(k, new RegExp(v, "i"));
               if (k === "facility") {
                 query = query.where(k, new Types.ObjectId(v));
+                break;
+              }
+              if (k === "time") {
+                booking_time = v;
                 break;
               }
               query = query.where(k, v);
@@ -104,16 +110,17 @@ export const findAvailableTables = async (
     }
 
     if (!booking_time) throw new Error("Missing time query parameter");
-    const reservations = await query.exec();
-    const r = await Reservation.find({
+    const reservations = await query.populate("tables").exec();
+    console.log(reservations);
+    /* const r = await Reservation.find({
       date: { $eq: "2025-04-02" }, // "2025-04-02",
       facility: new Types.ObjectId(searchOptions?.query?.facility),
     }); //.populate<{ tables: ITable[] }>("tables");
-    console.log(r);
+    console.log(r); */
     const allTables = await Table.find();
 
     // return await query.exec();
-    const busyTables: (string | Types.ObjectId)[] = [];
+    const busyTablesIds: string[] = [];
 
     reservations.forEach((reservation) => {
       const res = reservation.tables.filter(() => {
@@ -124,18 +131,20 @@ export const findAvailableTables = async (
           [Status.CHECKEDIN, Status.CONFIRMED, Status.RESCHEDULED].includes(
             reservation.status,
           ) &&
-          moment(booking_time, "HH:mm").isSameOrAfter(
-            moment(reservation.time, "HH:mm"),
-          ) &&
-          moment(booking_time, "HH:mm").isSameOrBefore(
-            moment(reservation.time, "HH:mm").add(delay, "minutes"),
-          )
+          moment(booking_time, "HH:mm")
+            .add(adjust, "minutes")
+            .isSameOrAfter(moment(reservation.time, "HH:mm")) &&
+          moment(booking_time, "HH:mm")
+            .add(adjust, "minutes")
+            .isSameOrBefore(
+              moment(reservation.time, "HH:mm").add(DELAY, "minutes"),
+            )
         );
       });
-      busyTables.push(...res);
+      busyTablesIds.push(...res.map((t) => t._id.toString()));
     });
     return allTables.filter(
-      (table) => !busyTables.includes(table._id.toString()),
+      (table) => !busyTablesIds.includes(table._id.toString()),
     );
   } catch {
     throw new Error("Cannot find Reservations");
