@@ -152,7 +152,7 @@ app.all("*", (req: Request, res: Response) => {
 /**
  * Error Handler.
  */
-if (process.env.NODE_ENV === "development") {
+if (process.env.NODE_ENV !== "production") {
   // only use in development
   app.use(errorHandler);
 } else {

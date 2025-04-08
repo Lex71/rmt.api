@@ -111,7 +111,7 @@ export const findAvailableTables = async (
 
     if (!booking_time) throw new Error("Missing time query parameter");
     const reservations = await query.populate("tables").exec();
-    console.log(reservations);
+    // console.log(reservations);
     /* const r = await Reservation.find({
       date: { $eq: "2025-04-02" }, // "2025-04-02",
       facility: new Types.ObjectId(searchOptions?.query?.facility),
@@ -123,6 +123,21 @@ export const findAvailableTables = async (
     const busyTablesIds: string[] = [];
 
     reservations.forEach((reservation) => {
+      const time = moment(reservation.time, "HH:mm");
+      const b_time = moment(booking_time, "HH:mm").add(adjust, "minutes");
+      // time conditions:
+      // booking_time == time ||
+      // booking_time == time+DELAY ||
+      // booking_time < time && booking_time+DELAY > time ||
+      // booking_time > time && booking_time < time+DELAY
+      const condition1 = b_time.isSame(time);
+      const condition2 = b_time.isSame(time.clone().add(DELAY, "minutes"));
+      const condition3 =
+        b_time.isBefore(time) && b_time.add(DELAY, "minutes").isAfter(time);
+      const condition4 =
+        b_time.isAfter(time) &&
+        b_time.isBefore(time.clone().add(DELAY, "minutes"));
+
       const res = reservation.tables.filter(() => {
         return (
           ![Status.CANCELLED, Status.NOSHOW, Status.PAID].includes(
@@ -131,14 +146,7 @@ export const findAvailableTables = async (
           [Status.CHECKEDIN, Status.CONFIRMED, Status.RESCHEDULED].includes(
             reservation.status,
           ) &&
-          moment(booking_time, "HH:mm")
-            .add(adjust, "minutes")
-            .isSameOrAfter(moment(reservation.time, "HH:mm")) &&
-          moment(booking_time, "HH:mm")
-            .add(adjust, "minutes")
-            .isSameOrBefore(
-              moment(reservation.time, "HH:mm").add(DELAY, "minutes"),
-            )
+          (condition1 || condition2 || condition3 || condition4)
         );
       });
       busyTablesIds.push(...res.map((t) => t._id.toString()));

@@ -42,7 +42,10 @@ Content-Type: application/json
 
 ###
 
-# delay: 75 -> no busy tables
-# delay: 90 -> t6 busy table
-GET http://localhost:3000/reservations/tables?date=2025-04-04&time=17:30&adjust=15facility=67ead7c4c8c556d2c551e945
+# reservation.time = 16:00
+# tables: t6# DELAY: 90
+# until 17:30, table t6 is busy
+# adjust: 0 -> no busy tables
+# adjust: 15 -> t6 busy table
+GET http://localhost:3000/reservations/tables?date=2025-04-04&time=17:30&adjust=1facility=67ead7c4c8c556d2c551e945
 Content-Type: application/json

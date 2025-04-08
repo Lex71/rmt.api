@@ -39,3 +39,34 @@
 .header-nav li a:hover, .header-title:hover {
   color: white;
 }
+
+.nav-list {
+  background: var(--color-background-dark);
+  box-shadow: 0px 0px 10px var(--color-text-light);
+  padding: 1rem 0;
+  border-radius: var(--radius);
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.nav-item {
+  list-style: none;
+  margin-right: 2rem;
+}
+
+.nav-item a {
+  text-decoration: none;
+  color: var(--color-text-light);
+  transition: all 200ms ease-in;
+}
+
+.nav-item a:hover {
+  color: white;
+}
+
+.nav-item:first-child {
+  margin-right: auto;
+  margin-left: 2rem;
+}

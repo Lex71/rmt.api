@@ -1,8 +1,9 @@
-import { NextFunction, Request, Response } from "express";
+import { NextFunction, Request, RequestHandler, Response } from "express";
 import passport from "passport";
 
 import User, { IUser } from "../models/user";
 import { find } from "../services/facilityService";
+import { ApplicationError } from "../utils/errors";
 // import { hashPassword } from "../utils/helpers";
 // enable these for jwt auth
 // const RefreshToken = require("../models/RefreshToken");
@@ -34,13 +35,13 @@ export const newRegister = async (req: Request, res: Response) => {
 };
 
 // session / cookie auth
-export const passportLogin = () => {
+export const passportLogin = (): RequestHandler => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-return
   return passport.authenticate("local", {
     failureFlash: true,
     failureRedirect: "/auth/login",
     successRedirect: "/",
-  });
+  }) as RequestHandler;
 };
 
 export const registerUser = async (

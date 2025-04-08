@@ -1,0 +1,50 @@
+
+
+
+.dialog {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .dialog h5 {
+    font-size: 2rem;
+    margin-bottom: 2rem;
+  }
+  
+  .dialog .content{
+    display: grid;
+    grid-template-columns: auto auto;
+    justify-items: start;
+    align-items: center;
+    font-size: 1.5rem;
+    margin-bottom: 2rem;
+    column-gap: 2rem;
+  }
+
+  .dialog .content div {
+    margin-bottom: 1rem;
+  }
+
+  .dialog .content div.warning {
+    color: red;
+  }
+  
+  .dialog nav {
+    display: flex;
+    justify-content: center;
+  }
+  
+  .dialog button {
+    margin: 0 1rem;
+  }
+  .dialog-wrapper {
+    display: none
+  }
