@@ -39,6 +39,10 @@
       <a class="btn btn-primary" href="/reservations/<%= item._id %>">View</a>
       <a class="btn btn-primary" href="/reservations/<%= item._id %>/edit">Edit</a>
       <%- include('../partials/deleteForm', { url: `/reservations/${item._id}` }) %>
+      <a class="btn btn-status btn-small" href="/reservations/<%= item._id %>/cancelled">Cancel</a>
+      <a class="btn btn-status btn-small" href="/reservations/<%= item._id %>/noshow">Checked In</a>
+      <a class="btn btn-status btn-small" href="/reservations/<%= item._id %>/noshow">No Show</a>
+      <a class="btn btn-status btn-small" href="/reservations/<%= item._id %>/paid">Paid</a>
     </div>
   </div>
   <% }) %>

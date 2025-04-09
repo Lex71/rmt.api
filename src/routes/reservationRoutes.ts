@@ -9,6 +9,7 @@ import {
   newReservation,
   removeReservation,
   updateReservation,
+  updateStatusReservation,
 } from "../controllers/reservationController";
 import { checkAuthenticated } from "../middlewares/auth";
 // import ssrErrorHandler from "../middlewares/ssrErrorHandler";
@@ -32,6 +33,9 @@ router.get("/:id", checkAuthenticated, getReservation);
 
 // Edit Reservation Route
 router.get("/:id/edit", checkAuthenticated, editReservation);
+
+// Status change
+router.get("/:id/:status", checkAuthenticated, updateStatusReservation);
 
 // Create Reservation Route
 router.post("/", checkAuthenticated, createReservation);

@@ -16,6 +16,7 @@ import initializePassport from "./config/passport-config";
 import connectDB from "./db/db";
 // import { checkAuthenticated } from "./middlewares/auth";
 import { errorHandler } from "./middlewares/errorHandler";
+// import facilityQuery from "./middlewares/facilityQuery";
 // import ssrErrorHandler from "./middlewares/ssrErrorHandler";
 // import facilityQuery from "./middlewares/facilityQuery";
 // routes
@@ -36,10 +37,10 @@ declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace Express {
     interface User {
-      email: string;
-      facility?: Types.ObjectId;
       id: string;
       name: string;
+      email: string;
+      facility?: Types.ObjectId;
       // password: string;
       role: string;
     }
@@ -87,7 +88,7 @@ app.use(passport.session()); //allow passport to use "express-session"
 /* const routesRegExp = [
   // /^\/facilities\/?.*$/,
   /^\/tables\/?.*$/,
-  /^\/other-route\/?.*$/,
+  /^\/reservations\/?.*$/,
 ];
 
 app.use(facilityQuery(routesRegExp)); */

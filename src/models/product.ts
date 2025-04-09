@@ -1,9 +1,9 @@
 import { Document, model, Schema, Types } from "mongoose";
 
 export interface Product extends Document {
-  facility?: Types.ObjectId;
   name: string;
   price: number;
+  facility?: Types.ObjectId;
 }
 
 const productSchema = new Schema(

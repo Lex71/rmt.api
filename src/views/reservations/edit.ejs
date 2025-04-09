@@ -1,3 +1,9 @@
+<script>
+  let availableTables = JSON.parse('<%- JSON.stringify(tables) %>'); // initially empty, fetched from server by ajax
+  // to set checked in edit mode:
+  const reservedTables = JSON.parse('<%- JSON.stringify(data?.tables || []) %>');
+</script>
+<script defer src="/javascripts/reservations.js"></script>
 <h2 class="page-header">Edit Reservation</h2>
 <form action="/reservations/<%= data._id %>/?_method=PUT" method="POST">
   <%- include('_form-fields') %>
@@ -8,3 +14,8 @@
     <button class="btn btn-primary" type="submit">Update</button>
   </div>
 </form>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    fetchAvailableTables(); 
+  })
+</script>

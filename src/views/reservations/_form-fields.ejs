@@ -1,5 +1,5 @@
 
-<input type="hidden" name="facility" value="<%= facility._id %>">
+<!-- <input type="hidden" name="facility" value="< %= facility._id % >"> -->
 <div class="form-row">
   <div class="form-item">
     <label>Date</label>
@@ -18,8 +18,8 @@
 <div class="form-row">
   <div class="form-item no-grow">
     <label>Adjust</label>
-    <input type="number" name="adjust" placeholder="time adjustment in minutes" pattern="-?[0-9]+" value="<%= adjust %>"
-      step="15" oninput="renderAdjustedTime(); fetchAvailableTables(); renderAvailableTables()">
+    <input type="number" name="adjust" placeholder="time adjustment in minutes" pattern="-?[0-9]+" value="<%= locals.adjust ?? 0 %>"
+      step="15" oninput="renderAdjustedTime(); fetchAvailableTables()">
   </div>
   <div class="form-item">
     <label>Adjusted time:</label>

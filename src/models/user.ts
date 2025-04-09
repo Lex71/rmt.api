@@ -19,10 +19,10 @@ enum Role {
 export interface IUser extends Document {
   email: string;
   // roles: Role[];
-  facility?: Types.ObjectId;
+  role: Role;
   name: string;
   password: string;
-  role: Role;
+  facility?: Types.ObjectId;
   // tokens: { token: string }[];
 }
 

@@ -32,16 +32,16 @@ export interface FacilitySearchOptionsType {
   // query?: Partial<QueryOptions<IFacility>>; // Optional search query, all searchable fields except _id
   // query?: Partial<QueryOptions<IQueryFacility>>; // Optional search query, all searchable fields except _id
   page?: number; // Optional page number for pagination
-  pageSize?: number; // Optional page size for pagination
-  query?: Partial<Omit<QueryOptions<IFacility>, "_id">>; // Optional search query, all searchable fields except _id
   sortBy?: string; // Optional field to sort by
+  pageSize?: number; // Optional page size for pagination
   sortOrder?: "asc" | "desc"; // Optional sort order, ascending or descending
+  query?: Partial<Omit<QueryOptions<IFacility>, "_id">>; // Optional search query, all searchable fields except _id
 }
 
 // 1. Create an interface representing a document in MongoDB.
 export interface IFacility extends Document {
-  address: string;
   name: string;
+  address: string;
   tables: PopulatedDoc<ITable>[];
 }
 

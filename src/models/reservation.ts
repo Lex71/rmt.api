@@ -46,21 +46,21 @@ export enum Status {
 // 1. Create an interface representing a document in MongoDB.
 export interface IReservation extends Document {
   date: string;
-  facility: Types.ObjectId;
   name: string;
+  time: string;
   phone: string;
   seats: number;
   status: Status;
+  facility: Types.ObjectId;
   tables: PopulatedDoc<ITable>[];
-  time: string;
 }
 
 export interface ReservationSearchOptionsType {
   page?: number; // Optional page number for pagination
-  pageSize?: number; // Optional page size for pagination
-  query?: Partial<Omit<QueryOptions<IReservation>, "_id">>; // Optional search query, all searchable fields except _id
   sortBy?: string; // Optional field to sort by
+  pageSize?: number; // Optional page size for pagination
   sortOrder?: "asc" | "desc"; // Optional sort order, ascending or descending
+  query?: Partial<Omit<QueryOptions<IReservation>, "_id">>; // Optional search query, all searchable fields except _id
 }
 
 export const reservationSchema = new Schema(

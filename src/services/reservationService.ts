@@ -5,9 +5,9 @@ import config from "../config/config";
 import Facility from "../models/facility";
 import Reservation, {
   IReservation,
-  reservationSchema,
   ReservationSearchOptionsType,
   Status,
+  reservationSchema,
 } from "../models/reservation";
 import Table from "../models/table";
 
@@ -41,13 +41,17 @@ export const find = async (searchOptions?: ReservationSearchOptionsType) => {
               query = query.where(k, Number(v));
               break;
             default:
+              if (k === "facility") {
+                query = query.where(k, new Types.ObjectId(v));
+                break;
+              }
               query = query.regex(k, new RegExp(v, "i"));
               break;
           }
         }
       }
     }
-
+    query = query.sort({ date: 1, time: 1 });
     return await query.exec();
   } catch {
     throw new Error("Cannot find Reservations");
@@ -117,7 +121,9 @@ export const findAvailableTables = async (
       facility: new Types.ObjectId(searchOptions?.query?.facility),
     }); //.populate<{ tables: ITable[] }>("tables");
     console.log(r); */
-    const allTables = await Table.find();
+    const allTables = await Table.find({
+      facility: searchOptions?.query?.facility,
+    });
 
     // return await query.exec();
     const busyTablesIds: string[] = [];

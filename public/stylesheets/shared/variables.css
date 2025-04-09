@@ -2,8 +2,11 @@
   --color-base-hue: 200;
   --color-danger-hue-offset: 180;
   --color-danger-hue: calc(var(--color-base-hue) - var(--color-danger-hue-offset));
+  --color-status-hue-offset: 150;
+  --color-status-hue: calc(var(--color-base-hue) - var(--color-status-hue-offset));
   --color-background-dark: hsl(var(--color-base-hue), 100%, 8%);
   --color-background-light: hsl(var(--color-base-hue), 100%, 16%);
   --color-text-light: hsl(var(--color-base-hue), 100%, 87%);
+  --button-radius: 0.5rem;
   --radius: 0.2rem;
 }

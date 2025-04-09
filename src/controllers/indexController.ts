@@ -6,7 +6,8 @@ import { fetchIndexData } from "../services/indexService";
 export const getIndexData = async (req: Request, res: Response) => {
   try {
     const isAdmin = req.isAuthenticated() && req.user.role === "admin";
-    const indexData = await fetchIndexData(isAdmin);
+    const facility = req.user?.facility;
+    const indexData = await fetchIndexData(facility, isAdmin);
     // res.status(200).json(indexData);
     res.render("index", {
       data: indexData,

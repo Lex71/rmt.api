@@ -1,6 +1,6 @@
 <h2 class="page-header">Search Tables</h2>
 <div class="form-row form-row-end">
-  <a class="btn btn-primary" href="/facilities/new">Add Table</a>
+  <a class="btn btn-primary" href="/tables/new">Add Table</a>
 </div>
 <form action="/tables" method="GET">
   <div class="form-row">
@@ -24,6 +24,9 @@
   <div class="table-row">
     <div class="table-name">
       <%= item.name %>
+    </div>
+    <div class="table-seats">
+      <%= item.seats %>
     </div>
     <div class="btn-row">
       <a class="btn btn-primary" href="/tables/<%= item._id %>">View</a>

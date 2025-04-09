@@ -1,9 +1,9 @@
 import { NextFunction, Request, Response } from "express";
 
 interface Params {
-  redirect?: string;
   render?: string;
   messages: string;
+  redirect?: string;
 }
 export function ssrErrorHandler(params: Params) {
   return (err: Error, req: Request, res: Response, next: NextFunction) => {

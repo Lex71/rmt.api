@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, { Types } from "mongoose";
 
 // import config from "../config/config";
 import Facility from "../models/facility";
@@ -20,17 +20,23 @@ export const findById = async (id: string) => {
 export const find = async (searchOptions?: TableSearchOptionsType) => {
   try {
     let query = Table.find();
-    // add regex filters to query
     if (
       searchOptions?.query != null &&
       Object.keys(searchOptions.query).length
     ) {
       for (const [k, v] of Object.entries(searchOptions.query)) {
         if (typeof v === "string" && v != "") {
-          if (tableSchema.path(k).instance === "Number") {
-            query = query.where(k, Number(v));
-          } else {
-            query = query.regex(k, new RegExp(v, "i"));
+          switch (tableSchema.path(k).instance) {
+            case "Number":
+              query = query.where(k, Number(v));
+              break;
+            default:
+              if (k === "facility") {
+                query = query.where(k, new Types.ObjectId(v));
+                break;
+              }
+              query = query.regex(k, new RegExp(v, "i"));
+              break;
           }
         }
       }

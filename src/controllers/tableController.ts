@@ -2,7 +2,6 @@ import { Request, Response } from "express";
 
 import Table, { ITable, TableSearchOptionsType } from "../models/table";
 import User from "../models/user";
-import { findById as findFacilityById } from "../services/facilityService";
 import {
   create,
   find,
@@ -14,6 +13,7 @@ import {
 export const getTables = async (req: Request, res: Response) => {
   // handle req.query
   const searchOptions: TableSearchOptionsType = {};
+
   searchOptions.query = {};
   // search by name
   if (req.query.name != null && req.query.name !== "") {
@@ -23,17 +23,21 @@ export const getTables = async (req: Request, res: Response) => {
   if (req.query.seats != null && req.query.seats !== "") {
     searchOptions.query.seats = req.query.seats as string;
   }
-  let tables = null;
-  try {
-    // tables must be filtered by facility, if req.user.facility is set (for admin it is not set, for user it is set)
-    if (req.user?.facility != undefined) {
-      // normal user
-      tables = (await findFacilityById(req.user.facility.toString())).tables;
-    } else {
-      // admin user
-      tables = await find(searchOptions);
-    }
 
+  // must be filtered by facility, if req.user.facility is set (for admin it is not set, for user it is set)
+  const facility = req.user?.facility;
+  if (facility) {
+    // normal user
+    searchOptions.query.facility = facility.toString();
+  } else {
+    if (req.query.facility != null && req.query.facility !== "") {
+      searchOptions.query.facility = req.query.facility as string;
+    }
+  }
+
+  let tables = [];
+  try {
+    tables = await find(searchOptions);
     res.render("tables/index", {
       data: tables,
       searchOptions: { ...req.query },
@@ -57,9 +61,9 @@ export const getTable = async (req: Request, res: Response) => {
 };
 
 export const createTable = async (req: Request, res: Response) => {
-  const { description, facility, name, seats } = req.body as Partial<ITable>;
+  const { description, name, seats } = req.body as Partial<ITable>;
   // get facility from req.user.facility
-  // const facility = req.user?.facility;
+  const facility = req.user?.facility;
   /* const table = new Table({
     description,
     facility,
@@ -80,7 +84,7 @@ export const createTable = async (req: Request, res: Response) => {
     res.render("tables/new", {
       data: newTable,
       // facility: new User(req.user).facility,
-      facility: req.user?.facility,
+      // // facility: req.user?.facility,
       // user: new User(req.user).toJSON(),
       // messages: "Error creating Table",
     });
@@ -94,8 +98,8 @@ export const editTable = async (req: Request, res: Response) => {
     res.render("tables/edit", {
       data: table,
       // facility: new User(req.user).facility,
-      facility: req.user?.facility,
-      // user: new User(req.user).toJSON(),
+      // // facility: req.user?.facility,
+      user: new User(req.user).toJSON(),
     });
     // renderEditPage(req, res, table);
   } catch {
@@ -112,19 +116,21 @@ export const newTable = (req: Request, res: Response) => {
   res.render("tables/new", {
     data: new Table(),
     // facility: new User(req.user).facility,
-    facility: req.user?.facility,
-    // user: new User(req.user).toJSON(),
+    // // facility: req.user?.facility,
+    user: new User(req.user).toJSON(),
   });
   // renderNewPage(req, res, new Table());
 };
 
 export const updateTable = async (req: Request, res: Response) => {
   let table = null;
+  const { description, /* facility,  */ name, seats } =
+    req.body as Partial<ITable>;
+  // const facility = req.user?.facility;
   try {
-    const { description, facility, name, seats } = req.body as Partial<ITable>;
     table = await update(req.params.id, {
       description,
-      facility,
+      // facility,
       name,
       seats,
     });
@@ -137,9 +143,10 @@ export const updateTable = async (req: Request, res: Response) => {
       req.flash("error", "Cannot update table");
       res.render("tables/edit", {
         data: table,
+        // facility,
         // facility: new User(req.user).facility,
-        facility: req.user?.facility,
-        // user: new User(req.user).toJSON(),
+        // // facility: req.user?.facility,
+        user: new User(req.user).toJSON(),
         // messages: "Error updating Table",
       });
       // renderEditPage(req, res, table, true);

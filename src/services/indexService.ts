@@ -1,3 +1,4 @@
+import { Types } from "mongoose";
 import Facility from "../models/facility";
 import Table from "../models/table";
 
@@ -15,12 +16,17 @@ import Table from "../models/table";
   //    return facilities;
 } */
 
-export const fetchIndexData = async (isAdmin = false) => {
+export const fetchIndexData = async (
+  facility: Types.ObjectId | undefined,
+  isAdmin: boolean,
+) => {
   // let facilities : IFacility[] = [];
-  const query = isAdmin ? Facility.find() : Table.find();
-  try {
-    // return await Facility.find(); /* .sort({ createdAt: "desc" }) */
 
+  let query = isAdmin ? Facility.find() : Table.find();
+  if (facility != null) {
+    query = query.where("facility", new Types.ObjectId(facility));
+  }
+  try {
     return await query.sort({ _id: -1 }).limit(3).exec();
   } catch {
     throw new Error("Cannot fetch index data");

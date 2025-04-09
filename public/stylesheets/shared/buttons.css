@@ -8,11 +8,15 @@
   --color-btn-danger-background-dark: hsl(var(--color-danger-hue), 100%, 73%);
   --color-btn-danger-text: black;
   --color-btn-danger-text-dark: black;
+  --color-btn-status-background: hsl(var(--color-status-hue), 100%, 83%);
+  --color-btn-status-background-dark: hsl(var(--color-status-hue), 100%, 73%);
+  --color-btn-status-text: black;
+  --color-btn-status-text-dark: black;
 }
 
 .btn {
   border: 1px solid var(--color-btn-border);
-  border-radius: .5rem;
+  border-radius: var(--button-radius);
   padding: .5rem 1rem;
   font-size: 1rem;
   font-family: 'Gotham Rounded';
@@ -23,7 +27,7 @@
 
 .btn-row {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
 }
 
 .btn-row > * {
@@ -52,4 +56,19 @@
 .btn-danger:hover {
   color: var(--color-btn-danger-text-dark);
   background-color: var(--color-btn-danger-background-dark);
+}
+
+.btn-status {
+  color: var(--color-btn-status-text);
+  background-color: var(--color-btn-status-background);
+}
+
+.btn-status:hover {
+  color: var(--color-btn-status-text-dark);
+  background-color: var(--color-btn-status-background-dark);
+}
+
+.btn-small {
+  padding: .4rem 0.8rem;
+  font-size: 0.8rem;
 }

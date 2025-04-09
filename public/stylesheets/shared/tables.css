@@ -28,19 +28,22 @@
 
 .table-grid {
   display: grid;
-  justify-content: center;
+  justify-content: space-between;
   grid-gap: 2rem;
   grid-template-columns: 30% 18% 50%;
 }
 
 .table-grid-large {
-  grid-template-columns: repeat(auto-fill, var(--table-width-large));
+  grid-template-columns: auto auto auto;
 }
 
 .table-details {
   display: flex;
   justify-content: space-between;
   flex-wrap: wrap;
+  margin-bottom: 1rem;
+  align-items: center;
+  column-gap: 1rem;
 }
 
 .table-details-label {
@@ -78,6 +81,8 @@
   display: flex;
   justify-content: space-between;
   flex-wrap: wrap;
+  margin-bottom: 1rem;
+  align-items: center;
 }
 .available-table {
   flex: 0 1 calc(50% - 2rem);
@@ -97,13 +102,13 @@
   flex: 1 0 auto; 
 }
 .table-name {
-  flex: 1 0 auto; 
+  flex: 1 0 10%; 
 }
 .table-description {
   flex: 1 0 auto; 
 }
 .table-status {
-  flex: 1 0 auto; 
+  flex: 1 0 10%; 
 }
 .table-seats {
   flex: 1 0 auto;

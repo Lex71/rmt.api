@@ -36,6 +36,16 @@ export const getReservations = async (req: Request, res: Response) => {
     searchOptions.query.phone = req.query.phone as string;
   }
 
+  const facility = req.user?.facility;
+  if (facility) {
+    // normal user
+    searchOptions.query.facility = facility.toString();
+  } else {
+    if (req.query.facility != null && req.query.facility !== "") {
+      searchOptions.query.facility = req.query.facility as string;
+    }
+  }
+
   try {
     const reservations = await find(searchOptions);
     res.render("reservations/index", {
@@ -64,9 +74,9 @@ export const getReservation = async (req: Request, res: Response) => {
 };
 
 export const createReservation = async (req: Request, res: Response) => {
-  const { date, facility, name, phone, seats, tables, time } =
+  const { date, name, phone, seats, tables, time } =
     req.body as Partial<IReservation>;
-  console.log(tables);
+  const facility = req.user?.facility;
   // const reservation = new Reservation({
   //   date,
   //   facility,
@@ -96,7 +106,7 @@ export const createReservation = async (req: Request, res: Response) => {
       adjust: 0,
       data: { date, name, phone, seats, time },
       // facility: new User(req.user).facility,
-      facility: req.user?.facility,
+      // // facility: req.user?.facility,
       tables: [], // there is an ajax fetch call to getReservableTables
       user: new User(req.user).toJSON(),
       // messages: "Error creating Reservation",
@@ -111,8 +121,9 @@ export const editReservation = async (req: Request, res: Response) => {
     res.render("reservations/edit", {
       data: reservation,
       // facility: new User(req.user).facility,
-      facility: req.user?.facility,
+      // // facility: req.user?.facility,
       status_enum: Status,
+      tables: [],
       user: new User(req.user).toJSON(),
     });
     // renderEditPage(req, res, table);
@@ -131,7 +142,7 @@ export const newReservation = (req: Request, res: Response) => {
     adjust: 0,
     data: new Reservation(),
     // facility: new User(req.user).facility,
-    facility: req.user?.facility,
+    // // facility: req.user?.facility,
     tables: [], // there is an ajax fetch call to getReservableTables
     user: new User(req.user).toJSON(),
   });
@@ -156,11 +167,14 @@ export const getReservableTables = async (req: Request, res: Response) => {
   if (time != null && time !== "") {
     searchOptions.query.time = time as string;
   }
-  // TODO check this after route has middleware guard...
-  if (req.query.facility != null && req.query.facility != "") {
-    searchOptions.query.facility = req.query.facility as string;
+  const facility = req.user?.facility;
+  if (facility) {
+    // normal user
+    searchOptions.query.facility = facility.toString();
   } else {
-    searchOptions.query.facility = req.user?.facility?.toString();
+    if (req.query.facility != null && req.query.facility !== "") {
+      searchOptions.query.facility = req.query.facility as string;
+    }
   }
 
   try {
@@ -175,13 +189,14 @@ export const getReservableTables = async (req: Request, res: Response) => {
 export const updateReservation = async (req: Request, res: Response) => {
   let reservation = null;
   try {
-    const { date, name, phone, seats, tables, time } =
+    const { date, name, phone, seats, status, tables, time } =
       req.body as Partial<IReservation>;
     reservation = await update(req.params.id, {
       date,
       name,
       phone,
       seats,
+      status,
       tables,
       time,
     });
@@ -195,7 +210,33 @@ export const updateReservation = async (req: Request, res: Response) => {
       res.render("reservations/edit", {
         data: reservation,
         // facility: new User(req.user).facility,
-        facility: req.user?.facility,
+        // // facility: req.user?.facility,
+        user: new User(req.user).toJSON(),
+        // messages: "Error updating Reservation",
+      });
+      // renderEditPage(req, res, table, true);
+    }
+  }
+};
+
+export const updateStatusReservation = async (req: Request, res: Response) => {
+  let reservation = null;
+  try {
+    const status = req.params.status as Status;
+    reservation = await update(req.params.id, {
+      status,
+    });
+    if (reservation != null) res.redirect(`/reservations/${req.params.id}`);
+    else res.redirect("/");
+  } catch {
+    if (reservation == null) {
+      res.redirect("/");
+    } else {
+      req.flash("error", "Cannot update reservation");
+      res.render("reservations/edit", {
+        data: reservation,
+        // facility: new User(req.user).facility,
+        // // facility: req.user?.facility,
         user: new User(req.user).toJSON(),
         // messages: "Error updating Reservation",
       });
@@ -221,7 +262,7 @@ export const removeReservation = async (req: Request, res: Response) => {
       res.render("reservations/show", {
         data: reservation,
         // facility: new User(req.user).facility,
-        facility: req.user?.facility,
+        // // facility: req.user?.facility,
         user: new User(req.user).toJSON(),
         // messages: "Could not remove reservation",
       });

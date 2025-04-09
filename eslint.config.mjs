@@ -2,25 +2,52 @@
 
 import eslint from "@eslint/js";
 import tseslint from "typescript-eslint";
+// @ts-ignore
 import perfectionist from "eslint-plugin-perfectionist";
 // import vitest from "@vitest/eslint-plugin";
 
 export default tseslint.config(
   {
-    ignores: ["**/*.js"],
+    ignores: ["dist/**/*.js", "**/*.mjs", "eslint.config.mjs", "**/*.js"],
+  },
+  {
+    plugins: {
+      perfectionist,
+    },
+    rules: {
+      "perfectionist/sort-objects": [
+        "error",
+        {
+          type: "alphabetical",
+        },
+      ],
+      "perfectionist/sort-interfaces": ["error"],
+    },
+    settings: {
+      perfectionist: {
+        type: "line-length",
+        partitionByComment: true,
+      },
+    },
   },
   eslint.configs.recommended,
   tseslint.configs.strictTypeChecked,
   tseslint.configs.stylisticTypeChecked,
   {
     languageOptions: {
+      parser: tseslint.parser,
       parserOptions: {
-        projectService: true,
+        // projectService: true,
+        projectService: {
+          allowDefaultProject: ["eslint.config.mjs", "dist/*.js"],
+          defaultProject: "tsconfig.json",
+        },
         tsconfigRootDir: import.meta.dirname,
+        sourceType: "module",
       },
     },
   },
-  perfectionist.configs["recommended-natural"],
+  // perfectionist.configs["recommended-natural"],
   // {
   //   files: ["**/*.test.ts", "**/*.spec.ts"],
   //   plugins: {
