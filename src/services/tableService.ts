@@ -76,7 +76,7 @@ export const find = async (searchOptions?: TableSearchOptionsType) => {
   });
 }
  */
-export const create = async (body: Partial<ITable>) => {
+export const create = async (body: ITable) => {
   // const table = new Table(body);
   // try{
   //   return await table.save();
@@ -108,17 +108,17 @@ export const create = async (body: Partial<ITable>) => {
   // const session = await startSession();
   try {
     session.startTransaction();
-    if (facility != null) {
-      // save the new table
-      await newTable.save();
-      // update the facility.tables array
-      await Facility.findByIdAndUpdate(facility, {
-        $push: { tables: newTable },
-      });
+    // if (facility != null) {
+    // save the new table
+    await newTable.save();
+    // update the facility.tables array
+    await Facility.findByIdAndUpdate(facility, {
+      $push: { tables: newTable },
+    });
 
-      await session.commitTransaction();
-      return newTable;
-      /* const f = await Facility.findById(facility._id);
+    await session.commitTransaction();
+    return newTable;
+    /* const f = await Facility.findById(facility._id);
       if (f) {
         // save the new table...
         await newTable.save();
@@ -129,9 +129,9 @@ export const create = async (body: Partial<ITable>) => {
         // TODO: if f.save() fails, delete the newTable
         return newTable;
       } */
-    } else {
-      throw new Error("Cannot create Table because cannot find Facility");
-    }
+    // } else {
+    //   throw new Error("Cannot create Table because cannot find Facility");
+    // }
   } catch (err: unknown) {
     await session.abortTransaction();
     if (err instanceof mongoose.MongooseError) {

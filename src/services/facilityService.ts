@@ -65,19 +65,7 @@ export const create = async (body: IFacility) => {
   }
 };
 
-export const update = async (id: string, body: Partial<IFacility>) => {
-  // let facility: IFacility | null = null;
-  // try {
-  //   facility = await Facility.findById(id);
-  //   if (facility) {
-  //     facility.name = body.name;
-  //     facility.address = body.address;
-  //     await facility.save();
-  //     return facility;
-  //   }
-  // } catch (err) {
-  //   throw new Error("Cannot update: Facility not found");
-  // }
+export const update = async (id: string, body: IFacility) => {
   try {
     return await Facility.findByIdAndUpdate(id, body, { new: true });
   } catch {
@@ -88,7 +76,11 @@ export const update = async (id: string, body: Partial<IFacility>) => {
 export const remove = async (id: string) => {
   try {
     return await Facility.deleteOne({ _id: id });
-  } catch {
-    throw new Error("Cannot deleteOne: Facility not found");
+  } catch (err: unknown) {
+    if (err instanceof Error) {
+      throw new Error(err.message);
+    } else {
+      throw new Error("Unable to remove facility");
+    }
   }
 };

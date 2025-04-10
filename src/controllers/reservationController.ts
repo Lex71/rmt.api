@@ -189,6 +189,7 @@ export const getReservableTables = async (req: Request, res: Response) => {
 export const updateReservation = async (req: Request, res: Response) => {
   let reservation = null;
   try {
+    // cannot update facility
     const { date, name, phone, seats, status, tables, time } =
       req.body as Partial<IReservation>;
     reservation = await update(req.params.id, {
@@ -202,11 +203,15 @@ export const updateReservation = async (req: Request, res: Response) => {
     });
     if (reservation != null) res.redirect(`/reservations/${req.params.id}`);
     else res.redirect("/");
-  } catch {
+  } catch (err: unknown) {
     if (reservation == null) {
       res.redirect("/");
     } else {
-      req.flash("error", "Cannot update reservation");
+      if (err instanceof Error) {
+        req.flash("error", err.message);
+      } else {
+        req.flash("error", "Cannot update reservation");
+      }
       res.render("reservations/edit", {
         data: reservation,
         // facility: new User(req.user).facility,
@@ -219,20 +224,23 @@ export const updateReservation = async (req: Request, res: Response) => {
   }
 };
 
-export const updateStatusReservation = async (req: Request, res: Response) => {
+export const patchReservation = async (req: Request, res: Response) => {
   let reservation = null;
   try {
-    const status = req.params.status as Status;
-    reservation = await update(req.params.id, {
-      status,
-    });
+    const body = req.body as Partial<IReservation>;
+
+    reservation = await update(req.params.id, body);
     if (reservation != null) res.redirect(`/reservations/${req.params.id}`);
     else res.redirect("/");
-  } catch {
+  } catch (err: unknown) {
     if (reservation == null) {
       res.redirect("/");
     } else {
-      req.flash("error", "Cannot update reservation");
+      if (err instanceof Error) {
+        req.flash("error", err.message);
+      } else {
+        req.flash("error", "Cannot update reservation");
+      }
       res.render("reservations/edit", {
         data: reservation,
         // facility: new User(req.user).facility,
@@ -256,9 +264,13 @@ export const removeReservation = async (req: Request, res: Response) => {
     reservation = await findById(req.params.id);
     await remove(req.params.id);
     res.redirect("/reservations");
-  } catch {
+  } catch (err: unknown) {
     if (reservation != null) {
-      req.flash("error", "Cannot remove reservation");
+      if (err instanceof Error) {
+        req.flash("error", err.message);
+      } else {
+        req.flash("error", "Cannot remove reservation");
+      }
       res.render("reservations/show", {
         data: reservation,
         // facility: new User(req.user).facility,

@@ -3,15 +3,15 @@
 <div class="form-row">
   <div class="form-item">
     <label>Date</label>
-    <input type="date" name="date" value="<%= data?.date %>" oninput="fetchAvailableTables()" autocomplete="off">
+    <input type="date" name="date" value="<%= data?.date %>" required oninput="fetchAvailableTables()" autocomplete="off">
   </div>
   <div class="form-item">
     <label>Time</label>
-    <input type="time" name="time" value="<%= data?.time %>" min="12:00" max="22:00" oninput="fetchAvailableTables()" autocomplete="off">
+    <input type="time" name="time" value="<%= data?.time %>" min="12:00" max="22:00" required oninput="fetchAvailableTables()" autocomplete="off">
   </div>
   <div class="form-item">
     <label>Seats</label>
-    <input type="number" name="seats" value="<%= data?.seats %>" min="2" oninput="renderAvailableTables()" autocomplete="off">
+    <input type="number" name="seats" value="<%= data?.seats %>" min="2" required oninput="renderAvailableTables()" autocomplete="off">
   </div>
   
 </div>
@@ -35,7 +35,7 @@
 <div class="form-row">
   <div class="form-item">
     <label>Name</label>
-    <input type="text" name="name" value="<%= data?.name %>" autocomplete="off">
+    <input type="text" name="name" value="<%= data?.name %>" required autocomplete="off">
   </div>
   
 </div>
@@ -43,6 +43,6 @@
 <div class="form-row">
   <div class="form-item">
     <label>Phone</label>
-    <input type="tel" name="phone" value="<%= data?.phone %>" autocomplete="off">
+    <input type="tel" name="phone" value="<%= data?.phone %>" required autocomplete="off">
   </div>
 </div>

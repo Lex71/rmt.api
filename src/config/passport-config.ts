@@ -29,7 +29,7 @@ function initialize(
           comparePassword(password, user.password)
             .then((isMatch) => {
               if (isMatch) {
-                done(null, user as Express.User);
+                done(null, user as unknown as Express.User);
                 return;
               } else {
                 done(null, false, { message: "Password incorrect" });
@@ -73,7 +73,7 @@ function initialize(
 
   passport.use(new LocalStrategy({ usernameField: "email" }, authenticateUser));
   passport.serializeUser((user, done) => {
-    done(null, (user as IUser).id);
+    done(null, user.id);
   });
   /* passport.deserializeUser(async (id, done) =>
     { done(null, await getUserById(id)); },
@@ -82,7 +82,7 @@ function initialize(
   passport.deserializeUser((id: string, done) => {
     getUserById(id)
       .then((user) => {
-        done(null, user as Express.User);
+        done(null, user as unknown as Express.User);
       })
       .catch((err: unknown) => {
         done(err);

@@ -48,14 +48,32 @@ const transformYupErrorsIntoHTMLString = (errors: ValidationError): string => {
   return validationErrors ? `<ul>${validationErrors}</ul>` : "";
 }; */
 
+function matchInArray(str: string, expressions: string[]) {
+  /* const fullExpr = new RegExp(
+    expressions.map((x) => new RegExp(x).source).join("|"),
+  );
+  return str.match(fullExpr); */
+  const isMatch = expressions.some((rx) => new RegExp(rx).test(str));
+
+  if (isMatch) {
+    const matchingRegex = expressions.find((rx) => new RegExp(rx).test(str));
+    return matchingRegex; // This will output the matching regex
+  }
+  return "";
+}
+
 const validate =
   // (schema: yup.Schema) =>
-  function (path: string) {
-    if (!Object.keys(schemas).includes(path)) {
+  function (path: string, method: string) {
+    // if (!Object.keys(schemas).includes(path)) {
+    //   throw new Error(`Schema not found for path: ${path}`);
+    // }
+    const found = matchInArray(path, Object.keys(schemas[method]));
+    if (!found) {
       throw new Error(`Schema not found for path: ${path}`);
     }
 
-    const schema = schemas[path];
+    const schema = schemas[method][found];
 
     return async (req: Request, res: Response, next: NextFunction) => {
       const body = req.body as AnyObject;
@@ -67,10 +85,24 @@ const validate =
         // const err = transformYupErrorsIntoObject(error as ValidationError);
         const err = transformYupErrorsIntoHTMLString(error as ValidationError);
         // const err = transformYupErrorsIntoString(error as ValidationError);
-        console.log(err);
         req.flash("error", err);
+        let url = req.baseUrl;
+        switch (req.method) {
+          case "PUT":
+          case "PATCH":
+            url += req.path + "edit";
+            break;
+          case "POST":
+            url += req.path + "new";
+            break;
+          default:
+            break;
+        }
+        // req.baseUrl+req.path+(req.method == 'PUT' ? "edit" : "new")
         // since I don't redirect, simply flash immediately
-        res.render("auth/register", { user: { ...body } });
+        // res.render(path, { data: { ...body } });
+        // in order to render every view, i should provide all data, which here i cannot be aware of => must redirect
+        res.redirect(url);
       }
     };
   };

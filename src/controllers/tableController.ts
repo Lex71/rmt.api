@@ -61,9 +61,9 @@ export const getTable = async (req: Request, res: Response) => {
 };
 
 export const createTable = async (req: Request, res: Response) => {
-  const { description, name, seats } = req.body as Partial<ITable>;
+  const { description, facility, name, seats } = req.body as ITable;
   // get facility from req.user.facility
-  const facility = req.user?.facility;
+  // const facility = req.user?.facility;
   /* const table = new Table({
     description,
     facility,
@@ -124,6 +124,7 @@ export const newTable = (req: Request, res: Response) => {
 
 export const updateTable = async (req: Request, res: Response) => {
   let table = null;
+  // cannot change facility!
   const { description, /* facility,  */ name, seats } =
     req.body as Partial<ITable>;
   // const facility = req.user?.facility;
@@ -136,11 +137,15 @@ export const updateTable = async (req: Request, res: Response) => {
     });
     if (table != null) res.redirect(`/tables/${req.params.id}`);
     else res.redirect("/");
-  } catch {
+  } catch (err: unknown) {
     if (table == null) {
       res.redirect("/");
     } else {
-      req.flash("error", "Cannot update table");
+      if (err instanceof Error) {
+        req.flash("error", err.message);
+      } else {
+        req.flash("error", "Cannot update table");
+      }
       res.render("tables/edit", {
         data: table,
         // facility,
@@ -168,9 +173,13 @@ export const removeTable = async (req: Request, res: Response) => {
     }
     await remove(req.params.id);
     res.redirect("/tables");
-  } catch {
+  } catch (err: unknown) {
     if (table != null) {
-      req.flash("error", "Cannot remove table");
+      if (err instanceof Error) {
+        req.flash("error", err.message);
+      } else {
+        req.flash("error", "Cannot remove table");
+      }
       res.render("tables/show", {
         data: table,
         user: new User(req.user).toJSON(),

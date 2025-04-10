@@ -1,5 +1,5 @@
 import {
-  Document,
+  // Document,
   HydratedDocument,
   model,
   QueryOptions,
@@ -10,7 +10,7 @@ import {
 } from "mongoose";
 
 // 1. Create an interface representing a document in MongoDB.
-export interface ITable extends Document {
+export interface ITable /*  extends Document */ {
   name: string;
   seats: number;
   description?: string;

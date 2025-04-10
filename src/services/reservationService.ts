@@ -166,32 +166,14 @@ export const findAvailableTables = async (
 };
 
 export const create = async (body: Partial<IReservation>) => {
-  /* const { date, facility, name, phone, seats, tables, time } = body;
-
-  const reservation = new Reservation({
-    date,
-    facility,
-    name,
-    phone,
-    seats,
-    tables,
-    time,
-  });
-
-  try {
-    return await reservation.save();
-  } catch {
-    throw new Error("Cannot create Reservation");
-  } */
-  const { date, facility, name, phone, seats, time } = body;
-  const tables = body.tables ? (body.tables as Types.ObjectId[]) : [];
+  const { date, facility, name, phone, seats, tables, time } = body;
+  // const tables = body.tables ? (body.tables as Types.ObjectId[]) : [];
 
   try {
     // if (facility != null) {
     const f = await Facility.findById(facility);
     if (f) {
       const newReservation = new Reservation({
-        // date: new Date(date ?? ""),
         date,
         facility,
         name,
@@ -201,8 +183,7 @@ export const create = async (body: Partial<IReservation>) => {
         time,
       });
       // save the reservation
-      await newReservation.save();
-      return newReservation;
+      return await newReservation.save();
     } else {
       throw new Error("Cannot create Reservation because cannot find Facility");
     }
@@ -216,18 +197,6 @@ export const create = async (body: Partial<IReservation>) => {
 };
 
 export const update = async (id: string, body: Partial<IReservation>) => {
-  // let reservation: IReservation | null = null;
-  // try {
-  //   reservation = await Reservation.findById(id);
-  //   if (reservation) {
-  //     reservation.name = body.name;
-  //     reservation.address = body.address;
-  //     await reservation.save();
-  //     return reservation;
-  //   }
-  // } catch (err) {
-  //   throw new Error("Cannot update: Reservation not found");
-  // }
   try {
     return await Reservation.findByIdAndUpdate(id, body, { new: true });
   } catch {

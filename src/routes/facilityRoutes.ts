@@ -10,6 +10,7 @@ import {
   updateFacility,
 } from "../controllers/facilityController";
 import { checkAuthenticated, isAdmin } from "../middlewares/auth";
+import validate from "../middlewares/validator";
 // import ssrErrorHandler from "../middlewares/ssrErrorHandler";
 // import validate from "../middlewares/validator";
 
@@ -30,10 +31,10 @@ router.get("/:id", checkAuthenticated, getFacility);
 router.get("/:id/edit", isAdmin, editFacility);
 
 // Create Facility Route
-router.post("/", isAdmin, createFacility);
+router.post("/", isAdmin, validate("facilities", "post"), createFacility);
 
 // Update Facility Route
-router.put("/:id", isAdmin, updateFacility);
+router.put("/:id", isAdmin, validate("facilities/:id", "put"), updateFacility);
 
 // Delete Facility Route
 router.delete("/:id", isAdmin, removeFacility);

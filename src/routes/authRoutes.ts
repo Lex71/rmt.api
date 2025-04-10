@@ -20,18 +20,18 @@ const router = express.Router();
 router.get("/login", checkNotAuthenticated, newLogin);
 
 // register view
-router.get("/register", checkNotAuthenticated, newRegister);
+router.get("/new", checkNotAuthenticated, newRegister);
 
 // register submit
 router.post(
-  "/register",
+  "/",
   checkNotAuthenticated,
-  validate("auth/register"),
+  validate("auth", "post"),
   // (req: Request, res: Response, next: NextFunction) => {
   //   console.log(`BODY: ${JSON.stringify(req.body)}`);
   //   // next();
   //   const { name, email } = req.body;
-  //   res.render("auth/register", {
+  //   res.render("auth/new", {
   //     user: { name, email },
   //     messages: "Auth ERROR",
   //   });

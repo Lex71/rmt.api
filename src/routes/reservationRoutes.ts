@@ -7,11 +7,12 @@ import {
   getReservation,
   getReservations,
   newReservation,
+  patchReservation,
   removeReservation,
   updateReservation,
-  updateStatusReservation,
 } from "../controllers/reservationController";
 import { checkAuthenticated } from "../middlewares/auth";
+import validate from "../middlewares/validator";
 // import ssrErrorHandler from "../middlewares/ssrErrorHandler";
 // import validate from "../middlewares/validator";
 
@@ -35,13 +36,31 @@ router.get("/:id", checkAuthenticated, getReservation);
 router.get("/:id/edit", checkAuthenticated, editReservation);
 
 // Status change
-router.get("/:id/:status", checkAuthenticated, updateStatusReservation);
+// router.get("/:id/:status", checkAuthenticated, updateStatusReservation);
 
 // Create Reservation Route
-router.post("/", checkAuthenticated, createReservation);
+router.post(
+  "/",
+  checkAuthenticated,
+  validate("reservations", "post"),
+  createReservation,
+);
 
 // Update Reservation Route
-router.put("/:id", checkAuthenticated, updateReservation);
+router.put(
+  "/:id",
+  checkAuthenticated,
+  validate("reservations/:id", "put"),
+  updateReservation,
+);
+
+// Patch Reservation Route
+router.patch(
+  "/:id",
+  checkAuthenticated,
+  validate("reservations/:id", "patch"),
+  patchReservation,
+);
 
 // Delete Reservation Route
 router.delete("/:id", checkAuthenticated, removeReservation);

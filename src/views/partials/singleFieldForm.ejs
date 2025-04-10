@@ -1,0 +1,18 @@
+<form method="POST" action="<%= url %>?_method=<%= method %>">
+  <% 
+  switch(type) { 
+    case "text":
+    %>
+      <input type="hidden" name="<%= name %>" value="<%= value %>">
+      <% break;
+    case "select":
+    %>
+      <select name="<% name %>">
+        <% options.forEach(option=> { %>
+          <option label="<%= option.name %>" value="<%= option.id %>"></option>
+          <% }) %>
+      </select>
+      <% break;
+  } %>
+  <button class="btn btn-form btn-small" type="submit"><%= label %></button>
+</form>

@@ -1,7 +1,7 @@
 // import bcrypt from "bcrypt";
 // import jwt from "jsonwebtoken";
 import {
-  Document,
+  // Document,
   HydratedDocument,
   Model,
   model,
@@ -16,7 +16,7 @@ enum Role {
   USER = "user",
 }
 
-export interface IUser extends Document {
+export interface IUser /* extends Document */ {
   email: string;
   // roles: Role[];
   role: Role;

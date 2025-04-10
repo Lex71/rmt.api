@@ -15,18 +15,10 @@
 
  */
 
-import {
-  CallbackError,
-  CallbackWithoutResultAndOptionalError,
-  Document,
-  HydratedDocument,
-  model,
-  PopulatedDoc,
-  Schema,
-} from "mongoose";
+import { model, PopulatedDoc, Schema } from "mongoose";
 
 import { QueryOptions } from "../types/index";
-import Table, { ITable } from "./table";
+import { ITable } from "./table";
 
 export interface FacilitySearchOptionsType {
   // query?: Partial<QueryOptions<IFacility>>; // Optional search query, all searchable fields except _id
@@ -39,10 +31,10 @@ export interface FacilitySearchOptionsType {
 }
 
 // 1. Create an interface representing a document in MongoDB.
-export interface IFacility extends Document {
+export interface IFacility /* extends Document */ {
   name: string;
   address: string;
-  tables: PopulatedDoc<ITable>[];
+  tables?: PopulatedDoc<ITable>[];
 }
 
 /* interface IFacilityMethods {
@@ -80,7 +72,7 @@ const facilitySchema = new Schema(
     //     return facilityObject;
     //   },
     // },
-    pre: {
+    /* pre: {
       // check for existing reference on Table before 'remove'
       deleteOne: function (next: CallbackWithoutResultAndOptionalError) {
         Table.find(
@@ -101,41 +93,20 @@ const facilitySchema = new Schema(
           },
         );
       },
-    },
+    }, */
     timestamps: true,
   },
 );
 
 // check for existing reference on Table before 'remove'
-/* facilitySchema.pre<IFacility>("deleteOne", function (next) {
-  Table.find(
-    { facility: this.id },
-    // (err: CallbackError | undefined, tables: HydratedDocument<ITable>[]) => {
-    (err: CallbackError | undefined, tables: ITable[]) => {
-      if (err) {
-        next(err);
-      } else if (tables.length > 0) {
-        next(new Error("This facility has tables still"));
-      } else {
-        next();
-      }
-    },
-  );
-}); */
-
-/* facilitySchema.methods.toJSON = function () {
-  const facility = this as HydratedDocument<IFacility> & IFacility;
-  const facilityObject = facility.toObject();
-  // delete facilityObject._id;
-  return facilityObject;
-}; */
+facilitySchema.pre("deleteOne", async function (next) {
+  const f = await Facility.findById(this.getQuery()).populate("tables").exec();
+  console.log(f?.tables);
+  if (f?.tables.length) next(new Error("This facility has tables still"));
+  else next();
+});
 
 // 3. Create a Model.
-// const Facility: Model<IFacility> = model<IFacility>("Facility", facilitySchema);
-/* const Facility = model<IFacility, FacilityModelType>(
-  "Facility",
-  facilitySchema,
-); */
 const Facility = model("Facility", facilitySchema);
 
 export default Facility;

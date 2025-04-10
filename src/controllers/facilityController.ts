@@ -96,18 +96,22 @@ export const newFacility = (req: Request, res: Response) => {
 export const updateFacility = async (req: Request, res: Response) => {
   let facility = null;
   try {
-    const { address, name } = req.body as Partial<IFacility>;
+    const { address, name } = req.body as IFacility;
     facility = await update(req.params.id, {
       address,
       name,
     });
     if (facility != null) res.redirect(`/facilities/${req.params.id}`);
     else res.redirect("/");
-  } catch {
+  } catch (err: unknown) {
     if (facility == null) {
       res.redirect("/");
     } else {
-      req.flash("error", "Cannot update facility");
+      if (err instanceof Error) {
+        req.flash("error", err.message);
+      } else {
+        req.flash("error", "Cannot update facility");
+      }
       res.render("facilities/edit", {
         data: facility,
         user: new User(req.user).toJSON(),
@@ -129,9 +133,14 @@ export const removeFacility = async (req: Request, res: Response) => {
     facility = await findById(req.params.id);
     await remove(req.params.id);
     res.redirect("/facilities");
-  } catch {
+  } catch (err: unknown) {
     if (facility != null) {
-      req.flash("error", "Cannot remove facility");
+      if (err instanceof Error) {
+        req.flash("error", err.message);
+      } else {
+        req.flash("error", "Cannot remove facility");
+      }
+
       res.render("facilities/show", {
         data: facility,
         user: new User(req.user).toJSON(),

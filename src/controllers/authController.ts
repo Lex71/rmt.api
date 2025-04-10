@@ -22,13 +22,17 @@ export const newRegister = async (req: Request, res: Response) => {
       req.flash("error", "Cannot register: no facilities available");
       res.redirect("/auth/login");
     } else {
-      res.render("auth/register", {
+      res.render("auth/new", {
         data: { facilities },
         layout: "layouts/auth",
       });
     }
-  } catch {
-    req.flash("error", "Cannot fetch facilities");
+  } catch (err: unknown) {
+    if (err instanceof Error) {
+      req.flash("error", err.message);
+    } else {
+      req.flash("error", "Cannot register user");
+    }
     res.redirect("/");
   }
 };
@@ -63,14 +67,18 @@ export const registerUser = async (
     });
     await user.save();
     res.redirect("/auth/login");
-  } catch {
+  } catch (err: unknown) {
     // next(err);
-    // console.log(err);
-    req.flash("error", "Cannot register user");
+    // console.log(err)
+    if (err instanceof Error) {
+      req.flash("error", err.message);
+    } else {
+      req.flash("error", "Cannot register user");
+    }
     // load fresh form...
-    res.redirect("/auth/register");
+    res.redirect("/auth/new");
     // OR if you want to keep (wrong) inputs:
-    // res.render("auth/register", { data: { user: { ...req.body } } });
+    // res.render("auth/new", { data: { user: { ...req.body } } });
   }
 };
 

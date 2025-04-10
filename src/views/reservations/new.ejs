@@ -1,5 +1,7 @@
 <script>
   var availableTables = JSON.parse('<%- JSON.stringify(tables) %>'); // initially empty, fetched from server by ajax
+  // to set checked
+  const reservedTables = [];
 </script>
 <script defer src="/javascripts/reservations.js"></script>
 <h2 class="page-header">New Reservation</h2>
@@ -18,8 +20,8 @@
       
     </div>
     <nav>
-      <button class="btn btn-danger" onclick="closeDialog()">Cancel</button>
       <button class="btn btn-primary" onclick="submitReservationForm()">Confirm</button>
+      <button class="btn btn-danger" onclick="closeDialog()">Cancel</button>
     </nav>
   </div>
 </div>

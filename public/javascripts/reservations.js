@@ -2,6 +2,7 @@
 let timeout1 = null;
 let timeout2 = null;
 let timeout3 = null;
+let timeout4 = null;
 
 // from ejs: availableTables, reservedTables
 
@@ -18,7 +19,8 @@ function onSubmitReservationForm(event) {
   // alert("submitting");
   const dialogContent = document.querySelector(".dialog .content");
   dialogContent.innerHTML = "";
-  const elements = event.target.elements;
+  const form = event.target;
+  const elements = form.elements;
   const warning = document.createAttribute("class");
   warning.value = "warning";
   // const tables = document.querySelector('input[name="tables[]"]').value;
@@ -85,8 +87,14 @@ function onSubmitReservationForm(event) {
   child.innerText = document.querySelector("#total-seats").innerText;
   dialogContent.appendChild(child);
 
-  document.querySelector(".dialog-wrapper").style.display = "block";
-  //submitReservationForm(event);
+  if (!checkedTables) {
+    document.querySelector("#total-seats").innerText =
+      "Select at least one table";
+  }
+
+  if (form.checkValidity() && checkedTables > 0) {
+    document.querySelector(".dialog-wrapper").style.display = "block";
+  }
 }
 function closeDialog() {
   document.querySelector(".dialog-wrapper").style.display = "none";
@@ -105,7 +113,11 @@ function submitReservationForm() {
         .format("HH:mm"),
     );
   }
+  // Trigger validation
+  // if (form.checkValidity() && checkedTables() > 0) {
+  // }
   form.submit();
+
   // fetch(form.action, {
   //   method: form.method,
   //   body: formData,
@@ -155,7 +167,7 @@ function renderAvailableTables() {
       `;
       });
     // // add the already reserved tables as checked, despite the seats
-    reservedTables.forEach((item) => {
+    reservedTables?.forEach((item) => {
       content += `
         <div class="available-table">
           <input class="table-checkbox" checked type="checkbox" name="tables[]" value="${item._id}" data-seats="${item.seats}" onchange="setTotalSeats(this.checked, this.dataset.seats)">
@@ -225,6 +237,9 @@ function fetchAvailableTables() {
   }, 1000);
 }
 function setTotalSeats(checked, seats) {
+  if (isNaN(parseInt(document.querySelector("#total-seats").innerHTML))) {
+    document.querySelector("#total-seats").innerHTML = 0;
+  }
   if (checked) {
     document.querySelector("#total-seats").innerHTML =
       parseInt(document.querySelector("#total-seats").innerHTML) +

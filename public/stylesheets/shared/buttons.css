@@ -8,10 +8,10 @@
   --color-btn-danger-background-dark: hsl(var(--color-danger-hue), 100%, 73%);
   --color-btn-danger-text: black;
   --color-btn-danger-text-dark: black;
-  --color-btn-status-background: hsl(var(--color-status-hue), 100%, 83%);
-  --color-btn-status-background-dark: hsl(var(--color-status-hue), 100%, 73%);
-  --color-btn-status-text: black;
-  --color-btn-status-text-dark: black;
+  --color-btn-form-background: hsl(var(--color-status-hue), 100%, 83%);
+  --color-btn-form-background-dark: hsl(var(--color-status-hue), 100%, 73%);
+  --color-btn-form-text: black;
+  --color-btn-form-text-dark: black;
 }
 
 .btn {
@@ -58,14 +58,14 @@
   background-color: var(--color-btn-danger-background-dark);
 }
 
-.btn-status {
-  color: var(--color-btn-status-text);
-  background-color: var(--color-btn-status-background);
+.btn-form {
+  color: var(--color-btn-form-text);
+  background-color: var(--color-btn-form-background);
 }
 
-.btn-status:hover {
-  color: var(--color-btn-status-text-dark);
-  background-color: var(--color-btn-status-background-dark);
+.btn-form:hover {
+  color: var(--color-btn-form-text-dark);
+  background-color: var(--color-btn-form-background-dark);
 }
 
 .btn-small {

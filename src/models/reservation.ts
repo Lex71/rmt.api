@@ -1,4 +1,4 @@
-import { Document, model, PopulatedDoc, Schema, Types } from "mongoose";
+import { model, PopulatedDoc, Schema, Types } from "mongoose";
 
 import { QueryOptions } from "../types/index";
 import { ITable } from "./table";
@@ -44,7 +44,7 @@ export enum Status {
  */
 
 // 1. Create an interface representing a document in MongoDB.
-export interface IReservation extends Document {
+export interface IReservation /* extends Document */ {
   date: string;
   name: string;
   time: string;
@@ -90,7 +90,14 @@ export const reservationSchema = new Schema(
       type: String,
     },
     // tables: { ref: "Table", required: true, type: [Schema.Types.ObjectId] },
-    tables: [{ ref: "Table", required: true, type: Schema.Types.ObjectId }],
+    tables: [
+      {
+        default: [],
+        ref: "Table",
+        required: true,
+        type: Schema.Types.ObjectId,
+      },
+    ],
     // time: { required: true, type: Date },
     time: {
       type: String,
