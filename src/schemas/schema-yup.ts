@@ -122,7 +122,7 @@ const reservationSchema = yup.object({
 });
 
 const tableSchema = yup.object({
-  facility: yup.string().required("Requited Facility"),
+  // facility: yup.string().required("Required Facility"),
   name: yup
     .string()
     .min(2, "Too Short!")

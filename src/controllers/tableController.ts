@@ -61,9 +61,9 @@ export const getTable = async (req: Request, res: Response) => {
 };
 
 export const createTable = async (req: Request, res: Response) => {
-  const { description, facility, name, seats } = req.body as ITable;
+  const { description, name, seats } = req.body as Partial<ITable>;
   // get facility from req.user.facility
-  // const facility = req.user?.facility;
+  const facility = req.user?.facility;
   /* const table = new Table({
     description,
     facility,
@@ -85,7 +85,7 @@ export const createTable = async (req: Request, res: Response) => {
       data: newTable,
       // facility: new User(req.user).facility,
       // // facility: req.user?.facility,
-      // user: new User(req.user).toJSON(),
+      user: new User(req.user).toJSON(),
       // messages: "Error creating Table",
     });
     // renderNewPage(req, res, table, true);

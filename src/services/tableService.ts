@@ -76,7 +76,7 @@ export const find = async (searchOptions?: TableSearchOptionsType) => {
   });
 }
  */
-export const create = async (body: ITable) => {
+export const create = async (body: Partial<ITable>) => {
   // const table = new Table(body);
   // try{
   //   return await table.save();
