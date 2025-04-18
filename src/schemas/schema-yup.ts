@@ -1,6 +1,6 @@
 // schema.ts
 import * as yup from "yup";
-import { Status } from "../models/reservation";
+import { Status } from "../models/reservation.ts";
 
 const PASSWORD_REGEX = new RegExp(
   /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!.@#$%^&*])(?=.{8,})/,

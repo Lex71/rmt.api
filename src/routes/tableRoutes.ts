@@ -8,8 +8,8 @@ import {
   newTable,
   removeTable,
   updateTable,
-} from "../controllers/tableController";
-import { checkAuthenticated } from "../middlewares/auth";
+} from "../controllers/tableController.ts";
+import { checkAuthenticated } from "../middlewares/auth.ts";
 // const imageMimeTypes = ["image/jpeg", "image/png", "images/gif"];
 
 const router = express.Router();

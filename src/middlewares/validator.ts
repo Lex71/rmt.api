@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from "express";
 // import * as yup from "yup";
 import { AnyObject, ValidationError } from "yup";
 
-import schemas from "../schemas/schema-yup";
+import schemas from "../schemas/schema-yup.ts";
 
 /**
  * TransformYupErrorsIntoObject

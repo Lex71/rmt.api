@@ -17,8 +17,8 @@
 
 import { model, PopulatedDoc, Schema } from "mongoose";
 
-import { QueryOptions } from "../types/index";
-import { ITable } from "./table";
+import { QueryOptions } from "../types/index.ts";
+import { ITable } from "./table.ts";
 
 export interface FacilitySearchOptionsType {
   // query?: Partial<QueryOptions<IFacility>>; // Optional search query, all searchable fields except _id

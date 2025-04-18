@@ -9,7 +9,7 @@ import {
   Types,
 } from "mongoose";
 
-import { comparePassword, hashPassword } from "../utils/helpers";
+import { comparePassword, hashPassword } from "../utils/helpers.ts";
 
 enum Role {
   ADMIN = "admin",

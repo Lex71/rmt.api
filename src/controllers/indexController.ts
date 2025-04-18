@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 
-import User from "../models/user";
-import { fetchIndexData } from "../services/indexService";
+import User from "../models/user.ts";
+import { fetchIndexData } from "../services/indexService.ts";
 
 export const getIndexData = async (req: Request, res: Response) => {
   try {

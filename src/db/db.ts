@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-import config from "../config/config";
+import config from "../config/config.ts";
 
 const dbOptions = {
   // autoReconnect: true,
@@ -34,7 +34,7 @@ const connectDB = async () => {
     await session.endSession(); */
     return;
   } catch (error) {
-    console.log(error);
+    console.error(error);
   }
 };
 

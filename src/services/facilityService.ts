@@ -1,8 +1,8 @@
 import Facility, {
   FacilitySearchOptionsType,
   IFacility,
-} from "../models/facility";
-import { ITable } from "../models/table";
+} from "../models/facility.ts";
+import { ITable } from "../models/table.ts";
 
 export const findById = async (id: string) => {
   try {

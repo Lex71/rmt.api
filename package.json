@@ -9,7 +9,7 @@
   ],
   "license": "ISC",
   "author": "Lex71",
-  "type": "commonjs",
+  "type": "module",
   "main": "server.ts",
   "scripts": {
     "dev-nodemon": "nodemon",
@@ -32,6 +32,7 @@
   "devDependencies": {
     "@eslint/js": "^9.22.0",
     "@types/bcrypt": "^5.0.2",
+    "@types/cors": "^2.8.17",
     "@types/ejs": "^3.1.5",
     "@types/express": "^5.0.1",
     "@types/express-ejs-layouts": "^2.5.4",
@@ -63,6 +64,7 @@
   },
   "dependencies": {
     "bcrypt": "^5.1.1",
+    "cors": "^2.8.5",
     "ejs": "^3.1.10",
     "express": "^4.21.2",
     "express-ejs-layouts": "^2.5.1",

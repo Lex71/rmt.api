@@ -5,9 +5,9 @@ import Reservation, {
   IReservation,
   ReservationSearchOptionsType,
   Status,
-} from "../models/reservation";
-// import { TableSearchOptionsType } from "../models/table";
-import User from "../models/user";
+} from "../models/reservation.ts";
+// import { TableSearchOptionsType } from "../models/table.ts";
+import User from "../models/user.ts";
 import {
   create,
   find,
@@ -15,9 +15,9 @@ import {
   findById,
   remove,
   update,
-} from "../services/reservationService";
-// import { find as findTables } from "../services/tableService";
-import { ApplicationError } from "../utils/errors";
+} from "../services/reservationService.ts";
+// import { find as findTables } from "../services/tableService.ts";
+import { ApplicationError } from "../utils/errors.ts";
 
 export const getReservations = async (req: Request, res: Response) => {
   // handle req.query

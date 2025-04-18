@@ -1,7 +1,7 @@
 // Centralized error handling middleware
 import { NextFunction, Request, Response } from "express";
 
-import { ApplicationError } from "../utils/errors";
+import { ApplicationError } from "../utils/errors.ts";
 
 export function errorHandler(
   err: ApplicationError,

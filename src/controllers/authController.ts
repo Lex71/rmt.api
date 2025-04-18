@@ -1,9 +1,9 @@
 import { NextFunction, Request, RequestHandler, Response } from "express";
 import passport from "passport";
 
-import User, { IUser } from "../models/user";
-import { find } from "../services/facilityService";
-// import { hashPassword } from "../utils/helpers";
+import User, { IUser } from "../models/user.ts";
+import { find } from "../services/facilityService.ts";
+// import { hashPassword } from "../utils/helpers.ts";
 // enable these for jwt auth
 // const RefreshToken = require("../models/RefreshToken");
 // const helper = require("../utils/helper");

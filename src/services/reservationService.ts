@@ -1,15 +1,15 @@
 import moment from "moment";
 import { MongooseError, Types } from "mongoose";
 
-import config from "../config/config";
-import Facility from "../models/facility";
+import config from "../config/config.ts";
+import Facility from "../models/facility.ts";
 import Reservation, {
   IReservation,
   ReservationSearchOptionsType,
   Status,
   reservationSchema,
-} from "../models/reservation";
-import Table from "../models/table";
+} from "../models/reservation.ts";
+import Table from "../models/table.ts";
 
 export const findById = async (id: string) => {
   try {

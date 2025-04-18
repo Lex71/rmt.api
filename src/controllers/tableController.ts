@@ -1,14 +1,14 @@
 import { Request, Response } from "express";
 
-import Table, { ITable, TableSearchOptionsType } from "../models/table";
-import User from "../models/user";
+import Table, { ITable, TableSearchOptionsType } from "../models/table.ts";
+import User from "../models/user.ts";
 import {
   create,
   find,
   findById,
   remove,
   update,
-} from "../services/tableService";
+} from "../services/tableService.ts";
 
 export const getTables = async (req: Request, res: Response) => {
   // handle req.query

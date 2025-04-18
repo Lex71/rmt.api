@@ -8,11 +8,11 @@ import {
   newFacility,
   removeFacility,
   updateFacility,
-} from "../controllers/facilityController";
-import { checkAuthenticated, isAdmin } from "../middlewares/auth";
-import validate from "../middlewares/validator";
+} from "../controllers/facilityController.ts";
+import { checkAuthenticated, isAdmin } from "../middlewares/auth.ts";
+import validate from "../middlewares/validator.ts";
 // import ssrErrorHandler from "../middlewares/ssrErrorHandler";
-// import validate from "../middlewares/validator";
+// import validate from "../middlewares/validator.ts";
 
 const router = express.Router();
 

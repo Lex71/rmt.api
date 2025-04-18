@@ -1,9 +1,9 @@
 // const users = [];
 
 // import { HydratedDocument } from "mongoose";
-import { FacilitySearchOptionsType } from "../models/facility";
-// import User, { IUser } from "../models/user";
-import User, { IUser } from "../models/user";
+import { FacilitySearchOptionsType } from "../models/facility.ts";
+// import User, { IUser } from "../models/user.ts";
+import User, { IUser } from "../models/user.ts";
 // create,
 //   find,
 //   findById,

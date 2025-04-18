@@ -7,28 +7,30 @@ import { Types } from "mongoose";
 // passport
 import passport from "passport";
 
+import cors from "cors";
+
 // OR use this for jwt authentication instead
 // const passport = require("./middlewares/passport"); // if integration inside passport-config doesn't work
-import config from "./config/config";
+import config from "./config/config.ts";
 // config
 // NOTE: just skip it for jwt authentication
-import initializePassport from "./config/passport-config";
-import connectDB from "./db/db";
+import initializePassport from "./config/passport-config.ts";
+import connectDB from "./db/db.ts";
 // import { checkAuthenticated } from "./middlewares/auth";
-import { errorHandler } from "./middlewares/errorHandler";
+import { errorHandler } from "./middlewares/errorHandler.ts";
 // import facilityQuery from "./middlewares/facilityQuery";
 // import ssrErrorHandler from "./middlewares/ssrErrorHandler";
 // import facilityQuery from "./middlewares/facilityQuery";
 // routes
-import authRouter from "./routes/authRoutes";
-import facilityRouter from "./routes/facilityRoutes";
-import indexRouter from "./routes/indexRoute";
-import reservationRouter from "./routes/reservationRoutes";
-import tableRouter from "./routes/tableRoutes";
-import { findByEmail, findById } from "./services/userService";
-import { ApplicationError } from "./utils/errors";
+import authRouter from "./routes/authRoutes.ts";
+import facilityRouter from "./routes/facilityRoutes.ts";
+import indexRouter from "./routes/indexRoute.ts";
+import reservationRouter from "./routes/reservationRoutes.ts";
+import tableRouter from "./routes/tableRoutes.ts";
+import { findByEmail, findById } from "./services/userService.ts";
+import { ApplicationError } from "./utils/errors.ts";
 // errors
-// import { NotFoundError } from "./utils/errors";
+// import { NotFoundError } from "./utils/errors.ts";
 
 // Create an Express application
 const app = express();
@@ -47,6 +49,11 @@ declare global {
   }
 }
 
+const corsOptions = {
+  credentials: true,
+  origin: ["http://localhost:5174"],
+};
+
 // NOTE: just skip it for jwt authentication // if integration inside passport-config doesn't work, anyway remove findByEmail function parameters
 initializePassport(
   passport,
@@ -57,11 +64,15 @@ initializePassport(
 );
 
 app.set("view engine", "ejs");
-app.set("views", __dirname + "/views");
+// app.set("views", __dirname + "/views"); // commonjs
+app.set("views", import.meta.dirname + "/views");
 app.set("layout", "layouts/layout");
 app.use(expressLayouts);
 app.use(methodOverride("_method")); // append to query string to override method: ?_method=DELETE|PUT
 app.use(express.static("public"));
+
+app.use(cors(corsOptions));
+
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 app.use(express.json());
 app.use(flash());
@@ -192,12 +203,13 @@ const start = async () => {
   });
 };
 
-start().catch((err: unknown) => {
-  console.log(err);
+start().catch((/* err: unknown */) => {
+  console.log("Error starting the server");
+  // console.error(err);
 });
 
-// import Facility from "./models/facility";
-// import Table from "./models/table";
+// import Facility from "./models/facility.ts";
+// import Table from "./models/table.ts";
 
 /* const test = async () => {
   const f1 = await Facility.create({

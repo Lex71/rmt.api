@@ -1,8 +1,8 @@
 import { PassportStatic } from "passport";
 import { IVerifyOptions, Strategy, VerifyFunction } from "passport-local";
 
-import { IUser } from "../models/user";
-import { comparePassword } from "../utils/helpers";
+import { IUser } from "../models/user.ts";
+import { comparePassword } from "../utils/helpers.ts";
 // const PassportJWT = require("passport-jwt");
 const LocalStrategy = Strategy;
 

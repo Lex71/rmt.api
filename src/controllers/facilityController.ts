@@ -3,15 +3,15 @@ import { Request, Response } from "express";
 import Facility, {
   FacilitySearchOptionsType,
   IFacility,
-} from "../models/facility";
-import User from "../models/user";
+} from "../models/facility.ts";
+import User from "../models/user.ts";
 import {
   create,
   find,
   findById,
   remove,
   update,
-} from "../services/facilityService";
+} from "../services/facilityService.ts";
 
 export const getFacilities = async (req: Request, res: Response) => {
   // handle req.query

@@ -1,12 +1,12 @@
 import mongoose, { Types } from "mongoose";
 
-// import config from "../config/config";
-import Facility from "../models/facility";
+// import config from "../config/config.ts";
+import Facility from "../models/facility.ts";
 import Table, {
   ITable,
   tableSchema,
   TableSearchOptionsType,
-} from "../models/table";
+} from "../models/table.ts";
 
 export const findById = async (id: string) => {
   try {

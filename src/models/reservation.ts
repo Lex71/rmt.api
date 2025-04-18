@@ -1,7 +1,7 @@
 import { model, PopulatedDoc, Schema, Types } from "mongoose";
 
-import { QueryOptions } from "../types/index";
-import { ITable } from "./table";
+import { QueryOptions } from "../types/index.ts";
+import { ITable } from "./table.ts";
 
 export enum Status {
   // AWAITINGPAYMENT = "awaitingpayment", // The booking is confirmed but payment is still pending.

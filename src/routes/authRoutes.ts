@@ -10,9 +10,12 @@ import {
   newRegister,
   passportLogin,
   registerUser,
-} from "../controllers/authController";
-import { checkAuthenticated, checkNotAuthenticated } from "../middlewares/auth";
-import validate from "../middlewares/validator";
+} from "../controllers/authController.ts";
+import {
+  checkAuthenticated,
+  checkNotAuthenticated,
+} from "../middlewares/auth.ts";
+import validate from "../middlewares/validator.ts";
 
 const router = express.Router();
 
