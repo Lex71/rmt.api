@@ -5,14 +5,12 @@
 <form action="/reservations" method="GET">
   <div class="form-row">
     <div class="form-item">
-      <label>Name</label>
-      <input type="text" name="name" value="<%= searchOptions?.name %>">
-    </div>
-  <!-- </div>
-  <div class="form-row"> -->
-    <div class="form-item">
       <label>Date</label>
       <input type="date" name="date" value="<%= searchOptions?.date %>">
+    </div>
+    <div class="form-item">
+      <label>Name</label>
+      <input type="text" name="name" value="<%= searchOptions?.name %>">
     </div>
     <div class="form-item">
       <label>Phone</label>
@@ -51,6 +49,11 @@
   </div>
   <% }) %>
 
-  <hr />
-
-<!--  include('../partials/tableGrid', { data, large: true })  -->
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+      if (document.querySelector('input[name="date"]').value == "") {
+        document.querySelector('input[name="date"]').value =
+          moment().format("YYYY-MM-DD");
+      }
+    });
+</script>
