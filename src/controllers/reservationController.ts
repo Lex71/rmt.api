@@ -7,18 +7,11 @@ import {
   Status,
 } from "../models/reservation.ts";
 // import { TableSearchOptionsType } from "../models/table.ts";
-import {
-  create,
-  find,
-  findAvailableTables,
-  findById,
-  remove,
-  update,
-} from "../services/reservationService.ts";
+import * as ReservationService from "../services/reservationService.ts";
 // import { find as findTables } from "../services/tableService.ts";
 import { ApplicationError } from "../utils/errors.ts";
 
-export const getReservations = async (
+export const getAll = async (
   req: Request,
   res: Response,
   next: NextFunction,
@@ -50,7 +43,7 @@ export const getReservations = async (
   }
 
   try {
-    const reservations = await find(searchOptions);
+    const reservations = await ReservationService.find(searchOptions);
     // res.render("reservations/index", {
     //   data: reservations,
     //   // facility: req.user?.facility,
@@ -64,13 +57,13 @@ export const getReservations = async (
   }
 };
 
-export const getReservation = async (
+export const getById = async (
   req: Request,
   res: Response,
   next: NextFunction,
 ) => {
   try {
-    const reservation = await findById(req.params.id);
+    const reservation = await ReservationService.findById(req.params.id);
     // res.render("reservations/show", {
     //   data: reservation,
     //   // facility: req.user?.facility,
@@ -84,7 +77,7 @@ export const getReservation = async (
   }
 };
 
-export const createReservation = async (
+export const create = async (
   req: Request,
   res: Response,
   next: NextFunction,
@@ -102,7 +95,7 @@ export const createReservation = async (
   //   time,
   // });
   try {
-    const newReservation = await create({
+    const newReservation = await ReservationService.create({
       date,
       facility,
       name,
@@ -129,11 +122,11 @@ export const createReservation = async (
   }
 };
 
-// REVIEW: can be called instead of getReservation, in order to get status_enum extra data
+// REVIEW: can be called instead of getById, in order to get status_enum extra data
 // TODO: maybe accept this as required endpoint (for all resources)
-export const editReservation = async (req: Request, res: Response) => {
+export const edit = async (req: Request, res: Response) => {
   try {
-    const reservation = await findById(req.params.id);
+    const reservation = await ReservationService.findById(req.params.id);
     // res.render("reservations/edit", {
     //   data: reservation,
     //   // facility: new User(req.user).facility,
@@ -199,7 +192,10 @@ export const getReservableTables = async (
   }
 
   try {
-    const at = await findAvailableTables(adjust, searchOptions);
+    const at = await ReservationService.findAvailableTables(
+      adjust,
+      searchOptions,
+    );
     res.status(200).json({ data: at });
     // res.status(200).json({ message: "OK!" });
   } catch {
@@ -207,7 +203,7 @@ export const getReservableTables = async (
   }
 };
 
-export const updateReservation = async (
+export const update = async (
   req: Request,
   res: Response,
   next: NextFunction,
@@ -217,7 +213,7 @@ export const updateReservation = async (
     // cannot update facility
     const { date, name, phone, seats, status, tables, time } =
       req.body as Partial<IReservation>;
-    reservation = await update(req.params.id, {
+    reservation = await ReservationService.update(req.params.id, {
       date,
       name,
       phone,
@@ -264,7 +260,7 @@ export const patchReservation = async (
   try {
     const body = req.body as Partial<IReservation>;
 
-    reservation = await update(req.params.id, body);
+    reservation = await ReservationService.update(req.params.id, body);
     // if (reservation != null) res.redirect(`/reservations/${req.params.id}`);
     // else res.redirect("/");
     if (reservation != null) res.status(200).json({ data: reservation });
@@ -293,7 +289,7 @@ export const patchReservation = async (
   }
 };
 
-export const removeReservation = async (
+export const remove = async (
   req: Request,
   res: Response,
   next: NextFunction,
@@ -305,8 +301,8 @@ export const removeReservation = async (
     //   await reservation.deleteOne();
     //   res.redirect("/reservations");
     // }
-    reservation = await findById(req.params.id);
-    await remove(req.params.id);
+    reservation = await ReservationService.findById(req.params.id);
+    await ReservationService.remove(req.params.id);
     // res.redirect("/reservations");
     res.status(200).json({ data: reservation });
     // or send status 204 and empty data

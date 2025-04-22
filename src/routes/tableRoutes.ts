@@ -1,13 +1,14 @@
 import express from "express";
 
 import {
-  createTable,
-  // editTable,
-  getTable,
-  getTables,
+  create,
+  getAll,
+  // edit,
+  getById,
   // newTable,
-  removeTable,
-  updateTable,
+  // newTable,
+  remove,
+  update,
 } from "../controllers/tableController.ts";
 import { checkAuthenticated } from "../middlewares/auth.ts";
 // const imageMimeTypes = ["image/jpeg", "image/png", "images/gif"];
@@ -17,24 +18,24 @@ const router = express.Router();
 // Define routes
 
 // All Tables Route
-router.get("/", checkAuthenticated, getTables);
+router.get("/", checkAuthenticated, getAll);
 
 // // New Table Route
 // router.get("/new", checkAuthenticated, newTable);
 
 // Show Table Route
-router.get("/:id", checkAuthenticated, getTable);
+router.get("/:id", checkAuthenticated, getById);
 
 // // Edit Table Route
-// router.get("/:id/edit", checkAuthenticated, editTable);
+// router.get("/:id/edit", checkAuthenticated, edit);
 
 // Create Table Route
-router.post("/", checkAuthenticated, createTable);
+router.post("/", checkAuthenticated, create);
 
 // Update Table Route
-router.put("/:id", checkAuthenticated, updateTable);
+router.put("/:id", checkAuthenticated, update);
 
 // Delete Table Route
-router.delete("/:id", checkAuthenticated, removeTable);
+router.delete("/:id", checkAuthenticated, remove);
 
 export default router;

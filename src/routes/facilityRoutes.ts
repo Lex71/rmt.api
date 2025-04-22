@@ -1,13 +1,14 @@
 import express from "express";
 
 import {
-  createFacility,
-  // editFacility,
-  getFacilities,
-  getFacility,
+  create,
+  // edit,
+  // edit,
+  getAll,
+  getById,
   // newFacility,
-  removeFacility,
-  updateFacility,
+  remove,
+  update,
 } from "../controllers/facilityController.ts";
 import { checkAuthenticated, isAdmin } from "../middlewares/auth.ts";
 import validate from "../middlewares/validator.ts";
@@ -19,24 +20,24 @@ const router = express.Router();
 // Define routes
 
 // All Facilities Route
-router.get("/", checkAuthenticated, getFacilities);
+router.get("/", checkAuthenticated, getAll);
 
 // // New Facility Route
 // router.get("/new", isAdmin, newFacility);
 
 // Show Facility Route
-router.get("/:id", checkAuthenticated, getFacility);
+router.get("/:id", checkAuthenticated, getById);
 
 // // Edit Facility Route
-// router.get("/:id/edit", isAdmin, editFacility);
+// router.get("/:id/edit", isAdmin, edit);
 
 // Create Facility Route
-router.post("/", isAdmin, validate("facilities", "post"), createFacility);
+router.post("/", isAdmin, validate("facilities", "post"), create);
 
 // Update Facility Route
-router.put("/:id", isAdmin, validate("facilities/:id", "put"), updateFacility);
+router.put("/:id", isAdmin, validate("facilities/:id", "put"), update);
 
 // Delete Facility Route
-router.delete("/:id", isAdmin, removeFacility);
+router.delete("/:id", isAdmin, remove);
 
 export default router;

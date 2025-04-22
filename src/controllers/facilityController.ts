@@ -5,16 +5,10 @@ import Facility, {
   IFacility,
 } from "../models/facility.ts";
 // import User from "../models/user.ts";
-import {
-  create,
-  find,
-  findById,
-  remove,
-  update,
-} from "../services/facilityService.ts";
+import * as FacilityService from "../services/facilityService.ts";
 import { ApplicationError } from "../utils/errors.ts";
 
-export const getFacilities = async (
+export const getAll = async (
   req: Request,
   res: Response,
   next: NextFunction,
@@ -32,7 +26,7 @@ export const getFacilities = async (
   }
 
   try {
-    const facilities = await find(searchOptions);
+    const facilities = await FacilityService.find(searchOptions);
     // res.render("facilities/index", {
     //   data: facilities,
     //   searchOptions: { ...req.query },
@@ -45,13 +39,13 @@ export const getFacilities = async (
   }
 };
 
-export const getFacility = async (
+export const getById = async (
   req: Request,
   res: Response,
   next: NextFunction,
 ) => {
   try {
-    const facility = await findById(req.params.id);
+    const facility = await FacilityService.findById(req.params.id);
     // res.render("facilities/show", {
     //   data: facility,
     //   user: new User(req.user).toJSON(),
@@ -64,7 +58,7 @@ export const getFacility = async (
   }
 };
 
-export const createFacility = async (
+export const create = async (
   req: Request,
   res: Response,
   next: NextFunction,
@@ -76,7 +70,7 @@ export const createFacility = async (
     tables: [],
   });
   try {
-    const newFacility = await create(facility);
+    const newFacility = await FacilityService.create(facility);
     // res.redirect(`facilities/${newFacility._id.toString()}`);
     res.status(201).json({ data: newFacility });
   } catch {
@@ -90,7 +84,7 @@ export const createFacility = async (
   }
 };
 
-/* export const editFacility = async (req: Request, res: Response) => {
+/* export const edit = async (req: Request, res: Response) => {
   try {
     const facility = await findById(req.params.id);
     res.render("facilities/edit", {
@@ -111,7 +105,7 @@ export const createFacility = async (
   // renderNewPage(req, res, new Table());
 }; */
 
-export const updateFacility = async (
+export const update = async (
   req: Request,
   res: Response,
   next: NextFunction,
@@ -119,7 +113,7 @@ export const updateFacility = async (
   let facility = null;
   try {
     const { address, name } = req.body as IFacility;
-    facility = await update(req.params.id, {
+    facility = await FacilityService.update(req.params.id, {
       address,
       name,
     });
@@ -150,7 +144,7 @@ export const updateFacility = async (
   }
 };
 
-export const removeFacility = async (
+export const remove = async (
   req: Request,
   res: Response,
   next: NextFunction,
@@ -162,8 +156,8 @@ export const removeFacility = async (
     //   await facility.deleteOne();
     //   res.redirect("/facilities");
     // }
-    facility = await findById(req.params.id);
-    await remove(req.params.id);
+    facility = await FacilityService.findById(req.params.id);
+    await FacilityService.remove(req.params.id);
     // res.redirect("/facilities");
     res.status(200).json({ data: facility });
     // or send status 204 and empty data

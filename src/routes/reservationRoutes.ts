@@ -1,15 +1,15 @@
 import express from "express";
 
 import {
-  createReservation,
-  editReservation,
+  create,
+  edit,
+  getAll,
+  getById,
   getReservableTables,
-  getReservation,
-  getReservations,
   // newReservation,
   patchReservation,
-  removeReservation,
-  updateReservation,
+  remove,
+  update,
 } from "../controllers/reservationController.ts";
 import { checkAuthenticated } from "../middlewares/auth.ts";
 import validate from "../middlewares/validator.ts";
@@ -21,7 +21,7 @@ const router = express.Router();
 // Define routes
 
 // All Reservations Route
-router.get("/", checkAuthenticated, getReservations);
+router.get("/", checkAuthenticated, getAll);
 
 // // New Reservation Route
 // router.get("/new", checkAuthenticated, newReservation);
@@ -30,28 +30,23 @@ router.get("/", checkAuthenticated, getReservations);
 router.get("/tables", getReservableTables);
 
 // Show Reservation Route
-router.get("/:id", checkAuthenticated, getReservation);
+router.get("/:id", checkAuthenticated, getById);
 
 // Edit Reservation Route
-router.get("/:id/edit", checkAuthenticated, editReservation);
+router.get("/:id/edit", checkAuthenticated, edit);
 
 // Status change
 // router.get("/:id/:status", checkAuthenticated, updateStatusReservation);
 
 // Create Reservation Route
-router.post(
-  "/",
-  checkAuthenticated,
-  validate("reservations", "post"),
-  createReservation,
-);
+router.post("/", checkAuthenticated, validate("reservations", "post"), create);
 
 // Update Reservation Route
 router.put(
   "/:id",
   checkAuthenticated,
   validate("reservations/:id", "put"),
-  updateReservation,
+  update,
 );
 
 // Patch Reservation Route
@@ -63,6 +58,6 @@ router.patch(
 );
 
 // Delete Reservation Route
-router.delete("/:id", checkAuthenticated, removeReservation);
+router.delete("/:id", checkAuthenticated, remove);
 
 export default router;

@@ -2,16 +2,10 @@ import { NextFunction, Request, Response } from "express";
 
 import { ITable, TableSearchOptionsType } from "../models/table.ts";
 import User from "../models/user.ts";
-import {
-  create,
-  find,
-  findById,
-  remove,
-  update,
-} from "../services/tableService.ts";
+import * as TableService from "../services/tableService.ts";
 import { ApplicationError } from "../utils/errors.ts";
 
-export const getTables = async (
+export const getAll = async (
   req: Request,
   res: Response,
   next: NextFunction,
@@ -42,7 +36,7 @@ export const getTables = async (
 
   let tables = [];
   try {
-    tables = await find(searchOptions);
+    tables = await TableService.find(searchOptions);
     // res.render("tables/index", {
     //   data: tables,
     //   searchOptions: { ...req.query },
@@ -55,13 +49,13 @@ export const getTables = async (
   }
 };
 
-export const getTable = async (
+export const getById = async (
   req: Request,
   res: Response,
   next: NextFunction,
 ) => {
   try {
-    const table = await findById(req.params.id);
+    const table = await TableService.findById(req.params.id);
     // res.render("tables/show", {
     //   data: table,
     //   user: new User(req.user).toJSON(),
@@ -73,7 +67,7 @@ export const getTable = async (
   }
 };
 
-export const createTable = async (
+export const create = async (
   req: Request,
   res: Response,
   next: NextFunction,
@@ -88,7 +82,7 @@ export const createTable = async (
     seats,
   }); */
   try {
-    const newTable = await create({
+    const newTable = await TableService.create({
       description,
       facility,
       name,
@@ -111,7 +105,7 @@ export const createTable = async (
   }
 };
 
-/* export const editTable = async (req: Request, res: Response) => {
+/* export const edit = async (req: Request, res: Response) => {
   try {
     const table = await findById(req.params.id);
     res.render("tables/edit", {
@@ -136,7 +130,7 @@ export const createTable = async (
   // renderNewPage(req, res, new Table());
 }; */
 
-export const updateTable = async (
+export const update = async (
   req: Request,
   res: Response,
   next: NextFunction,
@@ -147,7 +141,7 @@ export const updateTable = async (
     req.body as Partial<ITable>;
   // const facility = req.user?.facility;
   try {
-    table = await update(req.params.id, {
+    table = await TableService.update(req.params.id, {
       description,
       // facility,
       name,
@@ -183,7 +177,7 @@ export const updateTable = async (
   }
 };
 
-export const removeTable = async (
+export const remove = async (
   req: Request,
   res: Response,
   next: NextFunction,
@@ -195,11 +189,11 @@ export const removeTable = async (
     //   await table.deleteOne();
     //   res.redirect("/tables");
     // }
-    table = await findById(req.params.id);
+    table = await TableService.findById(req.params.id);
     // if (table == null) {
     //   res.redirect("/");
     // }
-    await remove(req.params.id);
+    await TableService.remove(req.params.id);
     // res.redirect("/tables");
     res.status(200).json({ data: table });
   } catch (err: unknown) {
