@@ -1,13 +1,12 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 // import moment from "moment";
 
-import Reservation, {
+import {
   IReservation,
   ReservationSearchOptionsType,
   Status,
 } from "../models/reservation.ts";
 // import { TableSearchOptionsType } from "../models/table.ts";
-import User from "../models/user.ts";
 import {
   create,
   find,
@@ -19,7 +18,11 @@ import {
 // import { find as findTables } from "../services/tableService.ts";
 import { ApplicationError } from "../utils/errors.ts";
 
-export const getReservations = async (req: Request, res: Response) => {
+export const getReservations = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   // handle req.query
   const searchOptions: ReservationSearchOptionsType = {};
   searchOptions.query = {};
@@ -48,32 +51,44 @@ export const getReservations = async (req: Request, res: Response) => {
 
   try {
     const reservations = await find(searchOptions);
-    res.render("reservations/index", {
-      data: reservations,
-      // facility: req.user?.facility,
-      searchOptions: { ...req.query },
-      user: new User(req.user).toJSON(),
-    });
+    // res.render("reservations/index", {
+    //   data: reservations,
+    //   // facility: req.user?.facility,
+    //   searchOptions: { ...req.query },
+    //   user: new User(req.user).toJSON(),
+    // });
+    res.status(200).json({ data: reservations });
   } catch {
-    res.redirect("/");
+    // res.redirect("/");
+    next(new ApplicationError(500, "Reservations not found"));
   }
 };
 
-export const getReservation = async (req: Request, res: Response) => {
+export const getReservation = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const reservation = await findById(req.params.id);
-    res.render("reservations/show", {
-      data: reservation,
-      // facility: req.user?.facility,
-      user: new User(req.user).toJSON(),
-    });
+    // res.render("reservations/show", {
+    //   data: reservation,
+    //   // facility: req.user?.facility,
+    //   user: new User(req.user).toJSON(),
+    // });
+    res.status(200).json({ data: reservation });
   } catch (err) {
     console.log(err);
-    res.redirect("/");
+    // res.redirect("/");
+    next(new ApplicationError(500, "Reservation not found"));
   }
 };
 
-export const createReservation = async (req: Request, res: Response) => {
+export const createReservation = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   const { date, name, phone, seats, tables, time } =
     req.body as Partial<IReservation>;
   const facility = req.user?.facility;
@@ -96,43 +111,45 @@ export const createReservation = async (req: Request, res: Response) => {
       tables,
       time,
     });
-    res.redirect(`reservations/${newReservation._id.toString()}`);
+    // res.redirect(`reservations/${newReservation._id.toString()}`);
+    res.status(201).json({ data: newReservation });
   } catch {
-    // const searchOptions: TableSearchOptionsType = {};
-    // searchOptions.query = { facility: req.user?.facility };
-    // const tables = await findTables(searchOptions);
-    req.flash("error", "Cannot create reservation");
-    res.render("reservations/new", {
-      adjust: 0,
-      data: { date, name, phone, seats, time },
-      // facility: new User(req.user).facility,
-      // // facility: req.user?.facility,
-      tables: [], // there is an ajax fetch call to getReservableTables
-      user: new User(req.user).toJSON(),
-      // messages: "Error creating Reservation",
-    });
-    // renderNewPage(req, res, table, true);
+    // req.flash("error", "Cannot create reservation");
+    // res.render("reservations/new", {
+    //   adjust: 0,
+    //   data: { date, name, phone, seats, time },
+    //   // facility: new User(req.user).facility,
+    //   // // facility: req.user?.facility,
+    //   tables: [], // there is an ajax fetch call to getReservableTables
+    //   user: new User(req.user).toJSON(),
+    //   // messages: "Error creating Reservation",
+    // });
+    // // renderNewPage(req, res, table, true);
+    next(new ApplicationError(500, "Cannot create reservation"));
   }
 };
 
+// REVIEW: can be called instead of getReservation, in order to get status_enum extra data
+// TODO: maybe accept this as required endpoint (for all resources)
 export const editReservation = async (req: Request, res: Response) => {
   try {
     const reservation = await findById(req.params.id);
-    res.render("reservations/edit", {
-      data: reservation,
-      // facility: new User(req.user).facility,
-      // // facility: req.user?.facility,
-      status_enum: Status,
-      tables: [],
-      user: new User(req.user).toJSON(),
-    });
-    // renderEditPage(req, res, table);
+    // res.render("reservations/edit", {
+    //   data: reservation,
+    //   // facility: new User(req.user).facility,
+    //   // // facility: req.user?.facility,
+    //   status_enum: Status,
+    //   tables: [],
+    //   user: new User(req.user).toJSON(),
+    // });
+    // // renderEditPage(req, res, table);
+    res.status(200).json({ data: reservation, status_enum: Status });
   } catch {
     res.redirect("/reservations");
   }
 };
 
-export const newReservation = (req: Request, res: Response) => {
+/* export const newReservation = (req: Request, res: Response) => {
   // const searchOptions: TableSearchOptionsType = {};
   // searchOptions.query = { facility: req.user?.facility };
   // initially send all tables
@@ -147,9 +164,13 @@ export const newReservation = (req: Request, res: Response) => {
     user: new User(req.user).toJSON(),
   });
   // renderNewPage(req, res, new Table());
-};
+}; */
 
-export const getReservableTables = async (req: Request, res: Response) => {
+export const getReservableTables = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   // const facility = new User(req.user).facility;
   const adjust =
     req.query.adjust != null && req.query.adjust != ""
@@ -182,11 +203,15 @@ export const getReservableTables = async (req: Request, res: Response) => {
     res.status(200).json({ data: at });
     // res.status(200).json({ message: "OK!" });
   } catch {
-    throw new ApplicationError(403, "Cannot get reservable tables");
+    next(new ApplicationError(403, "Cannot get reservable tables"));
   }
 };
 
-export const updateReservation = async (req: Request, res: Response) => {
+export const updateReservation = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   let reservation = null;
   try {
     // cannot update facility
@@ -201,59 +226,78 @@ export const updateReservation = async (req: Request, res: Response) => {
       tables,
       time,
     });
-    if (reservation != null) res.redirect(`/reservations/${req.params.id}`);
-    else res.redirect("/");
+    // if (reservation != null) res.redirect(`/reservations/${req.params.id}`);
+    // else res.redirect("/");
+
+    if (reservation != null) res.status(200).json({ data: reservation });
+    else next(new ApplicationError(404, "Reservation non exists"));
   } catch (err: unknown) {
     if (reservation == null) {
-      res.redirect("/");
+      // res.redirect("/");
+      next(new ApplicationError(404, "Reservation non exists"));
     } else {
       if (err instanceof Error) {
-        req.flash("error", err.message);
+        // req.flash("error", err.message);
+        next(new ApplicationError(500, err.message));
       } else {
-        req.flash("error", "Cannot update reservation");
+        // req.flash("error", "Cannot update reservation");
+        next(new ApplicationError(500, "Cannot update reservation"));
       }
-      res.render("reservations/edit", {
-        data: reservation,
-        // facility: new User(req.user).facility,
-        // // facility: req.user?.facility,
-        user: new User(req.user).toJSON(),
-        // messages: "Error updating Reservation",
-      });
-      // renderEditPage(req, res, table, true);
+      // res.render("reservations/edit", {
+      //   data: reservation,
+      //   // facility: new User(req.user).facility,
+      //   // // facility: req.user?.facility,
+      //   user: new User(req.user).toJSON(),
+      //   // messages: "Error updating Reservation",
+      // });
+      // // renderEditPage(req, res, table, true);
     }
   }
 };
 
-export const patchReservation = async (req: Request, res: Response) => {
+export const patchReservation = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   let reservation = null;
   try {
     const body = req.body as Partial<IReservation>;
 
     reservation = await update(req.params.id, body);
-    if (reservation != null) res.redirect(`/reservations/${req.params.id}`);
-    else res.redirect("/");
+    // if (reservation != null) res.redirect(`/reservations/${req.params.id}`);
+    // else res.redirect("/");
+    if (reservation != null) res.status(200).json({ data: reservation });
+    else next(new ApplicationError(404, "Reservation non exists"));
   } catch (err: unknown) {
     if (reservation == null) {
-      res.redirect("/");
+      // res.redirect("/");
+      next(new ApplicationError(404, "Reservation non exists"));
     } else {
       if (err instanceof Error) {
-        req.flash("error", err.message);
+        // req.flash("error", err.message);
+        next(new ApplicationError(500, err.message));
       } else {
-        req.flash("error", "Cannot update reservation");
+        // req.flash("error", "Cannot update reservation");
+        next(new ApplicationError(500, "Cannot update reservation"));
       }
-      res.render("reservations/edit", {
-        data: reservation,
-        // facility: new User(req.user).facility,
-        // // facility: req.user?.facility,
-        user: new User(req.user).toJSON(),
-        // messages: "Error updating Reservation",
-      });
-      // renderEditPage(req, res, table, true);
+      // res.render("reservations/edit", {
+      //   data: reservation,
+      //   // facility: new User(req.user).facility,
+      //   // // facility: req.user?.facility,
+      //   user: new User(req.user).toJSON(),
+      //   // messages: "Error updating Reservation",
+      // });
+      // // renderEditPage(req, res, table, true);
     }
   }
 };
 
-export const removeReservation = async (req: Request, res: Response) => {
+export const removeReservation = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   let reservation = null;
   try {
     // reservation = await findById(req.params.id);
@@ -263,23 +307,32 @@ export const removeReservation = async (req: Request, res: Response) => {
     // }
     reservation = await findById(req.params.id);
     await remove(req.params.id);
-    res.redirect("/reservations");
+    // res.redirect("/reservations");
+    res.status(200).json({ data: reservation });
+    // or send status 204 and empty data
   } catch (err: unknown) {
     if (reservation != null) {
       if (err instanceof Error) {
-        req.flash("error", err.message);
+        // req.flash("error", err.message);
+        next(new ApplicationError(500, err.message));
       } else {
-        req.flash("error", "Cannot remove reservation");
+        // req.flash("error", "Cannot remove reservation");
+        next(new ApplicationError(500, "Cannot remove reservation"));
       }
-      res.render("reservations/show", {
-        data: reservation,
-        // facility: new User(req.user).facility,
-        // // facility: req.user?.facility,
-        user: new User(req.user).toJSON(),
-        // messages: "Could not remove reservation",
-      });
+      // res.render("reservations/show", {
+      //   data: reservation,
+      //   // facility: new User(req.user).facility,
+      //   // // facility: req.user?.facility,
+      //   user: new User(req.user).toJSON(),
+      //   // messages: "Could not remove reservation",
+      // });
     } else {
-      res.redirect("/");
+      // res.redirect("/");
+      if (err instanceof Error) {
+        next(new ApplicationError(500, err.message));
+      } else {
+        next(new ApplicationError(500, "Reservation non exists"));
+      }
     }
   }
 };

@@ -18,8 +18,8 @@ content-type: application/json
 }
 
 ###
-GET http://localhost:3000/facilities?address=1&pippo=5
-
+GET http://localhost:3000/facilities
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkbWluQHJtdC5jb20iLCJpZCI6IjY3ZWFkN2M0YzhjNTU2ZDJjNTUxZTk0NCIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc0NTMxNjcyMCwiZXhwIjoxNzQ1MzE3NjIwfQ.frwXnvGnu6o092SJGnvzQYnYUfh3NzWcDFMUrSVs1Mk
 ###
 
 POST http://localhost:3000/users
@@ -32,12 +32,22 @@ Content-Type: application/json
 
 ###
 
-POST http://localhost:3000/users/login
+POST http://localhost:3000/auth/login
 Content-Type: application/json
 
 {
-  "name": "Kyle",
-  "password": "password"
+  "email": "test1@rmt.com",
+  "password": "Test1!!!"
+}
+
+###
+
+POST http://localhost:3000/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@rmt.com",
+  "password": "admin"
 }
 
 ###
@@ -49,3 +59,30 @@ Content-Type: application/json
 # adjust: 15 -> t6 busy table
 GET http://localhost:3000/reservations/tables?date=2025-04-04&time=17:30&adjust=1facility=67ead7c4c8c556d2c551e945
 Content-Type: application/json
+
+###
+
+GET http://localhost:3000/
+Content-Type: application/json
+
+###
+
+GET http://localhost:3000/me
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkbWluQHJtdC5jb20iLCJpZCI6IjY3ZWFkN2M0YzhjNTU2ZDJjNTUxZTk0NCIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc0NTMyNTgzNCwiZXhwIjoxNzQ1MzI1ODk0fQ.D4Tsg2oPJ5pRYZhLnh6PbHAiACkrIX2qLvld8_WRTqU 
+
+###
+
+POST http://localhost:3000/auth/refresh
+Content-Type: application/json
+
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ZWFkN2M0YzhjNTU2ZDJjNTUxZTk0NCIsImlhdCI6MTc0NTMyNDM1MiwiZXhwIjoxNzQ1OTI5MTUyfQ.VW4qkn4NJmRDrFGY7eymsnuIPeezjKBYXa0sa9KnCeE"
+}
+
+###
+
+
+###
+
+DELETE http://localhost:3000/facilities/123
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkbWluQHJtdC5jb20iLCJpZCI6IjY3ZWFkN2M0YzhjNTU2ZDJjNTUxZTk0NCIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc0NTMxNDYwNywiZXhwIjoxNzQ1MzE1NTA3fQ.8ks14W28hve72cs_MjASojNa6KWuVJ-vLRUHII5an9k

@@ -2,10 +2,10 @@ import express from "express";
 
 import {
   createTable,
-  editTable,
+  // editTable,
   getTable,
   getTables,
-  newTable,
+  // newTable,
   removeTable,
   updateTable,
 } from "../controllers/tableController.ts";
@@ -19,14 +19,14 @@ const router = express.Router();
 // All Tables Route
 router.get("/", checkAuthenticated, getTables);
 
-// New Table Route
-router.get("/new", checkAuthenticated, newTable);
+// // New Table Route
+// router.get("/new", checkAuthenticated, newTable);
 
 // Show Table Route
 router.get("/:id", checkAuthenticated, getTable);
 
-// Edit Table Route
-router.get("/:id/edit", checkAuthenticated, editTable);
+// // Edit Table Route
+// router.get("/:id/edit", checkAuthenticated, editTable);
 
 // Create Table Route
 router.post("/", checkAuthenticated, createTable);

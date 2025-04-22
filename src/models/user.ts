@@ -11,7 +11,7 @@ import {
 
 import { comparePassword, hashPassword } from "../utils/helpers.ts";
 
-enum Role {
+export enum Role {
   ADMIN = "admin",
   USER = "user",
 }
@@ -23,7 +23,6 @@ export interface IUser /* extends Document */ {
   name: string;
   password: string;
   facility?: Types.ObjectId;
-  // tokens: { token: string }[];
 }
 
 interface IUserMethods {
@@ -45,7 +44,6 @@ const userSchema = new Schema<IUser, UserModel, IUserMethods>(
     name: { required: true, trim: true, type: String },
     password: { required: true, type: String },
     role: { default: Role.USER, enum: Object.values(Role), type: String },
-    // tokens: [{ token: { type: String, required: true } }],
   },
   { timestamps: true },
 );

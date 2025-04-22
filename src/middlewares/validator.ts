@@ -11,20 +11,21 @@ import schemas from "../schemas/schema-yup.ts";
  * @param {ValidationError} errors Yup validation errors
  * @returns {Record<string, string>} Validation errors
  */
-/* const transformYupErrorsIntoObject = (
+const transformYupErrorsIntoObject = (
   errors: ValidationError,
 ): Record<string, string> => {
   const validationErrors: Record<string, string> = {};
 
-  errors.inner.forEach((error: any) => {
+  errors.inner.forEach((error: ValidationError) => {
     if (error.path !== undefined) {
       validationErrors[error.path] = error.errors[0];
     }
   });
 
   return validationErrors;
-}; */
-const transformYupErrorsIntoHTMLString = (errors: ValidationError): string => {
+};
+
+/* const transformYupErrorsIntoHTMLString = (errors: ValidationError): string => {
   let validationErrors = "";
 
   errors.inner.forEach((error: ValidationError) => {
@@ -34,7 +35,7 @@ const transformYupErrorsIntoHTMLString = (errors: ValidationError): string => {
   });
 
   return validationErrors;
-};
+}; */
 
 /* const transformYupErrorsIntoString = (errors: ValidationError): string => {
   let validationErrors: string = "";
@@ -82,10 +83,11 @@ const validate =
         await schema.validate(body, { abortEarly: false });
         next();
       } catch (error) {
-        // const err = transformYupErrorsIntoObject(error as ValidationError);
-        const err = transformYupErrorsIntoHTMLString(error as ValidationError);
+        const err = transformYupErrorsIntoObject(error as ValidationError);
+        // const err = transformYupErrorsIntoHTMLString(error as ValidationError);
+        res.status(400).json(err);
         // const err = transformYupErrorsIntoString(error as ValidationError);
-        req.flash("error", err);
+        /* req.flash("error", err);
         let url = req.baseUrl;
         switch (req.method) {
           case "PUT":
@@ -102,7 +104,7 @@ const validate =
         // since I don't redirect, simply flash immediately
         // res.render(path, { data: { ...body } });
         // in order to render every view, i should provide all data, which here i cannot be aware of => must redirect
-        res.redirect(url);
+        res.redirect(url); */
       }
     };
   };

@@ -1,13 +1,9 @@
-import express, { NextFunction, Request, Response } from "express";
-import expressLayouts from "express-ejs-layouts";
-import flash from "express-flash";
-import session from "express-session";
-import methodOverride from "method-override";
+import express, { Request, Response } from "express";
 import { Types } from "mongoose";
 // passport
-import passport from "passport";
-
+import cookieParser from "cookie-parser";
 import cors from "cors";
+import passport from "passport";
 
 // OR use this for jwt authentication instead
 // const passport = require("./middlewares/passport"); // if integration inside passport-config doesn't work
@@ -27,8 +23,8 @@ import facilityRouter from "./routes/facilityRoutes.ts";
 import indexRouter from "./routes/indexRoute.ts";
 import reservationRouter from "./routes/reservationRoutes.ts";
 import tableRouter from "./routes/tableRoutes.ts";
-import { findByEmail, findById } from "./services/userService.ts";
-import { ApplicationError } from "./utils/errors.ts";
+import { findByEmail /* , findById */ } from "./services/userService.ts";
+// import { ApplicationError } from "./utils/errors.ts";
 // errors
 // import { NotFoundError } from "./utils/errors.ts";
 
@@ -41,10 +37,9 @@ declare global {
     interface User {
       id: string;
       name: string;
+      role: string;
       email: string;
       facility?: Types.ObjectId;
-      // password: string;
-      role: string;
     }
   }
 }
@@ -54,57 +49,41 @@ const corsOptions = {
   origin: ["http://localhost:5174"],
 };
 
-// NOTE: just skip it for jwt authentication // if integration inside passport-config doesn't work, anyway remove findByEmail function parameters
+/* // NOTE: just skip it for jwt authentication // if integration inside passport-config doesn't work, anyway remove findByEmail function parameters
 initializePassport(
   passport,
   // (email: string) => users.find((user) => user.email === email),
   // (id: string) => users.find((user) => user.id === id),
   (email: string) => findByEmail(email),
   (id: string) => findById(id),
+); */
+initializePassport(
+  passport,
+  (email: string) => findByEmail(email),
+  // (id: string) => findById(id),
 );
 
-app.set("view engine", "ejs");
-// app.set("views", __dirname + "/views"); // commonjs
-app.set("views", import.meta.dirname + "/views");
-app.set("layout", "layouts/layout");
-app.use(expressLayouts);
-app.use(methodOverride("_method")); // append to query string to override method: ?_method=DELETE|PUT
-app.use(express.static("public"));
-
 app.use(cors(corsOptions));
+app.use(cookieParser(config.JWT_SECRET));
 
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 app.use(express.json());
-app.use(flash());
 
 // middleware
-app.use(
-  session({
-    resave: false,
-    saveUninitialized: false,
-    secret: config.SESSION_SECRET,
-  }),
-);
 
-app.use(passport.initialize()); // init passport on every route call
-app.use(passport.session()); //allow passport to use "express-session"
-
-// app.use((req, res, next) => {
-//   res.locals.messages = req.flash("messages");
-//   next();
-// });
-
-// facilityQuery middleware
-// const routes = [/^\/facilities\/create$/, /^\/facilities\/\d+\/edit$/];
-/* const routesRegExp = [
-  // /^\/facilities\/?.*$/,
-  /^\/tables\/?.*$/,
-  /^\/reservations\/?.*$/,
-];
-
-app.use(facilityQuery(routesRegExp)); */
+// app.use(passport.initialize()); // init passport on every route call
 
 // ROUTES
+
+// JWT Strategy
+// app.get('/protected', function(req, res, next) {
+//   passport.authenticate('local', function(err, user, info, status) {
+//     if (err) { return next(err) }
+//     if (!user) { return res.redirect('/signin') }
+//     res.redirect('/account');
+//   })(req, res, next);
+// });
+
 app.get(
   "/error",
   // checkAuthenticated,
@@ -153,9 +132,7 @@ app.get("/test", (_: Request, res: Response) => {
 
 // after all routes defined
 app.all("*", (req: Request, res: Response) => {
-  // throw new NotFoundError("Resource not found on this server");
-  req.flash("error", `The page ${req.path} does not exist!`);
-  res.render("404", { layout: "layouts/error" });
+  res.status(404).json({ message: `The page ${req.path} does not exist!` });
 });
 
 // if is SSR mode, do not use it!
@@ -164,37 +141,27 @@ app.all("*", (req: Request, res: Response) => {
 /**
  * Error Handler.
  */
-if (process.env.NODE_ENV !== "production") {
-  // only use in development
-  app.use(errorHandler);
-} else {
-  app.use(
-    (
-      err: ApplicationError,
-      req: Request,
-      res: Response,
-      next: NextFunction,
-    ) => {
-      if (res.headersSent) {
-        next(err);
-        return;
-      }
-      console.error(err);
-      res.status(500).send("Server Error");
-    },
-  );
-}
+app.use(errorHandler);
+// if (process.env.NODE_ENV !== "production") {
+//   // only use in development
+//   app.use(errorHandler);
+// } else {
+//   app.use(
+//     (
+//       err: ApplicationError,
+//       req: Request,
+//       res: Response,
+//       next: NextFunction,
+//     ) => {
+//       if (res.headersSent) {
+//         next(err);
+//       }
+//       console.error(err);
+//       res.status(500).json({ message: "Server Error" });
+//     },
+//   );
+// }
 
-// Specify the port number for the server
-// const port: number = +(process.env.PORT || 3000);
-// const port = config.PORT;
-
-// Start the server and listen on the specified port
-
-// app.listen(port, () => {
-//   // Log a message when the server is successfully running
-//   console.log(`Server is running on http://localhost:${port}`);
-// });
 const start = async () => {
   await connectDB();
   const port = config.PORT;
@@ -205,45 +172,4 @@ const start = async () => {
 
 start().catch((/* err: unknown */) => {
   console.log("Error starting the server");
-  // console.error(err);
 });
-
-// import Facility from "./models/facility.ts";
-// import Table from "./models/table.ts";
-
-/* const test = async () => {
-  const f1 = await Facility.create({
-    address: "via Uno",
-    name: "Facility 1",
-  }).catch((err) => console.log(err));
-
-  const f2 = await Facility.create({ address: "via Due", name: "Facility 2" });
-
-  const t1 = await Table.create({
-    description: "SmallTable",
-    facility: f1._id,
-    name: "Table 1",
-    seats: 1,
-  });
-
-  const t3 = await Table.create({
-    description: "Big Table",
-    facility: f1,
-    name: "Table 3",
-    seats: 3,
-  });
-
-  f1.tables.push(t1, t3);
-  f1.save();
-
-  const t2 = await Table.create({
-    description: "Medium Table",
-    facility: f2,
-    name: "Table 2",
-    seats: 2,
-  });
-
-  const d = Facility.findById(f1);
-}; */
-
-// test();

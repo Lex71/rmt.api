@@ -5,10 +5,12 @@ import express from "express";
 // refreshToken,
 // whoami,
 import {
+  // newLogin,
+  // newRegister,
+  // passportLogin,
+  loginUser,
   logoutUser,
-  newLogin,
-  newRegister,
-  passportLogin,
+  refreshToken,
   registerUser,
 } from "../controllers/authController.ts";
 import {
@@ -20,16 +22,16 @@ import validate from "../middlewares/validator.ts";
 const router = express.Router();
 
 // login view
-router.get("/login", checkNotAuthenticated, newLogin);
+// router.get("/login", checkNotAuthenticated, newLogin);
 
 // register view
-router.get("/new", checkNotAuthenticated, newRegister);
+// router.get("/new", checkNotAuthenticated, newRegister);
 
 // register submit
 router.post(
   "/",
   checkNotAuthenticated,
-  validate("auth", "post"),
+  validate("auth/new", "post"),
   // (req: Request, res: Response, next: NextFunction) => {
   //   console.log(`BODY: ${JSON.stringify(req.body)}`);
   //   // next();
@@ -43,7 +45,7 @@ router.post(
 );
 
 // login submit
-router.post("/login", checkNotAuthenticated, passportLogin());
+router.post("/login", checkNotAuthenticated, loginUser);
 // router.post(
 //   "/login",
 //   checkNotAuthenticated,
@@ -62,13 +64,11 @@ router.delete("/logout", checkAuthenticated, logoutUser);
 //   .route("/token")
 //   .post(validator.loginValidationRules, validator.validate, loginUser);
 
-// router
-//   .route("/token/refresh")
-//   .post(
-//     validator.refreshTokenValidationRules,
-//     validator.validate,
-//     refreshToken,
-//   );
+router.route("/refresh").post(
+  // validator.refreshTokenValidationRules,
+  // validator.validate,
+  refreshToken,
+);
 
 // router
 //   .route("/whoami")

@@ -6,7 +6,7 @@ import {
   getReservableTables,
   getReservation,
   getReservations,
-  newReservation,
+  // newReservation,
   patchReservation,
   removeReservation,
   updateReservation,
@@ -23,8 +23,8 @@ const router = express.Router();
 // All Reservations Route
 router.get("/", checkAuthenticated, getReservations);
 
-// New Reservation Route
-router.get("/new", checkAuthenticated, newReservation);
+// // New Reservation Route
+// router.get("/new", checkAuthenticated, newReservation);
 
 // API getReservableTables
 router.get("/tables", getReservableTables);

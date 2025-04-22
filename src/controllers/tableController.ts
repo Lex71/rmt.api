@@ -1,6 +1,6 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 
-import Table, { ITable, TableSearchOptionsType } from "../models/table.ts";
+import { ITable, TableSearchOptionsType } from "../models/table.ts";
 import User from "../models/user.ts";
 import {
   create,
@@ -9,8 +9,13 @@ import {
   remove,
   update,
 } from "../services/tableService.ts";
+import { ApplicationError } from "../utils/errors.ts";
 
-export const getTables = async (req: Request, res: Response) => {
+export const getTables = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   // handle req.query
   const searchOptions: TableSearchOptionsType = {};
 
@@ -38,29 +43,41 @@ export const getTables = async (req: Request, res: Response) => {
   let tables = [];
   try {
     tables = await find(searchOptions);
-    res.render("tables/index", {
-      data: tables,
-      searchOptions: { ...req.query },
-      user: new User(req.user).toJSON(),
-    });
+    // res.render("tables/index", {
+    //   data: tables,
+    //   searchOptions: { ...req.query },
+    //   user: new User(req.user).toJSON(),
+    // });
+    res.status(200).json({ data: tables });
   } catch {
-    res.redirect("/");
+    // res.redirect("/");
+    next(new ApplicationError(500, "Tables not found"));
   }
 };
 
-export const getTable = async (req: Request, res: Response) => {
+export const getTable = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const table = await findById(req.params.id);
-    res.render("tables/show", {
-      data: table,
-      user: new User(req.user).toJSON(),
-    });
+    // res.render("tables/show", {
+    //   data: table,
+    //   user: new User(req.user).toJSON(),
+    // });
+    res.status(200).json({ data: table });
   } catch {
-    res.redirect("/");
+    // res.redirect("/");
+    next(new ApplicationError(500, "Table not found"));
   }
 };
 
-export const createTable = async (req: Request, res: Response) => {
+export const createTable = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   const { description, name, seats } = req.body as Partial<ITable>;
   // get facility from req.user.facility
   const facility = req.user?.facility;
@@ -77,22 +94,24 @@ export const createTable = async (req: Request, res: Response) => {
       name,
       seats,
     }); //.catch(() => { throw new Error("Cannot create table"); });
-    res.redirect(`tables/${newTable._id.toString()}`);
+    // res.redirect(`tables/${newTable._id.toString()}`);
+    res.status(201).json({ data: newTable });
   } catch (err: unknown) {
     console.log(err);
-    req.flash("error", "Cannot create table");
-    res.render("tables/new", {
-      data: newTable,
-      // facility: new User(req.user).facility,
-      // // facility: req.user?.facility,
-      user: new User(req.user).toJSON(),
-      // messages: "Error creating Table",
-    });
-    // renderNewPage(req, res, table, true);
+    // req.flash("error", "Cannot create table");
+    // res.render("tables/new", {
+    //   data: newTable,
+    //   // facility: new User(req.user).facility,
+    //   // // facility: req.user?.facility,
+    //   user: new User(req.user).toJSON(),
+    //   // messages: "Error creating Table",
+    // });
+    // // renderNewPage(req, res, table, true);
+    next(new ApplicationError(500, "Error creating Table"));
   }
 };
 
-export const editTable = async (req: Request, res: Response) => {
+/* export const editTable = async (req: Request, res: Response) => {
   try {
     const table = await findById(req.params.id);
     res.render("tables/edit", {
@@ -105,14 +124,9 @@ export const editTable = async (req: Request, res: Response) => {
   } catch {
     res.redirect("/tables");
   }
-};
+}; */
 
-export const newTable = (req: Request, res: Response) => {
-  // console.log(req.user?.facility);
-  // console.log(new User(req.user).facility);
-  // console.log(typeof req.user?.facility);
-  // console.log(typeof new User(req.user).facility);
-
+/* export const newTable = (req: Request, res: Response) => {
   res.render("tables/new", {
     data: new Table(),
     // facility: new User(req.user).facility,
@@ -120,9 +134,13 @@ export const newTable = (req: Request, res: Response) => {
     user: new User(req.user).toJSON(),
   });
   // renderNewPage(req, res, new Table());
-};
+}; */
 
-export const updateTable = async (req: Request, res: Response) => {
+export const updateTable = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   let table = null;
   // cannot change facility!
   const { description, /* facility,  */ name, seats } =
@@ -135,31 +153,41 @@ export const updateTable = async (req: Request, res: Response) => {
       name,
       seats,
     });
-    if (table != null) res.redirect(`/tables/${req.params.id}`);
-    else res.redirect("/");
+    // if (table != null) res.redirect(`/tables/${req.params.id}`);
+    // else res.redirect("/");
+
+    if (table != null) res.status(200).json({ data: table });
+    else next(new ApplicationError(404, "Table non exists"));
   } catch (err: unknown) {
     if (table == null) {
-      res.redirect("/");
+      // res.redirect("/");
+      next(new ApplicationError(404, "Table non exists"));
     } else {
       if (err instanceof Error) {
-        req.flash("error", err.message);
+        // req.flash("error", err.message);
+        next(new ApplicationError(500, err.message));
       } else {
-        req.flash("error", "Cannot update table");
+        // req.flash("error", "Cannot update table");
+        next(new ApplicationError(500, "Cannot update table"));
       }
-      res.render("tables/edit", {
-        data: table,
-        // facility,
-        // facility: new User(req.user).facility,
-        // // facility: req.user?.facility,
-        user: new User(req.user).toJSON(),
-        // messages: "Error updating Table",
-      });
+      // res.render("tables/edit", {
+      //   data: table,
+      //   // facility,
+      //   // facility: new User(req.user).facility,
+      //   // // facility: req.user?.facility,
+      //   user: new User(req.user).toJSON(),
+      //   // messages: "Error updating Table",
+      // });
       // renderEditPage(req, res, table, true);
     }
   }
 };
 
-export const removeTable = async (req: Request, res: Response) => {
+export const removeTable = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   let table = null;
   try {
     // table = await findById(req.params.id);
@@ -168,17 +196,20 @@ export const removeTable = async (req: Request, res: Response) => {
     //   res.redirect("/tables");
     // }
     table = await findById(req.params.id);
-    if (table == null) {
-      res.redirect("/");
-    }
+    // if (table == null) {
+    //   res.redirect("/");
+    // }
     await remove(req.params.id);
-    res.redirect("/tables");
+    // res.redirect("/tables");
+    res.status(200).json({ data: table });
   } catch (err: unknown) {
     if (table != null) {
       if (err instanceof Error) {
-        req.flash("error", err.message);
+        // req.flash("error", err.message);
+        next(new ApplicationError(500, err.message));
       } else {
-        req.flash("error", "Cannot remove table");
+        // req.flash("error", "Cannot remove table");
+        next(new ApplicationError(500, "Cannot remove table"));
       }
       res.render("tables/show", {
         data: table,
@@ -186,7 +217,14 @@ export const removeTable = async (req: Request, res: Response) => {
         // messages: "Could not remove table",
       });
     } else {
-      res.redirect("/");
+      // res.redirect("/");
+      if (err instanceof Error) {
+        // req.flash("error", err.message);
+        next(new ApplicationError(500, err.message));
+      } else {
+        // req.flash("error", "Cannot remove facility");
+        next(new ApplicationError(500, "Table non exists"));
+      }
     }
   }
 };

@@ -1,14 +1,36 @@
 import { NextFunction, Request, Response } from "express";
-// TODO: enable for jwt validation
-// const jwt = require('jsonwebtoken');
+import jwt from "jsonwebtoken";
+import config from "../config/config.ts";
+import { ApplicationError } from "../utils/errors.ts";
 
 function checkAuthenticated(req: Request, res: Response, next: NextFunction) {
-  if (req.isAuthenticated()) {
-    next();
-    return;
+  // const authHeader = req.headers.authorization;
+  // const token = authHeader?.split(" ")[1];
+  let token = null;
+  if (req.headers.authorization) {
+    const parts = req.headers.authorization.split(" ");
+    if (parts.length === 2 && parts[0] === "Bearer") {
+      token = parts[1];
+    }
+  } else if (req.cookies.accessToken) {
+    token = req.cookies.accessToken as string;
   }
 
-  res.redirect("/auth/login");
+  if (!token) {
+    next(new ApplicationError(403, "Forbidden"));
+  } else {
+    jwt.verify(token, config.JWT_SECRET, (err, user) => {
+      if (err) {
+        throw new ApplicationError(401, "Unauthorized");
+      } else {
+        if (user == null) {
+          throw new ApplicationError(500, "User not found");
+        }
+        // req.user = user; // automatically set
+        next();
+      }
+    });
+  }
 }
 
 function checkNotAuthenticated(
@@ -16,20 +38,60 @@ function checkNotAuthenticated(
   res: Response,
   next: NextFunction,
 ) {
-  if (req.isAuthenticated()) {
-    res.redirect("/");
-    return;
+  let token = null;
+  if (req.headers.authorization) {
+    const parts = req.headers.authorization.split(" ");
+    if (parts.length === 2 && parts[0] === "Bearer") {
+      token = parts[1];
+    }
+  } else if (req.cookies.accessToken) {
+    token = req.cookies.accessToken as string;
   }
-  next();
+
+  if (!token) {
+    next();
+  } else {
+    jwt.verify(token, config.JWT_SECRET, (err) => {
+      if (err) {
+        next();
+      }
+    });
+  }
 }
 
 function isAdmin(req: Request, res: Response, next: NextFunction) {
-  if (req.isAuthenticated() && req.user.role === "admin") {
-    next();
-    return;
+  let token = null;
+  if (req.headers.authorization) {
+    const parts = req.headers.authorization.split(" ");
+    if (parts.length === 2 && parts[0] === "Bearer") {
+      token = parts[1];
+    }
+  } else if (req.cookies.accessToken) {
+    token = req.cookies.accessToken as string;
   }
 
-  res.redirect("/auth/login");
+  if (!token) {
+    // next("Forbidden");
+    next(new ApplicationError(403, "Forbidden"));
+  } else {
+    jwt.verify(token, config.JWT_SECRET, (err, user) => {
+      if (err) {
+        throw new ApplicationError(401, "Unauthorized");
+      } else {
+        if (user == null) {
+          throw new ApplicationError(500, "User not found");
+        }
+        // req.user = user; // automatically set
+        if (typeof user === "object" && "role" in user) {
+          if (user.role === "admin") {
+            next();
+          }
+        } else {
+          throw new ApplicationError(500, "User object not found");
+        }
+      }
+    });
+  }
 }
 
 // TODO: enable for jwt validation

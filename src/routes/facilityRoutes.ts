@@ -2,10 +2,10 @@ import express from "express";
 
 import {
   createFacility,
-  editFacility,
+  // editFacility,
   getFacilities,
   getFacility,
-  newFacility,
+  // newFacility,
   removeFacility,
   updateFacility,
 } from "../controllers/facilityController.ts";
@@ -21,14 +21,14 @@ const router = express.Router();
 // All Facilities Route
 router.get("/", checkAuthenticated, getFacilities);
 
-// New Facility Route
-router.get("/new", isAdmin, newFacility);
+// // New Facility Route
+// router.get("/new", isAdmin, newFacility);
 
 // Show Facility Route
 router.get("/:id", checkAuthenticated, getFacility);
 
-// Edit Facility Route
-router.get("/:id/edit", isAdmin, editFacility);
+// // Edit Facility Route
+// router.get("/:id/edit", isAdmin, editFacility);
 
 // Create Facility Route
 router.post("/", isAdmin, validate("facilities", "post"), createFacility);

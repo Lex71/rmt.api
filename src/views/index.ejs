@@ -1,9 +1,0 @@
-<h1>Hi <%= user.name %></h1>
-
-<% if(user.role === 'admin') { %>
-<h2 class="page-header">Recently Added Facilities</h2>
-<%- include('partials/facilityGrid', { data, large: true }) %>
-<% } else {%>
-<h2 class="page-header">Recently Added Tables</h2>
-<%- include('partials/tableGrid', { data, large: true }) %>
-<% } %>
