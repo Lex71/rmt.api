@@ -33,12 +33,13 @@ const issueAccessToken = (payload: {
   email: string;
   id: string;
   role: Role;
+  facility?: string;
 }) => {
-  return jwt.sign(payload, config.JWT_SECRET, { expiresIn: "1m" });
+  return jwt.sign(payload, config.JWT_SECRET, { expiresIn: "15m" });
 };
 
 const issueRefreshToken = (payload: { id: string }) => {
-  return jwt.sign(payload, config.JWT_SECRET, { expiresIn: "7d" });
+  return jwt.sign(payload, config.JWT_SECRET, { expiresIn: "1d" });
 };
 
 export {

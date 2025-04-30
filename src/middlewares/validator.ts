@@ -50,10 +50,6 @@ const transformYupErrorsIntoObject = (
 }; */
 
 function matchInArray(str: string, expressions: string[]) {
-  /* const fullExpr = new RegExp(
-    expressions.map((x) => new RegExp(x).source).join("|"),
-  );
-  return str.match(fullExpr); */
   const isMatch = expressions.some((rx) => new RegExp(rx).test(str));
 
   if (isMatch) {
@@ -63,49 +59,23 @@ function matchInArray(str: string, expressions: string[]) {
   return "";
 }
 
-const validate =
-  // (schema: yup.Schema) =>
-  function (path: string, method: string) {
-    // if (!Object.keys(schemas).includes(path)) {
-    //   throw new Error(`Schema not found for path: ${path}`);
-    // }
-    const found = matchInArray(path, Object.keys(schemas[method]));
-    if (!found) {
-      throw new Error(`Schema not found for path: ${path}`);
+const validate = function (path: string, method: string) {
+  const found = matchInArray(path, Object.keys(schemas[method]));
+  if (!found) {
+    throw new Error(`Schema not found for path: ${path}`);
+  }
+
+  const schema = schemas[method][found];
+
+  return async (req: Request, res: Response, next: NextFunction) => {
+    const body = req.body as AnyObject;
+    try {
+      await schema.validate(body, { abortEarly: false });
+      next();
+    } catch (error) {
+      const err = transformYupErrorsIntoObject(error as ValidationError);
+      res.status(400).json(err);
     }
-
-    const schema = schemas[method][found];
-
-    return async (req: Request, res: Response, next: NextFunction) => {
-      const body = req.body as AnyObject;
-      // const { name, email } = req.body;
-      try {
-        await schema.validate(body, { abortEarly: false });
-        next();
-      } catch (error) {
-        const err = transformYupErrorsIntoObject(error as ValidationError);
-        // const err = transformYupErrorsIntoHTMLString(error as ValidationError);
-        res.status(400).json(err);
-        // const err = transformYupErrorsIntoString(error as ValidationError);
-        /* req.flash("error", err);
-        let url = req.baseUrl;
-        switch (req.method) {
-          case "PUT":
-          case "PATCH":
-            url += req.path + "edit";
-            break;
-          case "POST":
-            url += req.path + "new";
-            break;
-          default:
-            break;
-        }
-        // req.baseUrl+req.path+(req.method == 'PUT' ? "edit" : "new")
-        // since I don't redirect, simply flash immediately
-        // res.render(path, { data: { ...body } });
-        // in order to render every view, i should provide all data, which here i cannot be aware of => must redirect
-        res.redirect(url); */
-      }
-    };
   };
+};
 export default validate;

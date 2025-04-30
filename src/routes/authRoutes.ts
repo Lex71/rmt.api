@@ -1,46 +1,29 @@
 import express from "express";
 
-// TODO: import theese for jwt auth
-// loginUser,
-// refreshToken,
-// whoami,
 import {
-  // newLogin,
-  // newRegister,
-  // passportLogin,
   loginUser,
   logoutUser,
-  refreshToken,
   registerUser,
+  // registerUser,
+  whoami,
 } from "../controllers/authController.ts";
+
+// import { refreshToken } from "../controllers/refreshToken.ts";
+
 import {
   checkAuthenticated,
   checkNotAuthenticated,
 } from "../middlewares/auth.ts";
 import validate from "../middlewares/validator.ts";
+// import validate from "../middlewares/validator.ts";
 
 const router = express.Router();
 
-// login view
-// router.get("/login", checkNotAuthenticated, newLogin);
-
-// register view
-// router.get("/new", checkNotAuthenticated, newRegister);
-
 // register submit
 router.post(
-  "/",
+  "/register",
   checkNotAuthenticated,
-  validate("auth/new", "post"),
-  // (req: Request, res: Response, next: NextFunction) => {
-  //   console.log(`BODY: ${JSON.stringify(req.body)}`);
-  //   // next();
-  //   const { name, email } = req.body;
-  //   res.render("auth/new", {
-  //     user: { name, email },
-  //     messages: "Auth ERROR",
-  //   });
-  // },
+  validate("auth/register", "post"),
   registerUser,
 );
 
@@ -56,22 +39,11 @@ router.post("/login", checkNotAuthenticated, loginUser);
 //   }),
 // );
 
-// logout
 router.delete("/logout", checkAuthenticated, logoutUser);
 
-// TODO: check theese
-// router
-//   .route("/token")
-//   .post(validator.loginValidationRules, validator.validate, loginUser);
+// router.post("/refresh", refreshToken);
+// router.post("/revoke", isAdmin, refreshToken);
 
-router.route("/refresh").post(
-  // validator.refreshTokenValidationRules,
-  // validator.validate,
-  refreshToken,
-);
-
-// router
-//   .route("/whoami")
-//   .get(passport.authenticate(["jwt", "basic"], { session: false }), whoami);
+router.get("/whoami", checkAuthenticated, whoami);
 
 export default router;

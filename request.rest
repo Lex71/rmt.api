@@ -1,54 +1,45 @@
-POST http://localhost:3000/auth/new
-content-type: application/json
+@hostname = localhost
+@port = 3000
+@host = {{hostname}}:{{port}}
+@contentType = application/json
 
-{
-  "name": "a",
-  "email": "a@a",
-  "password": "a"
-}
-
-###
-
-POST http://localhost:3000/auth/login
-content-type: application/json
-
-{
-  "email": "test1@mail.com",
-  "password": "Test1!!!"
-}
+GET http://{{host}}/test HTTP/1.1
+Content-Type: {{contentType}}
 
 ###
-GET http://localhost:3000/facilities
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkbWluQHJtdC5jb20iLCJpZCI6IjY3ZWFkN2M0YzhjNTU2ZDJjNTUxZTk0NCIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc0NTMxNjcyMCwiZXhwIjoxNzQ1MzE3NjIwfQ.frwXnvGnu6o092SJGnvzQYnYUfh3NzWcDFMUrSVs1Mk
-###
-
-POST http://localhost:3000/users
-Content-Type: application/json
+# @name registerAPI
+POST http://{{host}}/api/auth/register
+Content-Type: {{contentType}}
 
 {
-  "name": "Kyle",
-  "password": "password"
-}
-
-###
-
-POST http://localhost:3000/auth/login
-Content-Type: application/json
-
-{
+  "name": "aaa",
   "email": "test1@rmt.com",
   "password": "Test1!!!"
 }
 
 ###
-
-POST http://localhost:3000/auth/login
-Content-Type: application/json
+# @name loginAPI
+POST http://{{host}}/api/auth/login
+Content-Type: {{contentType}}
 
 {
   "email": "admin@rmt.com",
   "password": "admin"
 }
+
+# {
+#   "email": "test1@rmt.com",
+#   "password": "Test1!!!"
+# }
+
+###
+
+@accessToken = {{loginAPI.response.body.data.accessToken}}
+@cookie = {{loginAPI.response.headers.Set-Cookie}}
+###
+# @name logoutAPI
+DELETE http://{{host}}/api/auth/logout
+Authorization: Bearer {{accessToken}}
 
 ###
 
@@ -57,32 +48,30 @@ Content-Type: application/json
 # until 17:30, table t6 is busy
 # adjust: 0 -> no busy tables
 # adjust: 15 -> t6 busy table
-GET http://localhost:3000/reservations/tables?date=2025-04-04&time=17:30&adjust=1facility=67ead7c4c8c556d2c551e945
-Content-Type: application/json
+GET http://{{host}}/api/reservations/tables?date=2025-04-04&time=18:30&adjust=1
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}
+###
+
+GET http://{{host}}/api/auth/whoami
+Authorization: Bearer {{accessToken}}
 
 ###
 
-GET http://localhost:3000/
-Content-Type: application/json
+GET http://{{host}}/api/token/refresh
+Content-Type: {{contentType}}
+Set-Cookie: {{cookie}}
 
 ###
-
-GET http://localhost:3000/me
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkbWluQHJtdC5jb20iLCJpZCI6IjY3ZWFkN2M0YzhjNTU2ZDJjNTUxZTk0NCIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc0NTMyNTgzNCwiZXhwIjoxNzQ1MzI1ODk0fQ.D4Tsg2oPJ5pRYZhLnh6PbHAiACkrIX2qLvld8_WRTqU 
-
-###
-
-POST http://localhost:3000/auth/refresh
-Content-Type: application/json
+POST http://{{host}}/api/token/revoke
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}
 
 {
-  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ZWFkN2M0YzhjNTU2ZDJjNTUxZTk0NCIsImlhdCI6MTc0NTMyNDM1MiwiZXhwIjoxNzQ1OTI5MTUyfQ.VW4qkn4NJmRDrFGY7eymsnuIPeezjKBYXa0sa9KnCeE"
+  "email": "test@rmt.com"
 }
 
 ###
 
-
-###
-
-DELETE http://localhost:3000/facilities/123
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkbWluQHJtdC5jb20iLCJpZCI6IjY3ZWFkN2M0YzhjNTU2ZDJjNTUxZTk0NCIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc0NTMxNDYwNywiZXhwIjoxNzQ1MzE1NTA3fQ.8ks14W28hve72cs_MjASojNa6KWuVJ-vLRUHII5an9k
+DELETE http://{{host}}/api/facilities/123
+Authorization: Bearer {{accessToken}}

@@ -29,7 +29,6 @@ export const find = async (searchOptions?: FacilitySearchOptionsType) => {
         }
       }
     }
-
     return await query.exec();
   } catch {
     throw new Error("Cannot find Facilities");
@@ -37,22 +36,7 @@ export const find = async (searchOptions?: FacilitySearchOptionsType) => {
 };
 
 export const create = async (body: IFacility) => {
-  // facilities.push(facility);
-  // return facilities;
-  // const facility: IFacility = new Facility({
-  //   name: body.name,
-  //   address: body.address,
-  // });
-
-  /* try {
-    // return await facility.save();
-    return await Facility.create(body);
-  } catch (err) {
-    // renderNewPage(res, facility, true);
-    throw err;
-  } */
   const { address, name } = body;
-
   const facility = new Facility({
     address,
     name,
@@ -67,9 +51,9 @@ export const create = async (body: IFacility) => {
 
 export const update = async (id: string, body: IFacility) => {
   try {
-    return await Facility.findByIdAndUpdate(id, body, { new: true });
+    return await Facility.findByIdAndUpdate(id, body, { new: true }).orFail();
   } catch {
-    throw new Error("Cannot update: Facility not found");
+    throw new Error("Cannot update facility");
   }
 };
 

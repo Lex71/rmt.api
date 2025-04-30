@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 
-import RefreshToken, { IRefreshToken } from "../models/refreshToken.ts";
+import RefreshToken from "../models/refreshToken.ts";
 import User, { IUser } from "../models/user.ts";
 
 import { ApplicationError } from "../utils/errors.ts";
@@ -8,10 +8,8 @@ import {
   comparePassword,
   issueAccessToken,
   issueRefreshToken,
-  verifyRefreshTokenNotExpired,
 } from "../utils/helpers.ts";
 // enable these for jwt auth
-// const RefreshToken = require("../models/RefreshToken");
 // const helper = require("../utils/helper");
 
 /* export const newLogin = (_req: Request, res: Response) => {
@@ -106,26 +104,43 @@ export const registerUser = async (
 }; */
 
 export const logoutUser = (req: Request, res: Response) => {
-  const invalidToken = "invalidToken";
-  res.cookie("jwt", invalidToken, {
-    httpOnly: true,
-    sameSite: true,
-    secure: true,
-    signed: true,
-  });
-  res.json({ message: "Logged out successfully" });
+  // const invalidToken = "invalidToken";
+  res.clearCookie("refreshToken", { httpOnly: true, path: "/" });
+  // res.cookie("refreshToken", invalidToken, {
+  //   httpOnly: true,
+  //   sameSite: true,
+  //   secure: true,
+  //   signed: true,
+  // });
+  // res.cookie("accessToken", invalidToken, {
+  //   httpOnly: true,
+  //   sameSite: true,
+  //   secure: true,
+  //   // signed: true,
+  // });
+  res.status(200).json({ message: "Logged out successfully" });
 };
 
 // JWT
 
 // TODO: use these for passport-jwt strategy, to authenticate endpoints using a JSON web token.
 // It is intended to be used to secure RESTful endpoints without sessions.
-export async function registerUser(req: Request, res: Response) {
+export async function registerUser(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
   const { email, facility, name, password } = req.body as Partial<IUser>;
   // const passwordHash = await helper.hashPassword(password);
   // check email is not used
   if (await User.findOne({ email })) {
-    throw new Error("An user with that email is already registered");
+    next(
+      new ApplicationError(
+        400,
+        "An user with that email is already registered",
+      ),
+    );
+    // throw new Error("An user with that email is already registered");
   }
   // const user = await User.create({
   //   email,
@@ -141,10 +156,13 @@ export async function registerUser(req: Request, res: Response) {
   });
   try {
     await user.save();
-  } catch (err: unknown) {
+  } catch (err) {
     if (err instanceof Error) {
       // return res.status(400).json({ error: err.message });
-      throw new ApplicationError(500, err.message);
+      next(new ApplicationError(500, err.message));
+    } else {
+      // return res.status(400).json({ error: "Cannot register user" });
+      next(new ApplicationError(500, "Cannot register user"));
     }
   }
   res.status(201).json(user);
@@ -156,26 +174,29 @@ export async function loginUser(
   next: NextFunction,
 ) {
   const { email, password } = req.body as Partial<IUser>;
-  const user = await User.findOne({ email });
-  if (!user) {
-    // return res.status(401).json({ error: "Invalid Email" });
-    next(new ApplicationError(401, "Invalid Email"));
+  if (!email) {
+    next(new ApplicationError(401, "Missing Email"));
     return;
   }
   if (!password) {
-    // return res.status(401).json({ error: "Invalid Email" });
-    next(new ApplicationError(401, "Invalid Password"));
+    next(new ApplicationError(401, "Missing Password"));
     return;
   }
+
+  const user = await User.findOne({ email });
+  if (!user) {
+    next(new ApplicationError(401, "Invalid email"));
+    return;
+  }
+
   const isMatch = await comparePassword(password, user.password);
   if (!isMatch) {
-    // res.status(401).json({ error: "Invalid Password" });
-    // throw new ApplicationError(401, "Invalid Password");
     next(new ApplicationError(401, "Invalid Password"));
     return;
   }
   const payload = {
     email: user.email,
+    facility: user.facility?._id.toString(),
     id: user._id.toString(),
     role: user.role,
   };
@@ -189,25 +210,37 @@ export async function loginUser(
   try {
     await rT.save();
     // { httpOnly: true, sameSite: "strict", secure: true, signed: true }
-    res.cookie("accessToken", accessToken, {
-      httpOnly: true,
-      sameSite: "strict",
-      secure: true,
-    });
+    // res.cookie("accessToken", accessToken, {
+    //   httpOnly: true,
+    //   sameSite: "strict",
+    //   secure: true,
+    // });
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
       sameSite: "strict",
       secure: true,
+      // signed: true,
     });
+    // res.cookie("refreshToken", refreshToken, {
+    //   httpOnly: true, // Ensures the cookie is not accessible via JavaScript
+    //   maxAge: 24 * 60 * 60 * 1000, // Token expires in 24 hours
+    //   sameSite: "strict", // Helps prevent CSRF attacks
+    //   secure: true, // Ensures the cookie is only sent over HTTPS (set to false for development)
+    // });
     res.status(200).json({
-      accessToken,
-      refreshToken,
+      data: {
+        accessToken,
+        refreshToken,
+        user,
+      },
     });
   } catch (err: unknown) {
     if (err instanceof Error) {
       // res.status(400).json({ error: err.message });
-      next(new ApplicationError(400, err.message));
+      next(new ApplicationError(500, err.message));
       // throw new ApplicationError(500, err.message);
+    } else {
+      next(new ApplicationError(500, "Login failed"));
     }
   }
 }
@@ -245,64 +278,12 @@ export async function loginUser(
   });
 } */
 
-export async function refreshToken(
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) {
-  const { token: requestToken } = req.body as Partial<IRefreshToken>;
-  if (requestToken == null) {
-    next(new ApplicationError(403, "Refresh Token is required!"));
+export async function whoami(req: Request, res: Response, next: NextFunction) {
+  if (req.user) {
+    const user = await User.findOne({ email: (req.user as IUser).email });
+    // res.status(200).json({ data: { user: new User(req.user).toJSON() } });
+    res.status(200).json({ data: { user } });
+  } else {
+    next(new ApplicationError(401, "Unauthorized"));
   }
-
-  try {
-    const rT = await RefreshToken.findOne({ token: requestToken }).populate(
-      "user",
-    );
-    if (!rT) {
-      next(new ApplicationError(403, "Invalid refresh token"));
-    } else {
-      if (!verifyRefreshTokenNotExpired(rT.token)) {
-        RefreshToken.deleteOne({ user: rT.user });
-        next(
-          new ApplicationError(
-            403,
-            "Refresh token was expired. Please make a new sign in request",
-          ),
-        );
-      }
-
-      // const user = await User.findOne({
-      //   attributes: {
-      //     exclude: ["password"],
-      //   },
-      //   where: { id: rT.user },
-      // });
-      const user = await User.findById(rT.user);
-
-      if (!user) {
-        next(new ApplicationError(500, "User not found"));
-      } else {
-        const payload = {
-          email: user.email,
-          id: user._id.toString(),
-          role: user.role,
-        };
-
-        const newAccessToken = issueAccessToken(payload);
-
-        res.status(200).json({
-          accessToken: newAccessToken,
-          // refreshToken: refreshToken.token,
-        });
-      }
-    }
-  } catch (err) {
-    console.log("err", err);
-    res.status(500).send("Internal server error");
-  }
-}
-
-export function whoami(req: Request, res: Response) {
-  return res.status(200).json(req.user);
 }

@@ -113,7 +113,7 @@ export const findAvailableTables = async (
       }
     }
 
-    if (!booking_time) throw new Error("Missing time query parameter");
+    // if (!booking_time) throw new Error("Missing time query parameter");
     const reservations = await query.populate("tables").exec();
     // console.log(reservations);
     /* const r = await Reservation.find({
@@ -198,9 +198,11 @@ export const create = async (body: Partial<IReservation>) => {
 
 export const update = async (id: string, body: Partial<IReservation>) => {
   try {
-    return await Reservation.findByIdAndUpdate(id, body, { new: true });
+    return await Reservation.findByIdAndUpdate(id, body, {
+      new: true,
+    }).orFail();
   } catch {
-    throw new Error("Cannot update: Reservation not found");
+    throw new Error("Cannot update reservation");
   }
 };
 

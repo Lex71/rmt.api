@@ -1,27 +1,19 @@
-import express, { Request, Response } from "express";
+import express /* , { Request, Response } */ from "express";
 import { getIndexData } from "../controllers/indexController.ts";
 
 const router = express.Router();
 
-import passport from "passport";
-import { checkAuthenticated, isAdmin } from "../middlewares/auth.ts";
-import User from "../models/user.ts";
+import { checkAuthenticated } from "../middlewares/auth.ts";
 
-router.get("/", checkAuthenticated, getIndexData);
+// router.get("/free", (req: Request, res: Response) => {
+//   res.status(200).json({
+//     data: [
+//       { address: "via Uno", name: "Facility 1" },
+//       { address: "via Due", name: "Facility 2" },
+//     ],
+//   });
+// });
 
-router.get(
-  "/me",
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-  passport.authenticate("jwt", { session: false }),
-  isAdmin,
-  (req: Request, res: Response) => {
-    // console.log(`protected user: ${JSON.stringify(req.user)}`);
-    // console.log(
-    //   `protected user.password: ${req.user?.password ?? "NO PASSWORD"}`,
-    // );
-    // console.log("new User", new User(req.user).toJSON());
-    res.status(200).json(new User(req.user).toJSON());
-  },
-);
+router.get("/index", checkAuthenticated, getIndexData);
 
 export default router;

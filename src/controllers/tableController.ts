@@ -90,18 +90,12 @@ export const create = async (
     }); //.catch(() => { throw new Error("Cannot create table"); });
     // res.redirect(`tables/${newTable._id.toString()}`);
     res.status(201).json({ data: newTable });
-  } catch (err: unknown) {
-    console.log(err);
-    // req.flash("error", "Cannot create table");
-    // res.render("tables/new", {
-    //   data: newTable,
-    //   // facility: new User(req.user).facility,
-    //   // // facility: req.user?.facility,
-    //   user: new User(req.user).toJSON(),
-    //   // messages: "Error creating Table",
-    // });
-    // // renderNewPage(req, res, table, true);
-    next(new ApplicationError(500, "Error creating Table"));
+  } catch (err) {
+    if (err instanceof Error) {
+      next(new ApplicationError(500, err.message));
+    } else {
+      next(new ApplicationError(500, "Error creating Table"));
+    }
   }
 };
 
@@ -137,42 +131,25 @@ export const update = async (
 ) => {
   let table = null;
   // cannot change facility!
-  const { description, /* facility,  */ name, seats } =
-    req.body as Partial<ITable>;
-  // const facility = req.user?.facility;
+  const { description, name, seats } = req.body as Partial<ITable>;
   try {
     table = await TableService.update(req.params.id, {
       description,
-      // facility,
       name,
       seats,
     });
-    // if (table != null) res.redirect(`/tables/${req.params.id}`);
-    // else res.redirect("/");
 
-    if (table != null) res.status(200).json({ data: table });
-    else next(new ApplicationError(404, "Table non exists"));
+    res.status(200).json({ data: table });
   } catch (err: unknown) {
     if (table == null) {
       // res.redirect("/");
       next(new ApplicationError(404, "Table non exists"));
     } else {
       if (err instanceof Error) {
-        // req.flash("error", err.message);
         next(new ApplicationError(500, err.message));
       } else {
-        // req.flash("error", "Cannot update table");
         next(new ApplicationError(500, "Cannot update table"));
       }
-      // res.render("tables/edit", {
-      //   data: table,
-      //   // facility,
-      //   // facility: new User(req.user).facility,
-      //   // // facility: req.user?.facility,
-      //   user: new User(req.user).toJSON(),
-      //   // messages: "Error updating Table",
-      // });
-      // renderEditPage(req, res, table, true);
     }
   }
 };
@@ -184,39 +161,24 @@ export const remove = async (
 ) => {
   let table = null;
   try {
-    // table = await findById(req.params.id);
-    // if (table) {
-    //   await table.deleteOne();
-    //   res.redirect("/tables");
-    // }
     table = await TableService.findById(req.params.id);
-    // if (table == null) {
-    //   res.redirect("/");
-    // }
     await TableService.remove(req.params.id);
-    // res.redirect("/tables");
     res.status(200).json({ data: table });
   } catch (err: unknown) {
     if (table != null) {
       if (err instanceof Error) {
-        // req.flash("error", err.message);
         next(new ApplicationError(500, err.message));
       } else {
-        // req.flash("error", "Cannot remove table");
         next(new ApplicationError(500, "Cannot remove table"));
       }
       res.render("tables/show", {
         data: table,
         user: new User(req.user).toJSON(),
-        // messages: "Could not remove table",
       });
     } else {
-      // res.redirect("/");
       if (err instanceof Error) {
-        // req.flash("error", err.message);
         next(new ApplicationError(500, err.message));
       } else {
-        // req.flash("error", "Cannot remove facility");
         next(new ApplicationError(500, "Table non exists"));
       }
     }

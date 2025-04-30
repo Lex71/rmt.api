@@ -71,15 +71,8 @@ export const create = async (
   });
   try {
     const newFacility = await FacilityService.create(facility);
-    // res.redirect(`facilities/${newFacility._id.toString()}`);
     res.status(201).json({ data: newFacility });
   } catch {
-    // req.flash("error", "Cannot create facility");
-    // res.render("facilities/new", {
-    //   data: facility,
-    //   // messages: "Error creating Facility",
-    // });
-    // // renderNewPage(req, res, table, true);
     next(new ApplicationError(500, "Error creating Facility"));
   }
 };
@@ -120,26 +113,16 @@ export const update = async (
     // if (facility != null) res.redirect(`/facilities/${req.params.id}`);
     // else res.redirect("/");
 
-    if (facility != null) res.status(200).json({ data: facility });
-    else next(new ApplicationError(404, "Facility non exists"));
+    res.status(200).json({ data: facility });
   } catch (err: unknown) {
     if (facility == null) {
-      // res.redirect("/");
       next(new ApplicationError(404, "Facility non exists"));
     } else {
       if (err instanceof Error) {
-        // req.flash("error", err.message);
         next(new ApplicationError(500, err.message));
       } else {
-        // req.flash("error", "Cannot update facility");
         next(new ApplicationError(500, "Cannot update facility"));
       }
-      // res.render("facilities/edit", {
-      //   data: facility,
-      //   user: new User(req.user).toJSON(),
-      //   // messages: "Error updating Facility",
-      // });
-      // // renderEditPage(req, res, table, true);
     }
   }
 };
@@ -151,38 +134,21 @@ export const remove = async (
 ) => {
   let facility = null;
   try {
-    // facility = await findById(req.params.id);
-    // if (facility) {
-    //   await facility.deleteOne();
-    //   res.redirect("/facilities");
-    // }
     facility = await FacilityService.findById(req.params.id);
     await FacilityService.remove(req.params.id);
-    // res.redirect("/facilities");
     res.status(200).json({ data: facility });
     // or send status 204 and empty data
   } catch (err: unknown) {
     if (facility != null) {
       if (err instanceof Error) {
-        // req.flash("error", err.message);
         next(new ApplicationError(500, err.message));
       } else {
-        // req.flash("error", "Cannot remove facility");
         next(new ApplicationError(500, "Cannot remove facility"));
       }
-
-      // res.render("facilities/show", {
-      //   data: facility,
-      //   user: new User(req.user).toJSON(),
-      //   // messages: "Could not remove facility",
-      // });
     } else {
-      // res.redirect("/");
       if (err instanceof Error) {
-        // req.flash("error", err.message);
         next(new ApplicationError(500, err.message));
       } else {
-        // req.flash("error", "Cannot remove facility");
         next(new ApplicationError(500, "Facility non exists"));
       }
     }

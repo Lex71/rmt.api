@@ -27,7 +27,7 @@ router.get("/", checkAuthenticated, getAll);
 // router.get("/new", checkAuthenticated, newReservation);
 
 // API getReservableTables
-router.get("/tables", getReservableTables);
+router.get("/tables", checkAuthenticated, getReservableTables);
 
 // Show Reservation Route
 router.get("/:id", checkAuthenticated, getById);

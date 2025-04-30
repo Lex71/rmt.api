@@ -26,7 +26,7 @@ export const find = async (
 export const findById = async (id: string): Promise<IUser | null> => {
   try {
     // return await Facility.findById(id);
-    return await User.findById(id);
+    return await User.findById(id).orFail();
   } catch {
     throw new Error("User not found");
   }

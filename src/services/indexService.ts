@@ -23,7 +23,7 @@ export const fetchIndexData = async (
   // let facilities : IFacility[] = [];
 
   let query = isAdmin ? Facility.find() : Table.find();
-  if (facility != null) {
+  if (facility) {
     query = query.where("facility", new Types.ObjectId(facility));
   }
   try {

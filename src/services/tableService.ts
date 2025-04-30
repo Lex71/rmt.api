@@ -11,7 +11,7 @@ import Table, {
 export const findById = async (id: string) => {
   try {
     // return await Table.findById(id);
-    return await Table.findById(id); //.populate("reservations").exec();
+    return await Table.findById(id).populate("reservations").orFail();
   } catch {
     throw new Error("Table not found");
   }
@@ -114,7 +114,7 @@ export const create = async (body: Partial<ITable>) => {
     // update the facility.tables array
     await Facility.findByIdAndUpdate(facility, {
       $push: { tables: newTable },
-    });
+    }).orFail();
 
     await session.commitTransaction();
     return newTable;
@@ -159,10 +159,10 @@ export const update = async (id: string, body: Partial<ITable>) => {
   // }
   try {
     // const filter = { facility: body.facility, id };
-    return await Table.findByIdAndUpdate(id, body, { new: true });
+    return await Table.findByIdAndUpdate(id, body, { new: true }).orFail();
   } catch (err) {
     console.log(err);
-    throw new Error("Cannot update: Table not found");
+    throw new Error("Cannot update table");
   }
 };
 

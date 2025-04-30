@@ -16,6 +16,8 @@ const cookieExtractor = (req: Request) => {
   );
   if (req.signedCookies.accessToken) {
     token = req.signedCookies.accessToken as string;
+  } else if (req.cookies.accessToken) {
+    token = req.cookies.accessToken as string;
   }
   return token;
   // return req.cookies.accessToken as string;

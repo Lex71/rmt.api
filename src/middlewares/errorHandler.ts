@@ -13,13 +13,6 @@ export function errorHandler(
     next(err);
     return;
   }
-  // console.error(err.stack);
-  console.log("sono l'errorHandler");
-  // res
-  //   .status(err.statusCode || 500)
-  //   .json({ error: `from errorHandler: ${err.message}` }); // Use custom status code
-  // oppure disegna una pagina di errore...
-  // req.flash("error", err.message);
-  // res.render("500", { layout: "layouts/error" });
-  res.status(err.statusCode || 500).json({ error: err.message });
+  console.error(err.stack);
+  res.status(err.statusCode || 500).json({ message: err.message });
 }
