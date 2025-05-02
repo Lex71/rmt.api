@@ -32,9 +32,10 @@ const connectDB = async () => {
     const session = await db.startSession();
     console.log("session started", session);
     await session.endSession(); */
-    return;
+    return db;
   } catch (error) {
     console.error(error);
+    return false;
   }
 };
 

@@ -91,13 +91,16 @@ app.all("*", (req: Request, res: Response) => {
 app.use(errorHandler);
 
 const start = async () => {
-  await connectDB();
+  const conn = await connectDB();
+  if (!conn) {
+    throw new Error("Error on database connection");
+  }
   const port = config.PORT;
   app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port.toString()}`);
   });
 };
 
-start().catch((/* err: unknown */) => {
-  console.log("Error starting the server");
+start().catch((err: unknown) => {
+  console.log(err);
 });
