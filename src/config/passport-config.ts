@@ -6,7 +6,7 @@ import {
   VerifyCallback,
 } from "passport-jwt";
 import config from "../config/config.ts";
-import User, { IUser } from "../models/user.js";
+import User, { IUser } from "../models/user.ts";
 
 const cookieExtractor = (req: Request) => {
   let token = null;

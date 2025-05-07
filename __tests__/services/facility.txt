@@ -1,0 +1,105 @@
+import { jest } from "@jest/globals";
+// import mockingoose from "mockingoose";
+import model, { IFacility } from "../../src/models/facility.ts";
+import { find, findById, update } from "../../src/services/facilityService.ts";
+
+// describe("Facility Service", () => {
+//   // Plese do not use real model and database access
+//   test("Retrieve facility by Id", async () => {
+//     const id = "67ead7c4c8c556d2c551e945";
+//     const facility = await FacilityService.findById(id);
+//     expect(facility?.name).toBe("Facility 1");
+//   });
+// });
+
+describe("Books service", () => {
+  describe("find", () => {
+    it("should return the list of facilities", async () => {
+      const _docs = [
+        {
+          _id: "1",
+          address: "Address 1",
+          name: "Facility 1",
+        },
+        {
+          _id: "2",
+          address: "Address 2",
+          name: "Facility 2",
+        },
+      ];
+      // mockingoose(model).toReturn(_docs, "find");
+      // mockingoose("Facility").toReturn(_docs, "find");
+      // const results = await find();
+      // expect(results[0].name).toBe("Facility 1");
+      // Spy on the model save function and return a completed promise.
+      /* jest.spyOn(model, "find");
+      model.find = jest.fn().mockResolvedValue(_docs);
+      const results = await find();
+      expect(results[0].name).toBe("Facility 1"); */
+      jest.spyOn(model, "find"); // .mockReturnValue(Promise.resolve(_docs));
+      const asyncMock = jest
+        .fn<() => Promise<IFacility[]>>()
+        .mockImplementation(() => Promise.resolve(_docs));
+      await asyncMock();
+      const results = await find();
+      expect(results[0].name).toBe("Facility 1");
+    });
+  });
+  describe.skip("findById", () => {
+    // it("should return a facility", async () => {
+    //   mockingoose(Facility).toReturn(
+    //     {
+    //       _id: "1",
+    //       address: "Address 1",
+    //       name: "Facility 1",
+    //     },
+    //     "findOne",
+    //   );
+    //   const result = await findById("1");
+    //   expect(result.name).toBe("Facility 1");
+    // });
+    it("should return the doc with findById", async () => {
+      const _doc = {
+        _id: "67ead7c4c8c556d2c551e945",
+        address: "Address 1",
+        name: "Facility 1",
+      };
+
+      // mockingoose(model).toReturn(_doc, "findOne");
+
+      // return model
+      //   .findById({ _id: "67ead7c4c8c556d2c551e945" })
+      //   .then((doc) => {
+      //     expect(JSON.parse(JSON.stringify(doc))).toMatchObject(_doc);
+      //   });
+
+      const doc = await findById("67ead7c4c8c556d2c551e945");
+      expect(doc.name).toBe("Facility 1");
+      expect(JSON.parse(JSON.stringify(doc))).toMatchObject(_doc);
+    });
+
+    it("should return the doc with updated address", async () => {
+      const _doc = {
+        _id: "67ead7c4c8c556d2c551e945",
+        address: "Address 1 Updated",
+        name: "Facility 1",
+      };
+
+      // mockingoose(model).toReturn(_doc, "update");
+
+      // return model
+      //   .update({ address: "Address 1 Updated" }) // this won't really change anything
+      //   .where({ _id: "67ead7c4c8c556d2c551e945" })
+      //   .then((doc) => {
+      //     expect(JSON.parse(JSON.stringify(doc))).toMatchObject(_doc);
+      //   });
+
+      const doc = await update("67ead7c4c8c556d2c551e945", {
+        address: "Address 1 Updated",
+        name: "Facility 1",
+      });
+      expect(doc.address).toBe("Address 1 Updated");
+      expect(JSON.parse(JSON.stringify(doc))).toMatchObject(_doc);
+    });
+  });
+});

@@ -21,9 +21,9 @@ POST http://{{host}}/api/auth/register
 Content-Type: {{contentType}}
 
 {
-  "name": "aaa",
-  "email": "test1@rmt.com",
-  "password": "Test1!!!"
+  "name": "Test3",
+  "email": "test3@rmt.com",
+  "password": "Test3!!!"
 }
 
 ###
@@ -52,11 +52,16 @@ Authorization: Bearer {{accessToken}}
 
 ###
 
-
 GET http://{{host}}/api/free
 Content-Type: {{contentType}}
 
+###
 
+###
+
+GET http://{{host}}/api/facilities/67ead7c4c8c556d2c551e945
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}
 ###
 
 # reservation.time = 16:00

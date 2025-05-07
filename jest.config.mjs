@@ -11,4 +11,9 @@ export default {
   transform: {
     "^.+\.tsx?$": ["ts-jest", {}],
   },
+  // moduleNameMapper: {
+  //   "^@/(.*)$": "<rootDir>/src/$1",
+  // },
+  preset: "ts-jest",
+  testMatch: ["<rootDir>/__tests__/**/*.test.ts"], // Only test files inside __tests__/ folder
 };

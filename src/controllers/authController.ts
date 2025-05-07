@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 
 import RefreshToken from "../models/refreshToken.ts";
-import User, { IUser } from "../models/user.ts";
+import User, { IUser } from "../models/user";
 
 import { ApplicationError } from "../utils/errors.ts";
 import {
@@ -140,6 +140,7 @@ export async function registerUser(
         "An user with that email is already registered",
       ),
     );
+    return;
     // throw new Error("An user with that email is already registered");
   }
   // const user = await User.create({
@@ -147,25 +148,24 @@ export async function registerUser(
   //   name,
   //   password,
   // });
-  const user = new User({
-    email,
-    facility, // the ._id of the facility model
-    name,
-    // password: hashedPassword, // the Model has a pre hook to hash the password
-    password,
-  });
+  // const user: IUser = new User({
+  //   email,
+  //   facility, // the ._id of the facility model
+  //   name,
+  //   // password: hashedPassword, // the Model has a pre hook to hash the password
+  //   password,
+  // });
   try {
-    await user.save();
+    /* await user.save(); */
+    const user: IUser = await User.create({ email, facility, name, password });
+    res.status(201).json({ data: { user } }); // return res.status(201).json(user);
   } catch (err) {
     if (err instanceof Error) {
-      // return res.status(400).json({ error: err.message });
       next(new ApplicationError(500, err.message));
     } else {
-      // return res.status(400).json({ error: "Cannot register user" });
       next(new ApplicationError(500, "Cannot register user"));
     }
   }
-  res.status(201).json(user);
 }
 
 export async function loginUser(
@@ -203,19 +203,23 @@ export async function loginUser(
   const accessToken = issueAccessToken(payload);
   const refreshToken = issueRefreshToken({ id: user._id.toString() });
   // save the refresh token with current user
-  const rT = new RefreshToken({
-    token: refreshToken,
-    user: user._id,
-  });
+  // const rT = new RefreshToken({
+  //   token: refreshToken,
+  //   user: user._id,
+  // });
   try {
-    await rT.save();
+    // await rT.save();
+    const rT = await RefreshToken.create({
+      token: refreshToken,
+      user: user._id,
+    });
     // { httpOnly: true, sameSite: "strict", secure: true, signed: true }
     // res.cookie("accessToken", accessToken, {
     //   httpOnly: true,
     //   sameSite: "strict",
     //   secure: true,
     // });
-    res.cookie("refreshToken", refreshToken, {
+    res.cookie("refreshToken", rT.token, {
       httpOnly: true,
       sameSite: "strict",
       secure: true,
@@ -285,5 +289,6 @@ export async function whoami(req: Request, res: Response, next: NextFunction) {
     res.status(200).json({ data: { user } });
   } else {
     next(new ApplicationError(401, "Unauthorized"));
+    // throw new ApplicationError(401, "Unauthorized");
   }
 }

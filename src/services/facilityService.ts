@@ -4,7 +4,8 @@ import Facility, {
 } from "../models/facility.ts";
 import { ITable } from "../models/table.ts";
 
-export const findById = async (id: string) => {
+export const findById = async (id: string): Promise<IFacility> => {
+  console.log("id", id);
   try {
     // return await Facility.findById(id);
     return await Facility.findById(id)

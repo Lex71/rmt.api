@@ -8,7 +8,13 @@ import perfectionist from "eslint-plugin-perfectionist";
 
 export default tseslint.config(
   {
-    ignores: ["dist/**/*.js", "**/*.mjs", "eslint.config.mjs", "**/*.js"],
+    ignores: [
+      "dist/**/*.js",
+      "**/*.mjs",
+      "eslint.config.mjs",
+      "**/*.js",
+      // "**/*.tes.ts",
+    ],
   },
   {
     plugins: {
