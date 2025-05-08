@@ -11,7 +11,7 @@ import {
   update,
 } from "../controllers/facilityController";
 import { checkAuthenticated, isAdmin } from "../middlewares/auth";
-import validate from "../middlewares/validator";
+import validate from "../middlewares/yup.validator";
 // import validate from "../middlewares/validator";
 
 const router = express.Router();

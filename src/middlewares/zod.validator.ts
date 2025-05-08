@@ -1,0 +1,82 @@
+// import { NextFunction, Request, Response } from "express";
+
+// import schemas from "../schemas/schema-zod";
+
+// /**
+//  * TransformYupErrorsIntoObject
+//  *
+//  * @description Transform the useless yup error into a useable validation object
+//  * @param {ValidationError} errors Yup validation errors
+//  * @returns {Record<string, string>} Validation errors
+//  */
+// // const transformYupErrorsIntoObject = (
+// //   errors: ValidationError,
+// // ): Record<string, string> => {
+// //   const validationErrors: Record<string, string> = {};
+
+// //   errors.inner.forEach((error: ValidationError) => {
+// //     if (error.path !== undefined) {
+// //       validationErrors[error.path] = error.errors[0];
+// //     }
+// //   });
+
+// //   return validationErrors;
+// // };
+
+// function matchInArray(str: string, expressions: string[]) {
+//   const isMatch = expressions.some((rx) => new RegExp(rx).test(str));
+
+//   if (isMatch) {
+//     const matchingRegex = expressions.find((rx) => new RegExp(rx).test(str));
+//     return matchingRegex; // This will output the matching regex
+//   }
+//   return "";
+// }
+
+// const validate = function (path: string, method: string) {
+//   const found = matchInArray(path, Object.keys(schemas[method]));
+//   if (!found) {
+//     throw new Error(`Schema not found for path: ${path}`);
+//   }
+
+//   const schema = schemas[method][found];
+
+//   return async (req: Request, res: Response, next: NextFunction) => {
+//     const body = req.body as AnyObject;
+//     try {
+//       await schema.validate(body, { abortEarly: false });
+//       next();
+//     } catch (error) {
+//       const err = transformYupErrorsIntoObject(error as ValidationError);
+//       res.status(400).json(err);
+//     }
+//   };
+// };
+// export default validate;
+
+// export function zodMiddleware(
+//   err: unknown,
+//   _req: Request,
+//   res: Response,
+//   next: NextFunction,
+// ): void {
+//   if (!err) {
+//     next();
+//     return;
+//   }
+//   if (err instanceof z.ZodError) {
+//     res.status(400).json({
+//       error: err.flatten(),
+//     });
+//     return;
+//   } else if (err instanceof Error) {
+//     const error = err as Error & { statusCode?: number };
+//     res.status(error.statusCode ?? 400).json({
+//       message: err.message,
+//     });
+//     return;
+//   }
+//   res.status(500).json({
+//     message: "Internal server error",
+//   });
+// }

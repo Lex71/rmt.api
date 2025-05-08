@@ -11,7 +11,7 @@ import {
 // import { refreshToken } from "../controllers/refreshToken";
 
 import { checkAuthenticated, checkNotAuthenticated } from "../middlewares/auth";
-import validate from "../middlewares/validator";
+import validate from "../middlewares/yup.validator";
 // import validate from "../middlewares/validator";
 
 const router = express.Router();

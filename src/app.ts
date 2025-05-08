@@ -21,6 +21,7 @@ import refreshTokenRouter from "./routes/refreshTokenRoutes";
 import reservationRouter from "./routes/reservationRoutes";
 import tableRouter from "./routes/tableRoutes";
 import { findByEmail /* , findById */ } from "./services/userService";
+// import { zodMiddleware } from './middlewares/zod.validator';
 // import { ApplicationError } from "./utils/errors";
 // errors
 // import { NotFoundError } from "./utils/errors";
@@ -85,6 +86,7 @@ app.all("*", (req: Request, res: Response) => {
   res.status(404).json({ message: `The page ${req.path} does not exist!` });
 });
 
+// app.use(zodMiddleware);
 /**
  * Error Handler.
  */
