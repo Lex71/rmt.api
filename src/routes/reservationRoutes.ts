@@ -10,11 +10,10 @@ import {
   patchReservation,
   remove,
   update,
-} from "../controllers/reservationController.ts";
-import { checkAuthenticated } from "../middlewares/auth.ts";
-import validate from "../middlewares/validator.ts";
-// import ssrErrorHandler from "../middlewares/ssrErrorHandler";
-// import validate from "../middlewares/validator.ts";
+} from "../controllers/reservationController";
+import { checkAuthenticated } from "../middlewares/auth";
+import validate from "../middlewares/validator";
+// import validate from "../middlewares/validator";
 
 const router = express.Router();
 

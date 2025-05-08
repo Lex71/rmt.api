@@ -5,11 +5,12 @@ import {
   HydratedDocument,
   Model,
   model,
+  QueryOptions,
   Schema,
   Types,
 } from "mongoose";
 
-import { comparePassword, hashPassword } from "../utils/helpers.ts";
+import { comparePassword, hashPassword } from "../utils/helpers";
 
 export enum Role {
   ADMIN = "admin",
@@ -28,6 +29,16 @@ export interface IUser /* extends Document */ {
 interface IUserMethods {
   // generateAuthToken(): Promise<string>;
   toJSON(): Partial<IUser>;
+}
+
+export interface UserSearchOptionsType {
+  // query?: Partial<QueryOptions<IFacility>>; // Optional search query, all searchable fields except _id
+  // query?: Partial<QueryOptions<IQueryFacility>>; // Optional search query, all searchable fields except _id
+  page?: number; // Optional page number for pagination
+  sortBy?: string; // Optional field to sort by
+  pageSize?: number; // Optional page size for pagination
+  sortOrder?: "asc" | "desc"; // Optional sort order, ascending or descending
+  query?: Partial<Omit<QueryOptions<IUser>, "_id">>; // Optional search query, all searchable fields except _id
 }
 
 interface UserModel extends Model<IUser, object, IUserMethods> {

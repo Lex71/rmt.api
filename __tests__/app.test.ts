@@ -1,6 +1,6 @@
 import request from "supertest";
 
-import app from "../src/app.ts";
+import app from "../src/app";
 
 describe("Test app.ts", () => {
   test("test only route", async () => {

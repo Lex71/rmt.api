@@ -1,6 +1,6 @@
-import app from "./app.ts";
-import config from "./config/config.ts";
-import { connectDB } from "./db/db.ts";
+import app from "./app";
+import config from "./config/config";
+import { connectDB } from "./db/db";
 
 const start = async () => {
   const conn = await connectDB();

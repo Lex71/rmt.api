@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-import config from "../config/config.ts";
+import config from "../config/config";
 
 const dbOptions = {
   // autoReconnect: true,

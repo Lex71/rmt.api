@@ -1,13 +1,10 @@
 import express, { NextFunction, Request, Response } from "express";
-import { getIndexData } from "../controllers/indexController.ts";
+import { getIndexData } from "../controllers/indexController";
 
 const router = express.Router();
 
-import {
-  checkAuthenticated,
-  checkNotAuthenticated,
-} from "../middlewares/auth.ts";
-import { fetchIndexData } from "../services/indexService.ts";
+import { checkAuthenticated, checkNotAuthenticated } from "../middlewares/auth";
+import { fetchIndexData } from "../services/indexService";
 
 router.get("/free", checkNotAuthenticated, (_req: Request, res: Response) => {
   res.status(200).json({

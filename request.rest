@@ -51,19 +51,19 @@ DELETE http://{{host}}/api/auth/logout
 Authorization: Bearer {{accessToken}}
 
 ###
-
+# @name freeRoute
 GET http://{{host}}/api/free
 Content-Type: {{contentType}}
 
 ###
 
 ###
-
+# @name getFacilityById
 GET http://{{host}}/api/facilities/67ead7c4c8c556d2c551e945
 Content-Type: {{contentType}}
 Authorization: Bearer {{accessToken}}
 ###
-
+# @name getAvailableTables
 # reservation.time = 16:00
 # tables: t6# DELAY: 90
 # until 17:30, table t6 is busy
@@ -74,16 +74,19 @@ Content-Type: {{contentType}}
 Authorization: Bearer {{accessToken}}
 ###
 
+# @name whoami
 GET http://{{host}}/api/auth/whoami
 Authorization: Bearer {{accessToken}}
 
 ###
 
+# @name refreshToken
 GET http://{{host}}/api/token/refresh
 Content-Type: {{contentType}}
 Set-Cookie: {{cookie}}
 
 ###
+# @name revokeToken
 POST http://{{host}}/api/token/revoke
 Content-Type: {{contentType}}
 Authorization: Bearer {{accessToken}}
@@ -93,6 +96,30 @@ Authorization: Bearer {{accessToken}}
 }
 
 ###
-
-DELETE http://{{host}}/api/facilities/123
+# @name createFacility
+POST http://{{host}}/api/facilities
+Content-Type: {{contentType}}
 Authorization: Bearer {{accessToken}}
+
+{
+  "name": "facility 3",
+  "address": "Address 3"
+}
+
+
+###
+# @name deleteFacility
+DELETE http://{{host}}/api/facilities/681ca6577df7428a810c6d0a
+Authorization: Bearer {{accessToken}}
+
+###
+# @name createTable
+POST http://{{host}}/api/tables
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}
+
+{
+  "name": "t10",
+  "description": "big",
+  "seats": 10
+}

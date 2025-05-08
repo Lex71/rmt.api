@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response } from "express";
 
-// import User from "../models/user.ts";
-import { fetchIndexData } from "../services/indexService.ts";
-import { ApplicationError } from "../utils/errors.ts";
+// import User from "../models/user";
+import { fetchIndexData } from "../services/indexService";
+import { ApplicationError } from "../utils/errors";
 
 export const getIndexData = async (
   req: Request,

@@ -1,6 +1,6 @@
 import { Types } from "mongoose";
-import Facility from "../models/facility.ts";
-import Table from "../models/table.ts";
+import Facility from "../models/facility";
+import Table from "../models/table";
 
 /* function wait(t: number) {
   return new Promise((resolve, reject) => {

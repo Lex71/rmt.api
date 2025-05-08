@@ -3,8 +3,8 @@ import express from "express";
 import {
   refreshToken,
   revokeRefreshToken,
-} from "../controllers/refreshTokenController.ts";
-import { isAdmin } from "../middlewares/auth.ts";
+} from "../controllers/refreshTokenController";
+import { isAdmin } from "../middlewares/auth";
 
 const router = express.Router();
 

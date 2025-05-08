@@ -6,16 +6,13 @@ import {
   registerUser,
   // registerUser,
   whoami,
-} from "../controllers/authController.ts";
+} from "../controllers/authController";
 
-// import { refreshToken } from "../controllers/refreshToken.ts";
+// import { refreshToken } from "../controllers/refreshToken";
 
-import {
-  checkAuthenticated,
-  checkNotAuthenticated,
-} from "../middlewares/auth.ts";
-import validate from "../middlewares/validator.ts";
-// import validate from "../middlewares/validator.ts";
+import { checkAuthenticated, checkNotAuthenticated } from "../middlewares/auth";
+import validate from "../middlewares/validator";
+// import validate from "../middlewares/validator";
 
 const router = express.Router();
 

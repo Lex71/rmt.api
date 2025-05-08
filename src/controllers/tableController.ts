@@ -1,9 +1,9 @@
 import { NextFunction, Request, Response } from "express";
 
-import { ITable, TableSearchOptionsType } from "../models/table.ts";
-import User from "../models/user.ts";
-import * as TableService from "../services/tableService.ts";
-import { ApplicationError } from "../utils/errors.ts";
+import { ITable, TableSearchOptionsType } from "../models/table";
+import User from "../models/user";
+import * as TableService from "../services/tableService";
+import { ApplicationError } from "../utils/errors";
 
 export const getAll = async (
   req: Request,
@@ -81,6 +81,10 @@ export const create = async (
     name,
     seats,
   }); */
+  if (!facility) {
+    next(new ApplicationError(401, "Only Facility Users can create tables"));
+    return;
+  }
   try {
     const newTable = await TableService.create({
       description,

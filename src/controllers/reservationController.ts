@@ -5,11 +5,11 @@ import {
   IReservation,
   ReservationSearchOptionsType,
   Status,
-} from "../models/reservation.ts";
-// import { TableSearchOptionsType } from "../models/table.ts";
-import * as ReservationService from "../services/reservationService.ts";
-// import { find as findTables } from "../services/tableService.ts";
-import { ApplicationError } from "../utils/errors.ts";
+} from "../models/reservation";
+// import { TableSearchOptionsType } from "../models/table";
+import * as ReservationService from "../services/reservationService";
+// import { find as findTables } from "../services/tableService";
+import { ApplicationError } from "../utils/errors";
 
 export const getAll = async (
   req: Request,

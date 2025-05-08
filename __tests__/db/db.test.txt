@@ -1,8 +1,8 @@
 import { Connection } from "mongoose";
-import { connectDB, disconnectDB } from "../../src/db/db.ts";
-// import Facility from "../../src/models/facility.ts";
+import { connectDB, disconnectDB } from "../../src/db/db";
+// import Facility from "../../src/models/facility";
 
-// import * as FacilityService from "../../src/services/facilityService.ts";
+// import * as FacilityService from "../../src/services/facilityService";
 describe("Connection", () => {
   let conn: boolean | Connection;
 

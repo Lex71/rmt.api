@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
-import config from "../config/config.ts";
-import { ApplicationError } from "../utils/errors.ts";
+import config from "../config/config";
+import { ApplicationError } from "../utils/errors";
 
 /**
  * Middleware to check if a request is authenticated.

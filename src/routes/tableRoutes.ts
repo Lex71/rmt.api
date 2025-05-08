@@ -9,8 +9,8 @@ import {
   // newTable,
   remove,
   update,
-} from "../controllers/tableController.ts";
-import { checkAuthenticated } from "../middlewares/auth.ts";
+} from "../controllers/tableController";
+import { checkAuthenticated } from "../middlewares/auth";
 // const imageMimeTypes = ["image/jpeg", "image/png", "images/gif"];
 
 const router = express.Router();

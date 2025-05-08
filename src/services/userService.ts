@@ -1,18 +1,7 @@
-// const users = [];
-
-// import { HydratedDocument } from "mongoose";
-import { FacilitySearchOptionsType } from "../models/facility.ts";
-// import User, { IUser } from "../models/user.ts";
-import User, { IUser } from "../models/user.ts";
-// create,
-//   find,
-//   findById,
-//   findByEmail,
-//   remove,
-//   update,
+import User, { IUser, UserSearchOptionsType } from "../models/user";
 
 export const find = async (
-  searchOptions: FacilitySearchOptionsType,
+  searchOptions: UserSearchOptionsType,
 ): Promise<IUser[]> => {
   // TODO crreate the corresponding type
   // return facilities;
@@ -43,24 +32,21 @@ export const findByEmail = async (email: string): Promise<IUser | null> => {
 export const create = async (user: Partial<IUser>) => {
   const { email, name, password } = user;
   if (!name || !email || !password) {
-    return {
-      error: "Please provide all the required fields",
-    };
+    // return {
+    //   error: "Please provide all the required fields",
+    // };
+    throw new Error("Please provide all the required fields");
   }
   const existingUser = await findByEmail(email);
   if (existingUser) {
-    return {
-      error: "User with that email already exists.",
-    };
+    // return {
+    //   error: "User with that email already exists.",
+    // };
+    throw new Error("User with that email already exists.");
   }
 
-  // const { name, email, password } = body;
-
-  // const user: HydratedDocument<IUser> = new User({
-
   try {
-    const newUser = new User({ email, name, password });
-    return await newUser.save();
+    return await User.create({ email, name, password });
   } catch {
     throw new Error("Cannot create User");
   }

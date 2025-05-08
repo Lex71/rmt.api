@@ -1,7 +1,7 @@
 import bcrypt from "bcrypt";
 import jwt, { JwtPayload } from "jsonwebtoken";
-import config from "../config/config.ts";
-import { Role } from "../models/user.ts";
+import config from "../config/config";
+import { Role } from "../models/user";
 
 const saltRounds = 10;
 

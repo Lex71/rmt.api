@@ -1,12 +1,12 @@
 import mongoose, { Types } from "mongoose";
 
-// import config from "../config/config.ts";
-import Facility from "../models/facility.ts";
+// import config from "../config/config";
+import Facility from "../models/facility";
 import Table, {
   ITable,
   tableSchema,
   TableSearchOptionsType,
-} from "../models/table.ts";
+} from "../models/table";
 
 export const findById = async (id: string) => {
   try {
@@ -77,32 +77,9 @@ export const find = async (searchOptions?: TableSearchOptionsType) => {
 }
  */
 export const create = async (body: Partial<ITable>) => {
-  // const table = new Table(body);
-  // try{
-  //   return await table.save();
-  // } catch {
-  //   throw new Error("Cannot create Table");
-  // }
-  /* const { description, facility, name, seats } = body;
-  const newTable = new Table({
-    description,
-    facility,
-    name,
-    seats,
-  }); */
-  const newTable = new Table(body);
+  // const newTable = new Table(body);
 
   const facility = body.facility; // the ._id of the facility model
-  // await connect(config.MONGODB_URL, {
-  //   heartbeatFrequencyMS: 1000,
-  //   // autoReconnect: true,
-  //   // reconnectTries: 30,
-  //   // poolSize: 10,
-  //   serverSelectionTimeoutMS: 5000,
-  // });
-  // Wait for the connection to be ready before starting a session
-  // await mongoose.connect(config.MONGODB_URL, {});
-  // await waitForMongooseConnection(mongoose);
   const db = mongoose.connection;
   const session = await db.startSession();
   // const session = await startSession();
@@ -110,7 +87,8 @@ export const create = async (body: Partial<ITable>) => {
     session.startTransaction();
     // if (facility != null) {
     // save the new table
-    await newTable.save();
+    // await newTable.save();
+    const newTable = await Table.create(body);
     // update the facility.tables array
     await Facility.findByIdAndUpdate(facility, {
       $push: { tables: newTable },
@@ -118,20 +96,6 @@ export const create = async (body: Partial<ITable>) => {
 
     await session.commitTransaction();
     return newTable;
-    /* const f = await Facility.findById(facility._id);
-      if (f) {
-        // save the new table...
-        await newTable.save();
-        // update the facility.tables array
-        f.tables.push(newTable._id);
-        // save the facility
-        await f.save();
-        // TODO: if f.save() fails, delete the newTable
-        return newTable;
-      } */
-    // } else {
-    //   throw new Error("Cannot create Table because cannot find Facility");
-    // }
   } catch (err: unknown) {
     await session.abortTransaction();
     if (err instanceof mongoose.MongooseError) {
@@ -145,18 +109,6 @@ export const create = async (body: Partial<ITable>) => {
 };
 
 export const update = async (id: string, body: Partial<ITable>) => {
-  // let table: ITable | null = null;
-  // try {
-  //   table = await Table.findById(id);
-  //   if (table) {
-  //     table.name = body.name;
-  //     table.address = body.address;
-  //     await table.save();
-  //     return table;
-  //   }
-  // } catch (err) {
-  //   throw new Error("Cannot update: Table not found");
-  // }
   try {
     // const filter = { facility: body.facility, id };
     return await Table.findByIdAndUpdate(id, body, { new: true }).orFail();

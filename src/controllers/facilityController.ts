@@ -3,10 +3,10 @@ import { NextFunction, Request, Response } from "express";
 import Facility, {
   FacilitySearchOptionsType,
   IFacility,
-} from "../models/facility.ts";
-// import User from "../models/user.ts";
-import * as FacilityService from "../services/facilityService.ts";
-import { ApplicationError } from "../utils/errors.ts";
+} from "../models/facility";
+// import User from "../models/user";
+import * as FacilityService from "../services/facilityService";
+import { ApplicationError } from "../utils/errors";
 
 export const getAll = async (
   req: Request,

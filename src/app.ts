@@ -10,20 +10,20 @@ import passport from "passport";
 
 // config
 // NOTE: just skip it for jwt authentication
-import initializePassport from "./config/passport-config.ts";
+import initializePassport from "./config/passport-config";
 
-import { errorHandler } from "./middlewares/errorHandler.ts";
+import { errorHandler } from "./middlewares/errorHandler";
 // routes
-import authRouter from "./routes/authRoutes.ts";
-import facilityRouter from "./routes/facilityRoutes.ts";
-import indexRouter from "./routes/indexRoute.ts";
-import refreshTokenRouter from "./routes/refreshTokenRoutes.ts";
-import reservationRouter from "./routes/reservationRoutes.ts";
-import tableRouter from "./routes/tableRoutes.ts";
-import { findByEmail /* , findById */ } from "./services/userService.ts";
-// import { ApplicationError } from "./utils/errors.ts";
+import authRouter from "./routes/authRoutes";
+import facilityRouter from "./routes/facilityRoutes";
+import indexRouter from "./routes/indexRoute";
+import refreshTokenRouter from "./routes/refreshTokenRoutes";
+import reservationRouter from "./routes/reservationRoutes";
+import tableRouter from "./routes/tableRoutes";
+import { findByEmail /* , findById */ } from "./services/userService";
+// import { ApplicationError } from "./utils/errors";
 // errors
-// import { NotFoundError } from "./utils/errors.ts";
+// import { NotFoundError } from "./utils/errors";
 
 // Create an Express application
 const app: Application = express();

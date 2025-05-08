@@ -1,15 +1,15 @@
 import moment from "moment";
 import { MongooseError, Types } from "mongoose";
 
-import config from "../config/config.ts";
-import Facility from "../models/facility.ts";
+import config from "../config/config";
+import Facility from "../models/facility";
 import Reservation, {
   IReservation,
   ReservationSearchOptionsType,
   Status,
   reservationSchema,
-} from "../models/reservation.ts";
-import Table from "../models/table.ts";
+} from "../models/reservation";
+import Table from "../models/table";
 
 export const findById = async (id: string) => {
   try {
@@ -167,13 +167,11 @@ export const findAvailableTables = async (
 
 export const create = async (body: Partial<IReservation>) => {
   const { date, facility, name, phone, seats, tables, time } = body;
-  // const tables = body.tables ? (body.tables as Types.ObjectId[]) : [];
 
   try {
-    // if (facility != null) {
     const f = await Facility.findById(facility);
     if (f) {
-      const newReservation = new Reservation({
+      return await Reservation.create({
         date,
         facility,
         name,
@@ -182,10 +180,8 @@ export const create = async (body: Partial<IReservation>) => {
         tables,
         time,
       });
-      // save the reservation
-      return await newReservation.save();
     } else {
-      throw new Error("Cannot create Reservation because cannot find Facility");
+      throw new Error("Cannot create Reservation without Facility");
     }
   } catch (err: unknown) {
     if (err instanceof MongooseError) {

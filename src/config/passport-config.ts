@@ -5,8 +5,8 @@ import {
   Strategy as JwtStrategy,
   VerifyCallback,
 } from "passport-jwt";
-import config from "../config/config.ts";
-import User, { IUser } from "../models/user.ts";
+import config from "../config/config";
+import User, { IUser } from "../models/user";
 
 const cookieExtractor = (req: Request) => {
   let token = null;

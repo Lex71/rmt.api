@@ -1,8 +1,8 @@
 import Facility, {
   FacilitySearchOptionsType,
   IFacility,
-} from "../models/facility.ts";
-import { ITable } from "../models/table.ts";
+} from "../models/facility";
+import { ITable } from "../models/table";
 
 export const findById = async (id: string): Promise<IFacility> => {
   console.log("id", id);
@@ -38,13 +38,9 @@ export const find = async (searchOptions?: FacilitySearchOptionsType) => {
 
 export const create = async (body: IFacility) => {
   const { address, name } = body;
-  const facility = new Facility({
-    address,
-    name,
-  });
 
   try {
-    return await facility.save();
+    return await Facility.create({ address, name });
   } catch {
     throw new Error("Cannot create Facility");
   }

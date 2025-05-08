@@ -1,13 +1,13 @@
 import { NextFunction, Request, Response } from "express";
 
-import RefreshToken from "../models/refreshToken.ts";
-import User, { IUser } from "../models/user.ts";
+import RefreshToken from "../models/refreshToken";
+import User, { IUser } from "../models/user";
 
-import { ApplicationError } from "../utils/errors.ts";
+import { ApplicationError } from "../utils/errors";
 import {
   issueAccessToken,
   verifyRefreshTokenNotExpired,
-} from "../utils/helpers.ts";
+} from "../utils/helpers";
 
 export async function refreshToken(
   req: Request,
