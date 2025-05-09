@@ -31,10 +31,10 @@ router.get("/:id", checkAuthenticated, getById);
 // router.get("/:id/edit", isAdmin, edit);
 
 // Create Facility Route
-router.post("/", isAdmin, validate("facilities", "post"), create);
+router.post("/", [isAdmin, validate("facilities", "post")], create);
 
 // Update Facility Route
-router.put("/:id", isAdmin, validate("facilities/:id", "put"), update);
+router.put("/:id", [isAdmin, validate("facilities/:id", "put")], update);
 
 // Delete Facility Route
 router.delete("/:id", isAdmin, remove);

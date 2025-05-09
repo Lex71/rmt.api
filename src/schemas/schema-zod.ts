@@ -1,14 +1,14 @@
-// import { z } from "zod";
+import { z } from "zod";
 // // schema.ts
 // import { Status } from "../models/reservation";
 
-// const PASSWORD_REGEX = new RegExp(
-//   /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!.@#$%^&*])(?=.{8,})/,
-// );
+const PASSWORD_REGEX = new RegExp(
+  /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!.@#$%^&*])(?=.{8,})/,
+);
 
-// const EMAIL_REGEX = new RegExp(
-//   /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/,
-// );
+const EMAIL_REGEX = new RegExp(
+  /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/,
+);
 
 /* const authRegister = z.object().shape({
   // firstName: z
@@ -174,3 +174,67 @@ export default {
 //   password: "password",
 //   role: "USER",
 // });
+
+const userSchema = z.object({
+  body: z.object({
+    email: z
+      .string({
+        invalid_type_error: "Email must be a string",
+        required_error: "Email is required",
+      })
+      .email("Invalid email")
+      .regex(EMAIL_REGEX, "Invalid email format"),
+    // .required("Email is required")
+    name: z.string().min(3, "Name must be at least 3 characters"), //.optional(),
+    password: z
+      .string()
+      .regex(
+        PASSWORD_REGEX,
+        "Password must contain at least 1 UPPERCASE char, 1 number and 1 special char: !.@#$%^&*",
+      ),
+  }),
+  // email: z
+  //   .string({
+  //     invalid_type_error: "Email must be a string",
+  //     required_error: "Email is required",
+  //   })
+  //   .email("Invalid email")
+  //   .regex(EMAIL_REGEX, "Invalid email format"),
+  // // .required("Email is required")
+  // name: z.string().min(3, "Name must be at least 3 characters"), //.optional(),
+  // password: z
+  //   .string()
+  //   .regex(
+  //     PASSWORD_REGEX,
+  //     "Password must contain at least 1 UPPERCASE char, 1 number and 1 special char: !.@#$%^&*",
+  //   ),
+});
+export type UserSchema = z.infer<typeof userSchema>;
+
+/* export const createArticleSchema = z.object({
+  body: z.object({
+    content: z.string({ required_error: 'Content is required' }),
+    title: z.string({ required_error: 'Title is required' }),
+  }),
+});
+export type CreateArticleInput = z.infer<typeof createArticleSchema.shape.body>; 
+*/
+
+export default {
+  patch: {
+    // "facilities/(.*)": facilitySchema.clone().partial(),
+    // "reservations/(.*)": reservationSchema.clone().partial(),
+    // "tables/(.*)": tableSchema.clone().partial(),
+  },
+  post: {
+    auth: userSchema,
+    // facilities: facilitySchema,
+    // reservations: reservationSchema.clone().omit(["status"]),
+    // tables: tableSchema,
+  },
+  put: {
+    // "facilities/(.*)": facilitySchema,
+    // "reservations/(.*)": reservationSchema,
+    // "tables/(.*)": tableSchema,
+  },
+} as Record<string, Record<string, z.ZodObject<z.ZodRawShape>>>;

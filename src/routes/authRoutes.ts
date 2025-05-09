@@ -12,15 +12,14 @@ import {
 
 import { checkAuthenticated, checkNotAuthenticated } from "../middlewares/auth";
 import validate from "../middlewares/yup.validator";
-// import validate from "../middlewares/validator";
+// import validate from "../middlewares/zod.validator";
 
 const router = express.Router();
 
 // register submit
 router.post(
   "/register",
-  checkNotAuthenticated,
-  validate("auth/register", "post"),
+  [checkNotAuthenticated, validate("auth/register", "post")],
   registerUser,
 );
 

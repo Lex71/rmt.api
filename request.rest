@@ -20,10 +20,15 @@ Content-Type: {{contentType}}
 POST http://{{host}}/api/auth/register
 Content-Type: {{contentType}}
 
+# {
+#   "name": "Test3",
+#   "email": "test3@rmt.com",
+#   "password": "Test3!!!"
+# }
 {
   "name": "Test3",
-  "email": "test3@rmt.com",
-  "password": "Test3!!!"
+  "email": "",
+  "password": ""
 }
 
 ###

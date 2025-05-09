@@ -38,21 +38,23 @@ router.get("/:id/edit", checkAuthenticated, edit);
 // router.get("/:id/:status", checkAuthenticated, updateStatusReservation);
 
 // Create Reservation Route
-router.post("/", checkAuthenticated, validate("reservations", "post"), create);
+router.post(
+  "/",
+  [checkAuthenticated, validate("reservations", "post")],
+  create,
+);
 
 // Update Reservation Route
 router.put(
   "/:id",
-  checkAuthenticated,
-  validate("reservations/:id", "put"),
+  [checkAuthenticated, validate("reservations/:id", "put")],
   update,
 );
 
 // Patch Reservation Route
 router.patch(
   "/:id",
-  checkAuthenticated,
-  validate("reservations/:id", "patch"),
+  [checkAuthenticated, validate("reservations/:id", "patch")],
   patchReservation,
 );
 
