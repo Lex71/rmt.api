@@ -60,6 +60,7 @@ export const userSchema = yup.object({
     //.email("Invalid email")
     .required("Email is required")
     .matches(EMAIL_REGEX, "Invalid email format"),
+  facility: yup.string().required("Required Facility"),
   name: yup.string().min(3, "Name must be at least 3 characters"),
   password: yup
     .string()
@@ -111,10 +112,14 @@ const reservationSchema = yup.object({
     .max(50, "Too Long!")
     .required("Required name")
     .matches(/^[a-zA-Z]+$/, "Invalid name format"),
+  phone: yup
+    .string()
+    .matches(/^\+?\d{1,3}[- ]?\d{1,3}[- ]?\d{3}[- ]?\d{4}$/, "Invalid phone"),
   status: yup
     .mixed<Status>()
     .oneOf(Object.values(Status), "Invalid status")
     .required("Status required"),
+  tables: yup.array().min(1, "Too Short!").required("Required tables"),
   time: yup
     .string()
     .required("Required time")

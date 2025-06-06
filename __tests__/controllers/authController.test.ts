@@ -8,6 +8,7 @@ import {
   registerUser,
   whoami,
 } from "../../src/controllers/authController";
+import Facility /*,  { IFacility } */ from "../../src/models/facility";
 import RefreshToken, { IRefreshToken } from "../../src/models/refreshToken";
 import User, { IUser } from "../../src/models/user";
 import { ApplicationError } from "../../src/utils/errors";
@@ -18,6 +19,7 @@ import {
 } from "../../src/utils/helpers";
 
 jest.mock("../../src/models/user");
+jest.mock("../../src/models/facility");
 jest.mock("../../src/models/refreshToken");
 jest.mock("../../src/utils/helpers");
 
@@ -80,6 +82,56 @@ describe("registerUser method", () => {
     );
   });
 
+  it("should return 400 if facility invalid", async () => {
+    const req = mockRegistrationRequest();
+    const res = mockResponse();
+    const next = mockNext();
+
+    const user: IUser = new User({
+      email: "test@example.com",
+      facility: "123", // invalid ObjectId
+      name: "John Doe",
+      password: "password",
+    });
+
+    (User.findOne as jest.Mock).mockResolvedValue(null);
+    (User.create as jest.Mock).mockResolvedValue(user);
+    (Facility.exists as jest.Mock).mockRejectedValue(
+      new ApplicationError(400, "Not Valid Facility ObjectId"),
+    );
+    // jest.spyOn(User, "create").mockReturnValueOnce(Promise.resolve(user));
+    // User.create = jest.fn().mockImplementation(() => Promise.resolve(user));
+
+    await registerUser(req, res, next);
+    expect(next).toHaveBeenCalledWith(
+      new ApplicationError(400, "Not Valid Facility ObjectId"),
+    );
+  });
+
+  it("should return 400 if facility does not exist", async () => {
+    const req = mockRegistrationRequest();
+    const res = mockResponse();
+    const next = mockNext();
+
+    const user: IUser = new User({
+      email: "test@example.com",
+      facility: "6841a1552bffd75c87efe4fx", // valid ObjectId but does not exist
+      name: "John Doe",
+      password: "password",
+    });
+
+    (User.findOne as jest.Mock).mockResolvedValue(null);
+    (User.create as jest.Mock).mockResolvedValue(user);
+    (Facility.exists as jest.Mock).mockResolvedValue(false);
+    // jest.spyOn(User, "create").mockReturnValueOnce(Promise.resolve(user));
+    // User.create = jest.fn().mockImplementation(() => Promise.resolve(user));
+
+    await registerUser(req, res, next);
+    expect(next).toHaveBeenCalledWith(
+      new ApplicationError(400, "Facility does not exist"),
+    );
+  });
+
   it("should return 201 and user if successful", async () => {
     const req = mockRegistrationRequest();
     const res = mockResponse();
@@ -92,8 +144,14 @@ describe("registerUser method", () => {
       password: "password",
     });
 
+    // const facilty: IFacility = new Facility({
+    //   address: "address 1",
+    //   name: "name 1",
+    // });
+
     (User.findOne as jest.Mock).mockResolvedValue(null);
     (User.create as jest.Mock).mockResolvedValue(user);
+    (Facility.exists as jest.Mock).mockResolvedValue(true);
     // jest.spyOn(User, "create").mockReturnValueOnce(Promise.resolve(user));
     // User.create = jest.fn().mockImplementation(() => Promise.resolve(user));
 

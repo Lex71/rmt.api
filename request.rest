@@ -25,10 +25,13 @@ Content-Type: {{contentType}}
 #   "email": "test3@rmt.com",
 #   "password": "Test3!!!"
 # }
+# existing facility  
+# "facility": "6841a1552bffd75c87efe4f4"
 {
   "name": "Test3",
-  "email": "",
-  "password": ""
+  "email": "test3@rmt.com",
+  "password": "Test3!!!",
+  "facility": "123"
 }
 
 ###
@@ -42,8 +45,8 @@ Content-Type: {{contentType}}
 # }
 
 {
-  "email": "test1@rmt.com",
-  "password": "Test1!!!"
+  "email": "test2@rmt.com",
+  "password": "Test2!!!"
 }
 
 ###
@@ -60,23 +63,6 @@ Authorization: Bearer {{accessToken}}
 GET http://{{host}}/api/free
 Content-Type: {{contentType}}
 
-###
-
-###
-# @name getFacilityById
-GET http://{{host}}/api/facilities/67ead7c4c8c556d2c551e945
-Content-Type: {{contentType}}
-Authorization: Bearer {{accessToken}}
-###
-# @name getAvailableTables
-# reservation.time = 16:00
-# tables: t6# DELAY: 90
-# until 17:30, table t6 is busy
-# adjust: 0 -> no busy tables
-# adjust: 15 -> t6 busy table
-GET http://{{host}}/api/reservations/tables?date=2025-04-04&time=18:30&adjust=1
-Content-Type: {{contentType}}
-Authorization: Bearer {{accessToken}}
 ###
 
 # @name whoami
@@ -101,30 +87,81 @@ Authorization: Bearer {{accessToken}}
 }
 
 ###
+
 # @name createFacility
 POST http://{{host}}/api/facilities
 Content-Type: {{contentType}}
 Authorization: Bearer {{accessToken}}
 
 {
-  "name": "facility 3",
-  "address": "Address 3"
+  "name": "facility 1",
+  "address": "Address 1"
 }
 
+###
+
+# @name getAllFacilities
+GET http://{{host}}/api/facilities
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}
 
 ###
+
 # @name deleteFacility
 DELETE http://{{host}}/api/facilities/681ca6577df7428a810c6d0a
 Authorization: Bearer {{accessToken}}
 
 ###
+
+# @name getFacilityById
+GET http://{{host}}/api/facilities/6841a1552bffd75c87efe4f4
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}
+
+###
+
+# @name getFacilityById
+GET http://{{host}}/api/facilities/67ead7c4c8c556d2c551e945
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}
+
+###
+
+# @name getAvailableTables
+# reservation.time = 16:00
+# tables: t6# DELAY: 90
+# until 17:30, table t6 is busy
+# adjust: 0 -> no busy tables
+# adjust: 15 -> t6 busy table
+GET http://{{host}}/api/reservations/tables?date=2025-04-04&time=18:30&adjust=1
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}
+
+###
+
 # @name createTable
 POST http://{{host}}/api/tables
 Content-Type: {{contentType}}
 Authorization: Bearer {{accessToken}}
 
 {
-  "name": "t10",
-  "description": "big",
-  "seats": 10
+  "name": "t1",
+  "description": "smally",
+  "seats": 2
+}
+
+###
+
+# @name createReservation
+POST http://{{host}}/api/reservations
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}
+
+{
+  "name": "Roberto",
+  "phone": "0399909223",
+  "date": "2025-06-05",
+  "time": "20:00",
+  "seats": 2,
+  "tables": ["6841ac56795fc7b139917020"]
 }

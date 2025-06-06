@@ -3,6 +3,7 @@ import { NextFunction, Request, Response } from "express";
 import RefreshToken from "../models/refreshToken";
 import User, { IUser } from "../models/user";
 
+import Facility from "../models/facility";
 import { ApplicationError } from "../utils/errors";
 import {
   comparePassword,
@@ -31,6 +32,40 @@ export async function registerUser(
     );
     return;
   }
+  // check facility exists, if not throw error
+  // if (!(await Facility.findById({ _id: facility }))) {
+  //   next(new ApplicationError(400, "Facility does not exist"));
+  //   return;
+  // }
+
+  // const result = await Facility.findOne({ _id: facility }).select("_id").lean();
+  // if (!result) {
+  //   // facility not exists...
+  //   next(new ApplicationError(400, "Facility does not exist"));
+  //   return;
+  // }
+  try {
+    if (!(await Facility.exists({ _id: facility }))) {
+      next(new ApplicationError(400, "Facility does not exist"));
+      return;
+    }
+  } catch (err) {
+    if (err instanceof Error) {
+      next(new ApplicationError(400, err.message));
+      return;
+    } else {
+      next(new ApplicationError(400, "Invalid facility ObjectId"));
+      return;
+    }
+  }
+  // Facility.exists({ _id: facility }, function (err) {
+  //   if (err) {
+  //     next(new ApplicationError(400, "Facility does not exist"));
+  //     return;
+  //   } else {
+  //     console.log("Does the user exist?", exists); // true or false
+  //   }
+  // });
   try {
     const user: IUser = await User.create({ email, facility, name, password });
     res.status(201).json({ data: { user } });
