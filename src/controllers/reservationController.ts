@@ -6,6 +6,9 @@ import {
   ReservationSearchOptionsType,
   Status,
 } from "../models/reservation";
+
+import { ITable } from "../models/table";
+
 // import { TableSearchOptionsType } from "../models/table";
 import * as ReservationService from "../services/reservationService";
 // import { find as findTables } from "../services/tableService";
@@ -175,7 +178,7 @@ export const getReservableTables = async (
   // if (!facility) next(new ApplicationError(400, "Missing user.facility parameter"));
 
   try {
-    const at = await ReservationService.findAvailableTables(
+    const at: ITable[] = await ReservationService.findAvailableTables(
       adjust,
       searchOptions,
     );

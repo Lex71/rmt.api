@@ -8,6 +8,7 @@ const MONGODB_URL = process.env.MONGODB_URL ?? "";
 // const SESSION_SECRET = process.env.SESSION_SECRET ?? "mysecret";
 const AVERAGE_STAYING_TIME = +(process.env.AVERAGE_STAYING_TIME ?? 90);
 const JWT_SECRET = process.env.JWT_SECRET ?? "verystrongkey";
+const RMT_APP_URL = process.env.RMT_APP_URL ?? "http://localhost:3000";
 
 export default {
   AVERAGE_STAYING_TIME,
@@ -15,4 +16,5 @@ export default {
   PORT,
   // SESSION_SECRET,
   JWT_SECRET,
+  RMT_APP_URL,
 };

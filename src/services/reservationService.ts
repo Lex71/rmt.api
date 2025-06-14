@@ -9,7 +9,7 @@ import Reservation, {
   Status,
   reservationSchema,
 } from "../models/reservation";
-import Table from "../models/table";
+import Table, { ITable } from "../models/table";
 
 export const findById = async (id: string) => {
   try {
@@ -61,7 +61,7 @@ export const find = async (searchOptions?: ReservationSearchOptionsType) => {
 export const findAvailableTables = async (
   adjust: number,
   searchOptions?: ReservationSearchOptionsType,
-) => {
+): Promise<ITable[]> => {
   const DELAY: number = config.AVERAGE_STAYING_TIME;
   try {
     let query = Reservation.find();
@@ -121,7 +121,7 @@ export const findAvailableTables = async (
       facility: new Types.ObjectId(searchOptions?.query?.facility),
     }); //.populate<{ tables: ITable[] }>("tables");
     console.log(r); */
-    const allTables = await Table.find({
+    const allTables: ITable[] = await Table.find({
       facility: searchOptions?.query?.facility,
     });
 

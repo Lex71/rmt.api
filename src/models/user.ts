@@ -18,6 +18,7 @@ export enum Role {
 }
 
 export interface IUser /* extends Document */ {
+  _id: string;
   email: string;
   // roles: Role[];
   role: Role;

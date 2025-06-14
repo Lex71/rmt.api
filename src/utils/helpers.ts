@@ -34,12 +34,12 @@ const issueAccessToken = (payload: {
   id: string;
   role: Role;
   facility?: string;
-}) => {
+}): string => {
   return jwt.sign(payload, config.JWT_SECRET, { expiresIn: "15m" });
 };
 
 const issueRefreshToken = (payload: { id: string }) => {
-  return jwt.sign(payload, config.JWT_SECRET, { expiresIn: "1d" });
+  return jwt.sign(payload, config.JWT_SECRET, { expiresIn: "1h" });
 };
 
 export {

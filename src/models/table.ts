@@ -13,6 +13,7 @@ import {
 export interface ITable /*  extends Document */ {
   name: string;
   seats: number;
+  _id: Types.ObjectId;
   description?: string;
   facility: Types.ObjectId;
 }

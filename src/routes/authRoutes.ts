@@ -1,6 +1,7 @@
 import express from "express";
 
 import {
+  changePassword,
   loginUser,
   logoutUser,
   registerUser,
@@ -41,5 +42,7 @@ router.delete("/logout", checkAuthenticated, logoutUser);
 // router.post("/revoke", isAdmin, refreshToken);
 
 router.get("/whoami", checkAuthenticated, whoami);
+
+router.post("/changePassword", checkAuthenticated, changePassword);
 
 export default router;

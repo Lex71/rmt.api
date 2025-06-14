@@ -153,3 +153,58 @@ export async function whoami(req: Request, res: Response, next: NextFunction) {
     next(new ApplicationError(401, "Unauthorized"));
   }
 }
+
+export async function changePassword(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
+  const { email, newPassword, oldPassword } = req.body as {
+    email: string;
+    oldPassword: string;
+    newPassword: string;
+  };
+  if (!(await User.findOne({ email }))) {
+    next(new ApplicationError(400, "An user with that email not exists"));
+    return;
+  }
+  // find if old password is valid
+  const oldUser = await User.findOne({ email: email });
+
+  if (!oldUser) {
+    next(new ApplicationError(400, "User does not exist"));
+    return;
+  }
+  //return res.status(401).send("User does not exist");
+  const isMatch = await comparePassword(oldPassword, oldUser.password);
+
+  if (!isMatch) {
+    // return res.status(401).send("Invalid old password");
+    next(new ApplicationError(400, "Invalid old password"));
+    return;
+  }
+
+  if (oldPassword === newPassword) {
+    next(
+      new ApplicationError(
+        400,
+        "New password cannot be the same as the old password",
+      ),
+    );
+    return;
+  }
+
+  oldUser.password = newPassword;
+  try {
+    const newUser: IUser = await oldUser.save();
+    res.status(200).json({ data: newUser });
+  } catch (err: unknown) {
+    if (err instanceof Error) {
+      // res.status(400).json({ error: err.message });
+      next(new ApplicationError(500, err.message));
+      // throw new ApplicationError(500, err.message);
+    } else {
+      next(new ApplicationError(500, "Change Password failed"));
+    }
+  }
+}
