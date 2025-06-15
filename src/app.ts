@@ -72,7 +72,7 @@ app.use("/api", indexRouter);
 app.use("/api/auth", authRouter);
 app.use("/api/token", refreshTokenRouter);
 // app.use('/api/users', userRouter);
-app.use("/reset_password", emailRouter);
+app.use("/api/forgot-password", emailRouter);
 
 app.use("/api/facilities", facilityRouter);
 app.use("/api/tables", tableRouter);

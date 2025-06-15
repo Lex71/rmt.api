@@ -23,8 +23,8 @@ function verifyRefreshTokenNotExpired(token: string): boolean {
     ?.payload as JwtPayload;
   if (decodedToken.exp) {
     const expirationDate = new Date(decodedToken.exp * 1000);
-    console.log(expirationDate);
-    return expirationDate.getTime() > new Date().getTime();
+    console.log(`expirationDate: ${expirationDate.toDateString()}`);
+    return expirationDate.getTime() <= new Date().getTime();
   }
   return false;
 }

@@ -49,7 +49,7 @@ export const sendPasswordResetEmail = async (
   res: Response,
   next: NextFunction,
 ) => {
-  const { email } = req.params;
+  const { email } = req.body as { email: string };
   let user;
   try {
     user = await User.findOne({ email });
@@ -73,20 +73,25 @@ export const sendPasswordResetEmail = async (
     return;
   }
   const url = getPasswordResetURL(user, token);
+  console.log(url);
   const emailTemplate = resetPasswordTemplate(user, url);
 
   const sendEmail = () => {
     transporter.sendMail(emailTemplate, (err, info) => {
       if (err) {
-        res.status(500).json("Error sending email");
+        res.status(500).json({ message: "Error sending email" });
+        return;
       }
       console.log(`** Email sent **`, info.response);
+      res.status(202).json({ message: "Email sent" });
     });
   };
   sendEmail();
+  // DEBUG
+  // res.status(202).json({ message: "Email sent" });
 };
 
-export const receiveNewPassword = async (
+export const setNewPassword = async (
   req: Request,
   res: Response,
   next: NextFunction,
@@ -95,6 +100,7 @@ export const receiveNewPassword = async (
   const { password } = req.body as { password: string };
 
   const user = await User.findOne({ _id: userId });
+
   if (!user) {
     next(new ApplicationError(404, "User not found"));
     return;
@@ -114,12 +120,12 @@ export const receiveNewPassword = async (
   }
   const payload = jwt.decode(token, { complete: true })?.payload as JwtPayload;
 
-  if (payload.id === user.id) {
+  if (payload.userId === user.id) {
     // await User.findOneAndUpdate({ _id: userId }, {password});
     user.password = password;
     try {
       await user.save();
-      res.status(202).json({ message: "Password changed accepted" });
+      res.status(200).json({ message: "Password changed successfully" });
     } catch (err) {
       if (err instanceof Error) {
         next(new ApplicationError(500, err.message));
@@ -137,5 +143,35 @@ export const receiveNewPassword = async (
               .catch((err) => res.status(500).json(err));
           });
         }); */
+  } else {
+    next(new ApplicationError(400, "Invalid userId in token"));
   }
+};
+
+export const validatePasswordResetToken = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  const { token, userId } = req.params;
+
+  const user = await User.findOne({ _id: userId });
+  if (!user) {
+    next(new ApplicationError(404, "User not found"));
+    return;
+  }
+
+  if (verifyRefreshTokenNotExpired(token)) {
+    next(new ApplicationError(400, "1 Hour Token expired"));
+    return;
+  }
+
+  const secret = user.password; /*  + "-" + user.createdAt; */
+  // const payload = jwt.decode(token, secret);
+  // const payload = jwt.decode(token, { complete: true })
+  if (!jwt.verify(token, secret)) {
+    next(new ApplicationError(400, "Invalid token"));
+    return;
+  }
+  res.status(200).json({ message: "Token valid" });
 };

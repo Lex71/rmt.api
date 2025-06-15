@@ -3,6 +3,7 @@
 
 import { createTransport } from "nodemailer";
 // import SMTPTransport from "nodemailer/lib/smtp-transport";
+import SMTPTransport from "nodemailer/lib/smtp-transport";
 import config from "../config/config";
 import { IUser } from "../models/user";
 
@@ -16,10 +17,10 @@ import { IUser } from "../models/user";
 
 export const getPasswordResetURL = (user: IUser, token: string): string =>
   // `http://localhost:3000/password/reset/${user._id}/${token}`;
-  `${config.RMT_APP_URL}/${user._id}/${token}`;
+  `${config.RMT_APP_BASE_URL}/password/reset/${user._id}/${token}`;
 
 export const resetPasswordTemplate = (user: IUser, url: string) => {
-  const from = process.env.EMAIL_LOGIN;
+  const from = config.SMTP_FROM;
   const to = user.email;
   const subject = "ReserveMyTable Password Reset";
   const html = `
@@ -35,16 +36,23 @@ export const resetPasswordTemplate = (user: IUser, url: string) => {
   return { from, html, subject, to };
 };
 
-// Create a transporter object
-export const transporter = createTransport({
-  auth: {
-    pass: "1a2b3c4d5e6f7g",
-    user: "1a2b3c4d5e6f7g",
-  },
-  host: "live.smtp.mailtrap.io",
-  port: 587,
+const configOptions: SMTPTransport.Options = {
+  host: config.SMTP_HOST,
+  port: config.SMTP_PORT,
   secure: false, // use SSL
-});
+  // tls: {
+  //   rejectUnauthorized: false,
+  // },
+  // url: `smtp://${config.SMTP_HOST}:${config.SMTP_PORT}`,
+  // service: 'gmail',
+  auth: {
+    pass: config.SMTP_PASS,
+    user: config.SMTP_USER,
+  },
+};
+
+// Create a transporter object
+export const transporter = createTransport(configOptions);
 
 /* // Configure the mailoptions object
 const mailOptions: SMTPTransport.Options = {

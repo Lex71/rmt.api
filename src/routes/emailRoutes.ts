@@ -2,12 +2,15 @@ import express from "express";
 const router = express.Router();
 
 import {
-  receiveNewPassword,
   sendPasswordResetEmail,
+  setNewPassword,
+  validatePasswordResetToken,
 } from "../controllers/emailController";
 
-router.post("/user/:email", sendPasswordResetEmail);
+router.post("/", sendPasswordResetEmail);
 
-router.post("/receive_new_password/:userId/:token", receiveNewPassword);
+router.get("/:userId/:token", validatePasswordResetToken);
+
+router.post("/:userId/:token", setNewPassword);
 
 export default router;
