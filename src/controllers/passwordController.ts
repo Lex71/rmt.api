@@ -97,7 +97,10 @@ export const setNewPassword = async (
   next: NextFunction,
 ) => {
   const { token, userId } = req.params;
-  const { password } = req.body as { password: string };
+  const { password, passwordConfirm } = req.body as {
+    password: string;
+    passwordConfirm: string;
+  };
 
   const user = await User.findOne({ _id: userId });
 
@@ -108,6 +111,12 @@ export const setNewPassword = async (
 
   if (verifyRefreshTokenNotExpired(token)) {
     next(new ApplicationError(400, "1 Hour Token expired"));
+    return;
+  }
+
+  // password and confirm password do not match
+  if (password !== passwordConfirm) {
+    next(new ApplicationError(400, "Passwords do not match"));
     return;
   }
 

@@ -21,7 +21,10 @@ export async function registerUser(
   res: Response,
   next: NextFunction,
 ) {
-  const { email, facility, name, password } = req.body as Partial<IUser>;
+  const { email, facility, name, password, passwordConfirm } =
+    req.body as Partial<IUser> & {
+      passwordConfirm: string;
+    };
   // check email is not used
   if (await User.findOne({ email })) {
     next(
@@ -57,6 +60,12 @@ export async function registerUser(
       next(new ApplicationError(400, "Invalid facility ObjectId"));
       return;
     }
+  }
+
+  // password and confirm password do not match
+  if (password !== passwordConfirm) {
+    next(new ApplicationError(400, "Passwords do not match"));
+    return;
   }
   // Facility.exists({ _id: facility }, function (err) {
   //   if (err) {

@@ -38,6 +38,7 @@ const mockRegistrationRequest = () => {
       facility: "123",
       name: "John Doe",
       password: "password",
+      passwordConfirm: "password",
     },
   } as unknown as Request;
 };
@@ -129,6 +130,33 @@ describe("registerUser method", () => {
     await registerUser(req, res, next);
     expect(next).toHaveBeenCalledWith(
       new ApplicationError(400, "Facility does not exist"),
+    );
+  });
+
+  it("should return 400 if password and confirmPassword do not match", async () => {
+    const req = mockRegistrationRequest();
+    const res = mockResponse();
+    const next = mockNext();
+
+    const user: IUser = new User({
+      email: "test@example.com",
+      facility: "6841a1552bffd75c87efe4fx", // valid ObjectId but does not exist
+      name: "John Doe",
+      password: "password",
+    });
+
+    (req.body as Partial<IUser> & { passwordConfirm: string }).passwordConfirm =
+      "wrongPassword";
+
+    (User.findOne as jest.Mock).mockResolvedValue(null);
+    (User.create as jest.Mock).mockResolvedValue(user);
+    (Facility.exists as jest.Mock).mockResolvedValue(true);
+    // jest.spyOn(User, "create").mockReturnValueOnce(Promise.resolve(user));
+    // User.create = jest.fn().mockImplementation(() => Promise.resolve(user));
+
+    await registerUser(req, res, next);
+    expect(next).toHaveBeenCalledWith(
+      new ApplicationError(400, "Passwords do not match"),
     );
   });
 

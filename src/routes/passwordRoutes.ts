@@ -5,7 +5,7 @@ import {
   sendPasswordResetEmail,
   setNewPassword,
   validatePasswordResetToken,
-} from "../controllers/emailController";
+} from "../controllers/passwordController";
 
 router.post("/", sendPasswordResetEmail);
 

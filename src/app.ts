@@ -15,9 +15,9 @@ import initializePassport from "./config/passport-config";
 import { errorHandler } from "./middlewares/errorHandler";
 // routes
 import authRouter from "./routes/authRoutes";
-import emailRouter from "./routes/emailRoutes";
 import facilityRouter from "./routes/facilityRoutes";
 import indexRouter from "./routes/indexRoute";
+import passwordRouter from "./routes/passwordRoutes";
 import refreshTokenRouter from "./routes/refreshTokenRoutes";
 import reservationRouter from "./routes/reservationRoutes";
 import tableRouter from "./routes/tableRoutes";
@@ -72,7 +72,7 @@ app.use("/api", indexRouter);
 app.use("/api/auth", authRouter);
 app.use("/api/token", refreshTokenRouter);
 // app.use('/api/users', userRouter);
-app.use("/api/forgot-password", emailRouter);
+app.use("/api/forgot-password", passwordRouter);
 
 app.use("/api/facilities", facilityRouter);
 app.use("/api/tables", tableRouter);
