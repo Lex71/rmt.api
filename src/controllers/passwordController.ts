@@ -83,12 +83,13 @@ export const sendPasswordResetEmail = async (
         return;
       }
       console.log(`** Email sent **`, info.response);
-      res.status(202).json({ message: "Email sent" });
+      // res.status(202).json({ message: "Email sent" });
+      res.status(202).json({ data: user });
     });
   };
   sendEmail();
   // DEBUG
-  // res.status(202).json({ message: "Email sent" });
+  // res.status(202).json({ data: user });
 };
 
 export const setNewPassword = async (
@@ -102,7 +103,7 @@ export const setNewPassword = async (
     passwordConfirm: string;
   };
 
-  const user = await User.findOne({ _id: userId });
+  let user = await User.findOne({ _id: userId });
 
   if (!user) {
     next(new ApplicationError(404, "User not found"));
@@ -123,18 +124,25 @@ export const setNewPassword = async (
   const secret = user.password; /*  + "-" + user.createdAt; */
   // const payload = jwt.decode(token, secret);
   // const payload = jwt.decode(token, { complete: true })
-  if (!jwt.verify(token, secret)) {
+  try {
+    if (!jwt.verify(token, secret)) {
+      next(new ApplicationError(400, "Invalid token"));
+      return;
+    }
+  } catch {
     next(new ApplicationError(400, "Invalid token"));
     return;
   }
+
   const payload = jwt.decode(token, { complete: true })?.payload as JwtPayload;
 
   if (payload.userId === user.id) {
     // await User.findOneAndUpdate({ _id: userId }, {password});
     user.password = password;
     try {
-      await user.save();
-      res.status(200).json({ message: "Password changed successfully" });
+      user = await user.save();
+      // res.status(200).json({ message: "Password changed successfully" });
+      res.status(200).json({ data: user });
     } catch (err) {
       if (err instanceof Error) {
         next(new ApplicationError(500, err.message));
@@ -178,9 +186,16 @@ export const validatePasswordResetToken = async (
   const secret = user.password; /*  + "-" + user.createdAt; */
   // const payload = jwt.decode(token, secret);
   // const payload = jwt.decode(token, { complete: true })
-  if (!jwt.verify(token, secret)) {
+  try {
+    if (!jwt.verify(token, secret)) {
+      next(new ApplicationError(400, "Invalid token"));
+      return;
+    }
+  } catch {
     next(new ApplicationError(400, "Invalid token"));
     return;
   }
-  res.status(200).json({ message: "Token valid" });
+
+  // res.status(200).json({ message: "Token valid" });
+  res.status(200).json({ data: user });
 };

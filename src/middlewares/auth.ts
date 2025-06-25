@@ -80,7 +80,8 @@ function checkNotAuthenticated(
       if (err) {
         next();
       } else {
-        res.status(200).json({ message: "Already logged in" });
+        // res.status(200).json({ message: "Already logged in" });
+        res.status(200).json({ data: req.user });
       }
     });
   }

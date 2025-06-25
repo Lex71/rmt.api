@@ -28,6 +28,8 @@ export async function refreshToken(
     return;
   }
 
+  console.log(`>>>>>>  refreshToken: ${requestToken}`);
+
   // if (!verifyRefreshTokenNotExpired(requestToken)) {
   // next(
   //   new ApplicationError(
@@ -43,11 +45,13 @@ export async function refreshToken(
       "user",
     );
     if (!rT) {
-      next(new ApplicationError(401, "Invalid refresh token"));
+      console.log(">>>>>>  refreshToken not found in DB");
+      next(new ApplicationError(403, "Invalid refresh token"));
       return;
     } else {
       if (!verifyRefreshTokenNotExpired(rT.token)) {
         await RefreshToken.deleteOne({ user: rT.user });
+        // res.clearCookie("refreshToken", { httpOnly: true, path: "/" });
         next(
           new ApplicationError(
             401,
@@ -78,7 +82,7 @@ export async function refreshToken(
 
         const newAccessToken = issueAccessToken(payload);
 
-        res.status(200).json({
+        res.status(201).json({
           data: {
             accessToken: newAccessToken,
             // refreshToken: refreshToken.token,
@@ -104,8 +108,12 @@ export async function revokeRefreshToken(
       next(new ApplicationError(400, "User not found"));
       return;
     }
-    await RefreshToken.deleteOne({ user: user.id });
-    res.clearCookie("refreshToken", { httpOnly: true, path: "/" });
+    await RefreshToken.deleteOne({ user: user._id.toString() });
+    res.clearCookie("refreshToken", {
+      httpOnly: true,
+      sameSite: "strict",
+      secure: false,
+    });
     // const invalidToken = "invalidToken";
     // res.cookie("refreshToken", invalidToken, {
     //   httpOnly: true,
@@ -113,7 +121,8 @@ export async function revokeRefreshToken(
     //   secure: true,
     //   signed: true,
     // });
-    res.status(204).json({ message: "Refresh token revoked successfully" });
+    // res.status(204).json({ message: "Refresh token revoked successfully" });
+    res.status(204).json({ data: user });
   } catch {
     next(new ApplicationError(500, "Revoke refresh token failed"));
     return;

@@ -20,6 +20,11 @@ GET http://{{host}}/api/free2
 Content-Type: {{contentType}}
 
 ###
+GET http://{{host}}/api/free3
+Content-Type: {{contentType}}
+
+###
+
 # @name registerAPI
 POST http://{{host}}/api/auth/register
 Content-Type: {{contentType}}

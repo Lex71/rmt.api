@@ -82,7 +82,7 @@ export const create = async (
     seats,
   }); */
   if (!facility) {
-    next(new ApplicationError(401, "Only Facility Users can create tables"));
+    next(new ApplicationError(403, "Only Facility Users can create tables"));
     return;
   }
   try {

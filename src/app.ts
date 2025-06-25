@@ -80,7 +80,7 @@ app.use("/api/reservations", reservationRouter);
 
 // Define a route for the test path ('/test')
 app.get("/test", (_: Request, res: Response) => {
-  res.status(200).json({ message: "Ciao, TypeScript + Node.js + Express!" });
+  res.status(200).json({ data: "Ciao, TypeScript + Node.js + Express!" });
 });
 
 // after all routes defined

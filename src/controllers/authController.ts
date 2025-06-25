@@ -13,7 +13,8 @@ import {
 
 export const logoutUser = (req: Request, res: Response) => {
   res.clearCookie("refreshToken", { httpOnly: true, path: "/" });
-  res.status(200).json({ message: "Logged out successfully" });
+  // res.status(200).json({ message: "Logged out successfully" });
+  res.status(200).json({ data: req.user });
 };
 
 export async function registerUser(
@@ -121,19 +122,23 @@ export async function loginUser(
   };
   const accessToken = issueAccessToken(payload);
   const refreshToken = issueRefreshToken({ id: user._id.toString() });
+
+  console.log(`>>>>>>  NEW refreshToken: ${refreshToken}`);
   // save the refresh token with current user
   try {
     const rT = await RefreshToken.create({
       token: refreshToken,
-      user: user._id,
+      user: user._id.toString(),
     });
 
     res.cookie("refreshToken", rT.token, {
       httpOnly: true,
       sameSite: "strict",
-      secure: true,
+      secure: false,
       // signed: true,
     });
+
+    console.log(`>>>>>>  refreshToken saved in DB: ${refreshToken}`);
 
     res.status(200).json({
       data: {

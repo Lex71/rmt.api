@@ -19,7 +19,7 @@ const router = express.Router();
 // Define routes
 
 // All Facilities Route
-router.get("/", checkAuthenticated, getAll);
+router.get("/", /* checkAuthenticated, */ getAll);
 
 // // New Facility Route
 // router.get("/new", isAdmin, newFacility);

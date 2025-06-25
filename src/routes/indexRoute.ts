@@ -29,6 +29,19 @@ router.get(
   },
 );
 
+router.get(
+  "/free3",
+  checkNotAuthenticated,
+  (_req: Request, res: Response, next: NextFunction) => {
+    try {
+      // res.status(202).json({ message: "Email sent" });
+      res.status(202).json({ data: { info: "Email sent" } });
+    } catch (error) {
+      next(error);
+    }
+  },
+);
+
 router.get("/index", checkAuthenticated, getIndexData);
 
 export default router;
