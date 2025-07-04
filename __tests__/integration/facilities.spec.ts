@@ -1,0 +1,571 @@
+// integration tests use in memory mongodb
+
+import { Types } from "mongoose";
+import request from "supertest";
+import app from "../../src/app"; // Assuming app.ts initializes Express
+import Facility, { IFacility } from "../../src/models/facility";
+import User from "../../src/models/user";
+
+describe("Facilities Controller", () => {
+  // let admin: IUser & { _id: Types.ObjectId };
+  // let user: IUser & { _id: Types.ObjectId };
+  let accessTokenAdmin: string, accessTokenUser: string;
+  const payloadAdmin = {
+    email: "admin@rmt.com",
+    name: "admin",
+    password: "admin",
+    passwordConfirm: "admin",
+    role: "admin",
+  };
+  const payloadUser = {
+    email: "user@rmt.com",
+    name: "user",
+    password: "User1!!!",
+    passwordConfirm: "user",
+    role: "user",
+  };
+  beforeAll(async () => {
+    // create and admin and a user
+    /* admin =  */ await User.create(payloadAdmin);
+    /* user =  */ await User.create(payloadUser);
+
+    // await request(app)
+    //   .post("/api/auth/register")
+    //   .set("content-type", "application/json")
+    //   .send({
+    //     email: payloadAdmin.email,
+    //     name: payloadAdmin.name,
+    //     password: payloadAdmin.password,
+    //     passwordConfirm: payloadAdmin.passwordConfirm,
+    //     role: payloadAdmin.role,
+    //   });
+
+    const responseAdmin = await request(app)
+      .post("/api/auth/login")
+      .set("content-type", "application/json")
+      .send({
+        email: payloadAdmin.email,
+        password: payloadAdmin.password,
+      });
+    // console.log(responseAdmin.body);
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    accessTokenAdmin = responseAdmin.body.data.accessToken as string;
+
+    // await request(app)
+    //   .post("/api/auth/register")
+    //   .set("content-type", "application/json")
+    //   .send(payloadUser);
+
+    const responseUser = await request(app)
+      .post("/api/auth/login")
+      .set("content-type", "application/json")
+      .send({
+        email: payloadUser.email,
+        password: payloadUser.password,
+      });
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    accessTokenUser = responseUser.body.data.accessToken as string;
+  });
+  afterAll(async () => {
+    await request(app)
+      .get("/api/auth/logout")
+      .set("content-type", "application/json")
+      .set("Authorization", `Bearer ${accessTokenAdmin}`);
+    await request(app)
+      .get("/api/auth/logout")
+      .set("content-type", "application/json")
+      .set("Authorization", `Bearer ${accessTokenUser}`);
+    await User.deleteMany({});
+  });
+  describe("list all facilities", () => {
+    it("anybody can get all facilities", async () => {
+      const response = await request(app)
+        .get("/api/facilities")
+        .set("content-type", "application/json");
+
+      expect(response.status).toBe(200);
+      expect(response.body).toHaveProperty("data");
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      expect(response.body.data.length).toBe(0);
+    });
+  });
+
+  describe("unauthenticated user cannot create facility", () => {
+    it("should return 401", async () => {
+      const response = await request(app)
+        .post("/api/facilities")
+        .set("content-type", "application/json")
+        .send({
+          address: "Address 1",
+          name: "Facility 1",
+        });
+
+      expect(response.status).toBe(401);
+    });
+  });
+
+  describe("create facility", () => {
+    it("should return 201 and the facility created", async () => {
+      const response = await request(app)
+        .post("/api/facilities")
+        .set("content-type", "application/json")
+        .set("Authorization", `Bearer ${accessTokenAdmin}`)
+        .send({
+          address: "Address 1",
+          name: "Facility 1",
+        });
+
+      expect(response.status).toBe(201);
+      expect(response.body).toHaveProperty("data");
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      expect(response.body.data.name).toBe("Facility 1");
+    });
+    it("should return 403 if user is not admin", async () => {
+      const response = await request(app)
+        .post("/api/facilities")
+        .set("content-type", "application/json")
+        .set("Authorization", `Bearer ${accessTokenUser}`)
+        .send({
+          address: "Address 1",
+          name: "Facility 1",
+        });
+
+      expect(response.status).toBe(403);
+    });
+  });
+
+  describe("get all facilities", () => {
+    it("should return 200 and all facilities", async () => {
+      await Facility.create({
+        address: "Address a",
+        name: "Facility a",
+      });
+      await Facility.create({
+        address: "Address b",
+        name: "Facility b",
+      });
+      const response = await request(app)
+        .get("/api/facilities")
+        .set("content-type", "application/json");
+
+      expect(response.status).toBe(200);
+      expect(response.body).toHaveProperty("data");
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      expect(response.body.data.length).toBeGreaterThanOrEqual(2);
+    });
+  });
+
+  describe("get a facility", () => {
+    let facility: IFacility & { _id: Types.ObjectId };
+
+    beforeAll(async () => {
+      facility = await Facility.create({
+        address: "Address",
+        name: "Facility",
+        tables: [],
+      });
+    });
+
+    it("should return 401 if the accessToken is missing", async () => {
+      const response = await request(app).get(
+        `/api/facilities/${facility._id.toString()}}`,
+      );
+      expect(response.status).toBe(401);
+    });
+
+    it("should return 200 if user is not admin", async () => {
+      const response = await request(app)
+        .get(`/api/facilities/${facility._id.toString()}`)
+        .set("Authorization", `Bearer ${accessTokenUser}`);
+
+      expect(response.status).toBe(200);
+      expect(response.body).toHaveProperty("data");
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      expect(response.body.data.name).toBe(facility.name);
+    });
+
+    it("should return 200 if user is admin", async () => {
+      const response = await request(app)
+        .get(`/api/facilities/${facility._id.toString()}`)
+        .set("Content-Type", "application/json")
+        // .set("Authorization", `Bearer ${accessTokenAdmin}`);
+        .auth(accessTokenAdmin, { type: "bearer" });
+
+      expect(response.status).toBe(200);
+      expect(response.body).toHaveProperty("data");
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      expect(response.body.data.name).toBe(facility.name);
+    });
+  });
+
+  describe("update a facility", () => {
+    // let facility: IFacility & { _id: Types.ObjectId };
+    // beforeAll(async () => {
+    //   facility = await Facility.create({
+    //     address: "Address 2",
+    //     name: "Facility 2",
+    //   });
+    // });
+
+    it("should return 404 if the facility doesnt exist", async () => {
+      const facilityId = "639c80ef98284bfdf111ad09";
+
+      const response = await request(app)
+        .put(`/api/facilities/${facilityId}`)
+        .set("content-type", "application/json")
+        .set("Authorization", `Bearer ${accessTokenAdmin}`)
+        .send({ address: "Address 2", name: "Facility 2 NEW" });
+
+      expect(response.status).toBe(404);
+    });
+
+    it("should return 200 and the updated facility", async () => {
+      const facility = await Facility.create({
+        address: "Address 2",
+        name: "Facility 2",
+      });
+      const response = await request(app)
+        // .patch(`/api/facilities/${facility._id.toString()}`) // facilities have no patch method!!!
+        .put(`/api/facilities/${facility._id.toString()}`)
+        .set("content-type", "application/json")
+        .set("Authorization", `Bearer ${accessTokenAdmin}`)
+        .send({ address: "Address 2", name: "Facility updated" });
+
+      expect(response.status).toBe(200);
+      expect(response.body).toHaveProperty("data");
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      expect(response.body.data.name).toBe("Facility updated");
+    });
+  });
+
+  describe("delete a facility", () => {
+    let facility: IFacility & { _id: Types.ObjectId };
+    beforeEach(async () => {
+      facility = await Facility.create({
+        address: "Address 3",
+        name: "Facility 3",
+      });
+    });
+
+    it("should return 404 if the facility with the id doesnt exist", async () => {
+      const facilityId = "639c80ef98284bfdf111ad09";
+      const response = await request(app)
+        .delete(`/api/facilities/${facilityId}`)
+        .set("content-type", "application/json")
+        .set("Authorization", `Bearer ${accessTokenAdmin}`);
+
+      expect(response.status).toBe(404);
+    });
+
+    it("should return 200 and the deleted facility", async () => {
+      const response = await request(app)
+        .delete(`/api/facilities/${facility._id.toString()}`)
+        .set("content-type", "application/json")
+        .set("Authorization", `Bearer ${accessTokenAdmin}`);
+
+      expect(response.status).toBe(200);
+      expect(response.body).toHaveProperty("data");
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      expect(response.body.data._id).toBe(facility._id.toString());
+    });
+  });
+});
+
+// REVIEW: cannot set req.user object, so server cant find req.user.facility to create tables
+// describe("Tables Controller", () => {
+//   // let admin: IUser & { _id: Types.ObjectId };
+//   let user: IUser & { _id: Types.ObjectId };
+//   let accessTokenAdmin: string, accessTokenUser: string;
+//   const payloadAdmin = {
+//     email: "admin@rmt.com",
+//     name: "admin",
+//     password: "admin",
+//     passwordConfirm: "admin",
+//     role: "admin",
+//   };
+//   const payloadUser = {
+//     email: "user@rmt.com",
+//     name: "user",
+//     password: "User1!!!",
+//     passwordConfirm: "user",
+//     role: "user",
+//   };
+//   beforeAll(async () => {
+//     // create and admin and a user
+//     /* admin =  */ await User.create(payloadAdmin);
+//     /* user =  */ await User.create(payloadUser);
+
+//     // await request(app)
+//     //   .post("/api/auth/register")
+//     //   .set("content-type", "application/json")
+//     //   .send({
+//     //     email: payloadAdmin.email,
+//     //     name: payloadAdmin.name,
+//     //     password: payloadAdmin.password,
+//     //     passwordConfirm: payloadAdmin.passwordConfirm,
+//     //     role: payloadAdmin.role,
+//     //   });
+
+//     const responseAdmin = await request(app)
+//       .post("/api/auth/login")
+//       .set("content-type", "application/json")
+//       .send({
+//         email: payloadAdmin.email,
+//         password: payloadAdmin.password,
+//       });
+//     // console.log(responseAdmin.body);
+//     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+//     accessTokenAdmin = responseAdmin.body.data.accessToken as string;
+
+//     // await request(app)
+//     //   .post("/api/auth/register")
+//     //   .set("content-type", "application/json")
+//     //   .send(payloadUser);
+
+//     const responseUser = await request(app)
+//       .post("/api/auth/login")
+//       .set("content-type", "application/json")
+//       .send({
+//         email: payloadUser.email,
+//         password: payloadUser.password,
+//       });
+//     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+//     accessTokenUser = responseUser.body.data.accessToken as string;
+//     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+//     user = responseUser.body.data.user;
+//   });
+//   afterAll(async () => {
+//     await request(app)
+//       .get("/api/auth/logout")
+//       .set("content-type", "application/json")
+//       .set("Authorization", `Bearer ${accessTokenAdmin}`);
+//     await request(app)
+//       .get("/api/auth/logout")
+//       .set("content-type", "application/json")
+//       .set("Authorization", `Bearer ${accessTokenUser}`);
+//     await User.deleteMany({});
+//   });
+//   describe("list all tables", () => {
+//     it("should return 401 if not authenticated", async () => {
+//       const response = await request(app)
+//         .get("/api/tables")
+//         .set("content-type", "application/json");
+
+//       expect(response.status).toBe(401);
+//     });
+//   });
+
+//   describe("unauthenticated user cannot create tables", () => {
+//     it("should return 401", async () => {
+//       const response = await request(app)
+//         .post("/api/tables")
+//         .set("content-type", "application/json")
+//         .send({
+//           description: "Description 1",
+//           name: "Table 1",
+//           seats: 4,
+//         });
+
+//       expect(response.status).toBe(401);
+//     });
+//   });
+
+//   describe("create table", () => {
+//     it("should return 201 and the table created by user", async () => {
+//       const response = await request(app)
+//         .post("/api/tables")
+//         .set("content-type", "application/json")
+//         // .set("Authorization", `Bearer ${accessTokenAdmin}`)
+//         .auth(accessTokenUser, { type: "bearer" })
+//         .send({
+//           description: "Description 1",
+//           name: "Table 1",
+//           seats: 4,
+//         });
+
+//       expect(response.status).toBe(201);
+//       expect(response.body).toHaveProperty("data");
+//       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+//       expect(response.body.data.name).toBe("Table 1");
+//       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+//       expect(response.body.data.facility).toBe(user.facility);
+//     });
+
+//     it("should return 201 and the table created by admin", async () => {
+//       // admin is not bound to any facility, so must provide it in the body
+//       const facility: IFacility & { _id: Types.ObjectId } =
+//         await Facility.create({
+//           address: "Address b",
+//           name: "Facility b",
+//         });
+//       const response = await request(app)
+//         .post("/api/tables")
+//         .set("content-type", "application/json")
+//         // .set("Authorization", `Bearer ${accessTokenAdmin}`)
+//         .auth(accessTokenAdmin, { type: "bearer" })
+//         .send({
+//           description: "Description 2",
+//           facility: facility._id.toString(),
+//           name: "Table 2",
+//           seats: 8,
+//         });
+
+//       expect(response.status).toBe(201);
+//       expect(response.body).toHaveProperty("data");
+//       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+//       expect(response.body.data.name).toBe("Table 2");
+//       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+//       expect(response.body.data.facility).toBe(facility._id.toString());
+//     });
+//   });
+
+//   describe("get all tables", () => {
+//     it("should return 200 and all facilities", async () => {
+//       await Table.create({
+//         description: "Description 2",
+//         facility: user.facility,
+//         name: "Table 2",
+//         seats: 10,
+//       });
+//       await Table.create({
+//         description: "Description 3",
+//         facility: user.facility,
+//         name: "Table 3",
+//         seats: 2,
+//       });
+//       const response = await request(app)
+//         .get("/api/tables")
+//         .set("content-type", "application/json")
+//         .auth(accessTokenUser, { type: "bearer" });
+
+//       expect(response.status).toBe(200);
+//       expect(response.body).toHaveProperty("data");
+//       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+//       expect(response.body.data.length).toBeGreaterThanOrEqual(2);
+//     });
+//   });
+
+//   describe("get a table", () => {
+//     let table: ITable & { _id: Types.ObjectId };
+
+//     beforeAll(async () => {
+//       table = await Table.create({
+//         description: "Description",
+//         facility: user.facility,
+//         name: "Table",
+//         seats: 6,
+//       });
+//     });
+
+//     it("should return 401 if the accessToken is missing", async () => {
+//       const response = await request(app).get(
+//         `/api/facilities/${table._id.toString()}}`,
+//       );
+//       expect(response.status).toBe(401);
+//     });
+
+//     it("should return 200 if user is not admin", async () => {
+//       const response = await request(app)
+//         .get(`/api/tables/${table._id.toString()}`)
+//         // .set("Authorization", `Bearer ${accessTokenUser}`);
+//         .auth(accessTokenAdmin, { type: "bearer" });
+
+//       expect(response.status).toBe(200);
+//       expect(response.body).toHaveProperty("data");
+//       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+//       expect(response.body.data.name).toBe(table.name);
+//     });
+
+//     it("should return 200 if user is admin", async () => {
+//       const response = await request(app)
+//         .get(`/api/tables/${table._id.toString()}`)
+//         .set("Content-Type", "application/json")
+//         // .set("Authorization", `Bearer ${accessTokenAdmin}`);
+//         .auth(accessTokenAdmin, { type: "bearer" });
+
+//       expect(response.status).toBe(200);
+//       expect(response.body).toHaveProperty("data");
+//       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+//       expect(response.body.data.name).toBe(table.name);
+//     });
+//   });
+
+//   describe("update a table", () => {
+//     // let facility: IFacility & { _id: Types.ObjectId };
+//     // beforeAll(async () => {
+//     //   facility = await Facility.create({
+//     //     address: "Address 2",
+//     //     name: "Facility 2",
+//     //   });
+//     // });
+
+//     it("should return 404 if the table doesnt exist", async () => {
+//       const tableId = "639c80ef98284bfdf111ad09";
+
+//       const response = await request(app)
+//         .put(`/api/facilities/${tableId}`)
+//         .set("content-type", "application/json")
+//         // .set("Authorization", `Bearer ${accessTokenUser}`)
+//         .auth(accessTokenUser, { type: "bearer" })
+//         .send({ description: "Facility NEW", name: "Table NEW", seats: 4 });
+
+//       expect(response.status).toBe(404);
+//     });
+
+//     it("should return 200 and the updated table", async () => {
+//       const table = await Table.create({
+//         description: "Description",
+//         facility: user.facility,
+//         name: "Table",
+//         seats: 10,
+//       });
+//       const response = await request(app)
+//         // .patch(`/api/facilities/${facility._id.toString()}`) // facilities have no patch method!!!
+//         .put(`/api/tables/${table._id.toString()}`)
+//         .set("content-type", "application/json")
+//         // .set("Authorization", `Bearer ${accessTokenUser}`)
+//         .auth(accessTokenUser, { type: "bearer" })
+//         .send({ description: "Description", name: "Table updated", seats: 10 });
+
+//       expect(response.status).toBe(200);
+//       expect(response.body).toHaveProperty("data");
+//       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+//       expect(response.body.data.name).toBe("Table updated");
+//     });
+//   });
+
+//   describe("delete a table", () => {
+//     let table: ITable & { _id: Types.ObjectId };
+//     beforeEach(async () => {
+//       table = await Table.create({
+//         description: "Description",
+//         facility: user.facility,
+//         name: "Table",
+//         seats: 10,
+//       });
+//     });
+
+//     it("should return 404 if the facility with the id doesnt exist", async () => {
+//       const tableId = "639c80ef98284bfdf111ad09";
+//       const response = await request(app)
+//         .delete(`/api/tables/${tableId}`)
+//         .set("content-type", "application/json")
+//         // .set("Authorization", `Bearer ${accessTokenUser}`);
+//         .auth(accessTokenUser, { type: "bearer" });
+
+//       expect(response.status).toBe(404);
+//     });
+
+//     it("should return 200 and the deleted facility", async () => {
+//       const response = await request(app)
+//         .delete(`/api/tables/${table._id.toString()}`)
+//         .set("content-type", "application/json")
+//         .set("Authorization", `Bearer ${accessTokenAdmin}`);
+
+//       expect(response.status).toBe(200);
+//       expect(response.body).toHaveProperty("data");
+//       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+//       expect(response.body.data._id).toBe(table._id.toString());
+//     });
+//   });
+// });

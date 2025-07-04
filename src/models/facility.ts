@@ -31,9 +31,10 @@ export interface FacilitySearchOptionsType {
 }
 
 // 1. Create an interface representing a document in MongoDB.
-export interface IFacility /* extends Document */ {
+export interface IFacility {
   name: string;
   address: string;
+  // _id?: Types.ObjectId;
   tables?: PopulatedDoc<ITable>[];
 }
 

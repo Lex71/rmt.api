@@ -16,22 +16,29 @@ import { ApplicationError } from "../utils/errors";
 function checkAuthenticated(req: Request, res: Response, next: NextFunction) {
   // const authHeader = req.headers.authorization;
   // const token = authHeader?.split(" ")[1];
-  let token = null;
+  let accessToken = null;
   if (req.headers.authorization) {
     const parts = req.headers.authorization.split(" ");
     if (parts.length === 2 && parts[0] === "Bearer") {
-      token = parts[1];
+      accessToken = parts[1];
     }
     // } else if (req.signedCookies.accessToken) {
     //   token = req.signedCookies.accessToken as string;
     // } else if (req.cookies.accessToken) {
     //   token = req.cookies.accessToken as string;
   }
+  // let refreshToken: string | null = null;
+  // if (req.signedCookies.refreshToken) {
+  //   // Destructuring refreshToken from cookie
+  //   refreshToken = req.signedCookies.refreshToken as string;
+  // } else if (req.cookies.refreshToken) {
+  //   refreshToken = req.cookies.refreshToken as string;
+  // }
 
-  if (!token) {
+  if (!accessToken) {
     next(new ApplicationError(401, "Unauthorized"));
   } else {
-    jwt.verify(token, config.JWT_SECRET, (err, user) => {
+    jwt.verify(accessToken, config.JWT_SECRET, (err, user) => {
       if (err) {
         next(new ApplicationError(401, err.message));
       } else {
@@ -56,7 +63,7 @@ function checkAuthenticated(req: Request, res: Response, next: NextFunction) {
  * @param next - Express next middleware function
  */
 
-function checkNotAuthenticated(
+/* function checkNotAuthenticated(
   req: Request,
   res: Response,
   next: NextFunction,
@@ -81,11 +88,15 @@ function checkNotAuthenticated(
         next();
       } else {
         // res.status(200).json({ message: "Already logged in" });
-        res.status(200).json({ data: req.user });
+        console.log(
+          `#######  checkNotAuthenticated req.user: ${JSON.stringify(req.user)}`,
+        );
+        // res.status(200).json({ data: { user: req.user } });
+        next(new ApplicationError(400, "Already logged in"));
       }
     });
   }
-}
+} */
 
 /**
  * Middleware to verify if the user has admin privileges.
@@ -111,7 +122,6 @@ function isAdmin(req: Request, res: Response, next: NextFunction) {
     // } else if (req.cookies.accessToken) {
     //   token = req.cookies.accessToken as string;
   }
-
   if (!token) {
     // next("Forbidden");
     next(new ApplicationError(401, "Unauthorized"));
@@ -140,4 +150,4 @@ function isAdmin(req: Request, res: Response, next: NextFunction) {
   }
 }
 
-export { checkAuthenticated, checkNotAuthenticated, isAdmin };
+export { checkAuthenticated, isAdmin };

@@ -113,11 +113,12 @@
   },
   "include": [
     "src/**/*.ts",
+    "__tests__/integration/bootstrap.ts",
     "__tests__/**/*.test.ts",
+    "__tests__/**/*.spec.ts",
     "eslint.config.mjs",
     "jest.config.mjs",
-    "vitest.config.js",
-    "__tests__/services/facility.ts"
+    "vitest.config.js"
   ],
   "exclude": ["**/*.js"]
 }

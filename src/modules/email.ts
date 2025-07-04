@@ -3,6 +3,7 @@
 
 import { createTransport } from "nodemailer";
 // import SMTPTransport from "nodemailer/lib/smtp-transport";
+import { Types } from "mongoose";
 import SMTPTransport from "nodemailer/lib/smtp-transport";
 import config from "../config/config";
 import { IUser } from "../models/user";
@@ -15,9 +16,12 @@ import { IUser } from "../models/user";
 //   }
 // })
 
-export const getPasswordResetURL = (user: IUser, token: string): string =>
+export const getPasswordResetURL = (
+  user: IUser & { _id: Types.ObjectId },
+  token: string,
+): string =>
   // `http://localhost:3000/password/reset/${user._id}/${token}`;
-  `${config.RMT_APP_BASE_URL}/password/reset/${user._id}/${token}`;
+  `${config.RMT_APP_BASE_URL}/password/reset/${user._id.toString()}/${token}`;
 
 export const resetPasswordTemplate = (user: IUser, url: string) => {
   const from = config.SMTP_FROM;

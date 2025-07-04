@@ -1,0 +1,1079 @@
+openapi: 3.0.0
+
+info:
+  title: Reserve My Table API
+  description: >
+    API for RMT server using OpenApi Specification.
+
+    ---
+
+    Using this API you can register, login, logout, and change password.
+    Handle CRUD for facilities, tables, and reservations.
+  termsOfService: "http://swagger.io/terms/"
+  contact:
+    name: Luca Albani
+    url: "https://github.com/Lex71"
+    email: walallah@gmail.com
+  license:
+    name: "Apache 2.0"
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+  version: 1.0.0
+
+servers:
+  - url: "{protocol}://{environment}.rmt.com/api"
+    variables:
+      environment:
+        default: rmt.com # Production server
+        enum:
+          - rmt.com # Production server
+          - rmt.dev # Development server
+          - rmt.staging # Staging server
+      protocol:
+        default: https
+        enum:
+          - http
+          - https
+tags:
+  - name: Auth
+    description: Authenticationn and Authorization
+    # externalDocs:
+    #   description: Find out more about our store
+    #   url: https://swagger.io
+  - name: Password
+    description: Passsword management
+  - name: Facilities
+    description: "The organization's facilities"
+  - name: Tables
+    description: The tables defined for each facility
+  - name: Reservations
+    description: The booking management
+
+paths:
+  /auth/whoami:
+    get:
+      tags:
+        - Auth
+      summary: Return the user
+      description: Return the user that is logged in.
+      operationId: "whoami"
+      responses:
+        "200":
+          description: A user in JSON format
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Access token does not have the required scope
+  /auth/login:
+    post:
+      tags:
+        - Auth
+      summary: Login a user
+      security: [] # No security
+      description: Login a user.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserLogin"
+      operationId: "loginUser"
+      responses:
+        "200":
+          description: A user in JSON format
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoggedUser"
+  /auth/register:
+    post:
+      tags:
+        - Auth
+      summary: Register a user
+      security: [] # No security
+      description: Register a user.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserRegister"
+      operationId: "registerUser"
+      responses:
+        "201":
+          description: A user in JSON format
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+  /auth/logout:
+    delete:
+      tags:
+        - Auth
+      summary: Logout a user
+      security:
+        - bearerAuth: []
+      description: Logout a user.
+      operationId: "logoutUser"
+      responses:
+        "200":
+          description: A user in JSON format
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Access token does not have the required scope
+  /auth/change-password:
+    put:
+      tags:
+        - Auth
+      summary: Change password
+      security:
+        - bearerAuth: []
+      description: Change password.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PasswordChange"
+      operationId: "changePassword"
+      responses:
+        "200":
+          description: A user in JSON format
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Access token does not have the required scope
+  /forgot-password:
+    post:
+      tags:
+        - Password
+      summary: Send an email to reset password
+      security: [] # No security
+      description: Send an email to reset password.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PasswordForgot"
+      operationId: "forgotPassword"
+      responses:
+        "200":
+          description: A user in JSON format
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+  /forgot-password/{userId}/{token}:
+    get:
+      tags:
+        - Password
+      summary: Verify token
+      security: [] # No security
+      description: Check 1-hour validity of token for resetting password.
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: token
+          in: path
+          required: true
+          schema:
+            type: string
+      operationId: "validatePasswordResetToken"
+      responses:
+        "200":
+          description: A user in JSON format
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+    post:
+      tags:
+        - Password
+      summary: Reset password
+      security: [] # No security
+      description: Reset password.
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: token
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PasswordReset"
+      operationId: "resetPassword"
+      responses:
+        "200":
+          description: A user in JSON format
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+  /facilities:
+    get:
+      tags:
+        - Facilities
+      summary: Return all the facilities
+      security: [] # No security (registerUser need to fetch data)
+      description: Return all the facilities that are in our organization.
+      operationId: "getAll"
+      responses:
+        "200":
+          description: An array of facilities in JSON format
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Facilities"
+    post:
+      tags:
+        - Facilities
+      summary: Create a facility
+      security:
+        - bearerAuth: []
+      description: Add a new facility in our organization.
+      operationId: "create"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Facility"
+      responses:
+        "201":
+          description: The request has succeeded and a new resource has been created as a result.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Facility"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Access token does not have the required scope
+  /facility/{id}:
+    get:
+      tags:
+        - Facilities
+      summary: Return a facility
+      security:
+        - bearerAuth: []
+      description: Return a facility with _id equals to id.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The facility._id requested by user.
+          schema:
+            type: string
+      operationId: "getById"
+      responses:
+        "200":
+          description: A facility in JSON format
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Facility"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Access token does not have the required scope
+    put:
+      tags:
+        - Facilities
+      summary: Update a facility
+      security:
+        - bearerAuth: []
+      description: A complete replacement of a facility by id.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The facility._id requested by user.
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FacilityUpdate"
+      operationId: "update"
+      responses:
+        "200":
+          description: Updated the facility completely.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Facility"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Access token does not have the required scope
+    patch:
+      tags:
+        - Facilities
+      summary: Update a facility
+      security:
+        - bearerAuth: []
+      description: Patch the facility by id partially.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The facility._id requested by user.
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FacilityPatch"
+      operationId: "patch"
+      responses:
+        "200":
+          description: Updated the facility partially.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Facility"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Access token does not have the required scope
+    delete:
+      tags:
+        - Facilities
+      summary: Deletes a facility
+      security:
+        - bearerAuth: []
+      description: Deletes the facilities by id.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The facility._id requested by user.
+          schema:
+            type: string
+      operationId: "remove"
+      responses:
+        "200":
+          description: The resource was deleted successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Facility"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Access token does not have the required scope
+  /tables:
+    get:
+      tags:
+        - Tables
+      summary: Return all the tables
+      security:
+        - bearerAuth: []
+      description: Return all the tables that are in our organization.
+      operationId: "getAllTables"
+      responses:
+        "200":
+          description: An array of tables in JSON format
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Tables"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Access token does not have the required scope
+    post:
+      tags:
+        - Tables
+      summary: Create a table
+      security:
+        - bearerAuth: []
+      description: Add a new table in our organization.
+      operationId: "createTable"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Table"
+      responses:
+        "201":
+          description: The request has succeeded and a new resource has been created as a result.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Table"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Access token does not have the required scope
+  /table/{id}:
+    get:
+      tags:
+        - Tables
+      summary: Return a table
+      security:
+        - bearerAuth: []
+      description: Return a table with _id equals to id.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The table._id requested by user.
+          schema:
+            type: string
+      operationId: "getTableById"
+      responses:
+        "200":
+          description: A table in JSON format
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Table"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Access token does not have the required scope
+    put:
+      tags:
+        - Tables
+      summary: Update a table
+      security:
+        - bearerAuth: []
+      description: A complete replacement of a table by id.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The table._id requested by user.
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TableUpdate"
+      operationId: "updateTable"
+      responses:
+        "200":
+          description: Updated the table completely.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Table"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Access token does not have the required scope
+    patch:
+      tags:
+        - Tables
+      summary: Update a table partially
+      security:
+        - bearerAuth: []
+      description: Patch the table by id partially.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The table._id requested by user.
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TablePatch"
+      operationId: "patch"
+      responses:
+        "200":
+          description: Updated the table partially.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Table"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Access token does not have the required scope
+    delete:
+      tags:
+        - Tables
+      summary: Deletes a table
+      security:
+        - bearerAuth: []
+      description: Deletes the tables by id.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The table._id requested by user.
+          schema:
+            type: string
+      operationId: "removeTable"
+      responses:
+        "200":
+          description: The resource was deleted successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Table"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Access token does not have the required scope
+  /reservations:
+    get:
+      tags:
+        - Reservations
+      summary: Return all the reservations
+      security:
+        - bearerAuth: []
+      description: Return all the reservations that are in our organization.
+      operationId: "getAllReservations"
+      responses:
+        "200":
+          description: An array of reservations in JSON format
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Reservations"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Access token does not have the required scope
+    post:
+      tags:
+        - Reservations
+      summary: Create a reservation
+      security:
+        - bearerAuth: []
+      description: Add a new reservation in our organization.
+      operationId: "createReservation"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Reservation"
+      responses:
+        "201":
+          description: The request has succeeded and a new resource has been created as a result.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Reservation"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Access token does not have the required scope
+  /reservations/{id}:
+    put:
+      tags:
+        - Reservations
+      summary: Update a reservation
+      security:
+        - bearerAuth: []
+      description: Update the reservation by id.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The reservation._id requested by user.
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReservationUpdate"
+      operationId: "patch"
+      responses:
+        "200":
+          description: Updated the reservation.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Reservation"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Access token does not have the required scope
+    patch:
+      tags:
+        - Reservations
+      summary: Update a reservation partially
+      security:
+        - bearerAuth: []
+      description: Patch the reservation by id partially.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The reservation._id requested by user.
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReservationPatch"
+      operationId: "patch"
+      responses:
+        "200":
+          description: Updated the reservation partially.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Reservation"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Access token does not have the required scope
+    delete:
+      tags:
+        - Reservations
+      summary: Deletes a reservation
+      security:
+        - bearerAuth: []
+      description: Deletes the reservation by id.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The reservation._id requested by user.
+          schema:
+            type: string
+      operationId: "removeReservation"
+      responses:
+        "200":
+          description: The resource was deleted successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Reservation"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Access token does not have the required scope
+components:
+  securitySchemes:
+    bearerAuth: # arbitrary name for the security scheme
+      type: http
+      scheme: bearer
+      bearerFormat: JWT # optional, arbitrary value for documentation purposes
+  schemas:
+    Facilities:
+      description: "An array of facility objects."
+      type: array
+      items:
+        $ref: "#/components/schemas/Facility"
+      example:
+        [
+          {
+            "_id": "5f5f5f5f5f5f5f5f5f5f5f5f",
+            "name": "Facility 1",
+            "address": "Address 1",
+          },
+        ]
+    Facility:
+      type: object
+      properties:
+        _id:
+          type: string
+          description: "The facility id."
+        name:
+          type: string
+          description: "The name of the facility."
+        address:
+          type: string
+          description: "The address of the facility"
+      required:
+        - name
+        - address
+      example:
+        name: "Facility name"
+        address: "Facility address"
+    FacilityUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+          description: "The name of the facility."
+        address:
+          type: string
+          description: "The address of the facility"
+      required:
+        - name
+        - address
+      example:
+        name: "Facility name"
+        address: "Facility address"
+    FacilityPatch:
+      type: object
+      properties:
+        name:
+          type: string
+          description: "The name of the facility"
+        address:
+          type: string
+          description: "The address of the facility"
+    Tables:
+      description: "An array of table objects."
+      type: array
+      items:
+        $ref: "#/components/schemas/Table"
+      example:
+        [
+          {
+            "_id": "1t1t1t1t1t1t1t1t1t1t1t1t",
+            "description": "A medium table 1",
+            "name": "Table 1",
+            "seats": 6,
+            "facility": "5f5f5f5f5f5f5f5f5f5f5f5f",
+          },
+        ]
+    Table:
+      type: object
+      properties:
+        _id:
+          type: string
+          description: "The table id."
+        description:
+          type: string
+          description: "The description of the table."
+        name:
+          type: string
+          description: "The name of the table."
+        seats:
+          type: number
+          description: "The number of seats of the table."
+        facility:
+          type: string
+          description: "The facility id of the table."
+      required:
+        - name
+        - description
+        - seats
+        - facility
+      example:
+        name: "Table name"
+        description: "Table description"
+        seats: 5
+        facility: "5f5f5f5f5f5f5f5f5f5f5f5f"
+    TableUpdate:
+      type: object
+      properties:
+        description:
+          type: string
+          description: "The description of the table."
+        name:
+          type: string
+          description: "The name of the table."
+        seats:
+          type: number
+          description: "The number of seats of the table."
+      required:
+        - name
+        - description
+        - seats
+        - facility
+      example:
+        name: "Table name"
+        description: "Table description"
+        seats: 5
+        facility: "5f5f5f5f5f5f5f5f5f5f5f5f"
+    TablePatch:
+      type: object
+      properties:
+        description:
+          type: string
+          description: "The description of the table."
+        name:
+          type: string
+          description: "The name of the table."
+        seats:
+          type: number
+          description: "The number of seats of the table."
+      example:
+        name: "Table new name"
+    Reservations:
+      description: "An array of reservation objects."
+      type: array
+      items:
+        $ref: "#/components/schemas/Reservation"
+      example:
+        [
+          {
+            "_id": "1r1r1r1r1r1r1r1r1r1r1r1r",
+            "date": "2021-01-01",
+            "time": "12:00",
+            "seats": 2,
+            "name": "John Doe",
+            "phone": "1234567890",
+            "tables": ["3t3t3t3t3t3t3t3t3t3t3t3t", "4t4t4t4t4t4t4t4t4t4t4t4t"],
+            "facility": "5f5f5f5f5f5f5f5f5f5f5f5f",
+          },
+        ]
+    Reservation:
+      type: object
+      properties:
+        _id:
+          type: string
+          description: "The reservation id."
+        date:
+          type: string
+          description: "The date of the reservation."
+        time:
+          type: string
+          description: "The time of the reservation."
+        seats:
+          type: number
+          description: "The number of guests of the reservation."
+        name:
+          type: string
+          description: "The name of the customer."
+        phone:
+          type: string
+          description: "The phone number of the customer."
+        status:
+          type: string
+          enum:
+            - pending
+            - approved
+            - rejected
+          description: "The status of the reservation."
+        tables:
+          type: array
+          items:
+            type: string
+          description: "The tables of the reservation."
+        facility:
+          type: string
+          description: "The facility id of the reservation."
+      required:
+        - date
+        - time
+        - seats
+        - name
+        - phone
+        - status
+        - tables
+        - facility
+      example:
+        date: "2021-01-01"
+        time: "12:00"
+        tables: ["3t3t3t3t3t3t3t3t3t3t3t3t", "4t4t4t4t4t4t4t4t4t4t4t4t"]
+        facility: "5f5f5f5f5f5f5f5f5f5f5f5f"
+    ReservationUpdate:
+      type: object
+      properties:
+        id:
+          type: string
+          description: "The facility id."
+        name:
+          type: string
+          description: "The name of the facility"
+        address:
+          type: string
+          description: "The address of the facility"
+      required:
+        - name
+        - address
+      example:
+        name: "Facility name"
+        address: "Facility address"
+    ReservationPatch:
+      type: object
+      properties:
+        id:
+          type: string
+          description: "The facility id."
+        name:
+          type: string
+          description: "The name of the facility"
+        address:
+          type: string
+          description: "The address of the facility"
+      example:
+        name: "Facility name"
+    User:
+      type: object
+      properties:
+        name:
+          type: string
+          description: "The name of the user."
+        email:
+          type: string
+          description: "The email of the user."
+        password:
+          type: string
+          description: "The password of the user."
+          writeOnly: true
+        facility:
+          type: string
+          description: "The facility id of the user."
+        role:
+          type: string
+          enum:
+            - user
+            - admin
+          description: "The role of the user."
+      required:
+        - name
+        - email
+        - password
+        - facility
+      example:
+        name: "John Doe"
+        email: "john.doe@rmt.com"
+        password: "Password123!"
+        facility: "5f5f5f5f5f5f5f5f5f5f5f5f"
+    UserRegister:
+      type: object
+      properties:
+        name:
+          type: string
+          description: "The name of the user."
+        email:
+          type: string
+          description: "The email of the user."
+        password:
+          type: string
+          description: "The password of the user."
+          writeOnly: true
+        passwordConfirm:
+          type: string
+          description: "The passwordConfirm of the user."
+          writeOnly: true
+        facility:
+          type: string
+          description: "The facility id of the user."
+      required:
+        - name
+        - email
+        - password
+        - passwordConfirm
+        - facility
+      example:
+        name: "John Doe"
+        email: "john.doe@rmt.com"
+        password: "Password123!"
+        passwordConfirm: "Password123!"
+        facility: "5f5f5f5f5f5f5f5f5f5f5f5f"
+    UserLogin:
+      type: object
+      properties:
+        email:
+          type: string
+          description: "The email of the user."
+        password:
+          type: string
+          description: "The password of the user."
+          writeOnly: true
+      required:
+        - email
+        - password
+      example:
+        email: "john.doe@rmt.com"
+        password: "Password123!"
+    LoggedUser:
+      type: object
+      properties:
+        user:
+          $ref: "#/components/schemas/User"
+        accessToken:
+          type: string
+          description: "The accessToken of the user."
+        refreshToken:
+          type: string
+          description: "The refreshToken of the user."
+      required:
+        - user
+        - token
+      example:
+        user:
+          name: "John Doe"
+          email: "john.doe@rmt.com"
+          role: "user"
+          facility: "5f5f5f5f5f5f5f5f5f5f5f5f"
+        accessToken: "accessToken"
+        refreshToken: "refreshToken"
+    PasswordChange:
+      type: object
+      properties:
+        currentPassword:
+          type: string
+          description: "The current password of the user."
+          writeOnly: true
+        newPassword:
+          type: string
+          description: "The new password of the user."
+          writeOnly: true
+        email:
+          type: string
+          description: "The email of the user."
+      required:
+        - currentPassword
+        - newPassword
+        - email
+    PasswordForgot:
+      type: object
+      properties:
+        email:
+          type: string
+          description: "The email of the user."
+      required:
+        - email
+    PasswordReset:
+      type: object
+      properties:
+        password:
+          type: string
+          description: "The password of the user."
+          writeOnly: true
+        passwordConfirm:
+          type: string
+          description: "The passwordConfirm of the user."
+          writeOnly: true
+      required:
+        - password
+        - passwordConfirm
+      example:
+        password: "Password123!"
+        passwordConfirm: "Password123!"
+# 2) Apply the security globally to all operations
+security:
+  - bearerAuth: [] # use the same name as above

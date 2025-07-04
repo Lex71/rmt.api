@@ -14,14 +14,24 @@ import initializePassport from "./config/passport-config";
 
 import { errorHandler } from "./middlewares/errorHandler";
 // routes
-import authRouter from "./routes/authRoutes";
-import facilityRouter from "./routes/facilityRoutes";
-import indexRouter from "./routes/indexRoute";
-import passwordRouter from "./routes/passwordRoutes";
-import refreshTokenRouter from "./routes/refreshTokenRoutes";
-import reservationRouter from "./routes/reservationRoutes";
-import tableRouter from "./routes/tableRoutes";
-import { findByEmail /* , findById */ } from "./services/userService";
+// import authRouter from "./routes/authRoutes";
+// import facilityRouter from "./routes/facilityRoutes";
+// import indexRouter from "./routes/indexRoute";
+// import passwordRouter from "./routes/passwordRoutes";
+// import refreshTokenRouter from "./routes/refreshTokenRoutes";
+// import reservationRouter from "./routes/reservationRoutes";
+// import tableRouter from "./routes/tableRoutes";
+
+import { findByEmail /* , findById */ } from "./api/users/users.service";
+import {
+  authRouter,
+  facilityRouter,
+  homeRouter,
+  passwordRouter,
+  refreshTokenRouter,
+  reservationRouter,
+  tableRouter,
+} from "./routes";
 // import { zodMiddleware } from './middlewares/zod.validator';
 // import { ApplicationError } from "./utils/errors";
 // errors
@@ -68,7 +78,7 @@ app.use(cookieParser(/* config.JWT_SECRET */));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 app.use(express.json());
 
-app.use("/api", indexRouter);
+app.use("/api", homeRouter);
 app.use("/api/auth", authRouter);
 app.use("/api/token", refreshTokenRouter);
 // app.use('/api/users', userRouter);
@@ -80,7 +90,7 @@ app.use("/api/reservations", reservationRouter);
 
 // Define a route for the test path ('/test')
 app.get("/test", (_: Request, res: Response) => {
-  res.status(200).json({ data: "Ciao, TypeScript + Node.js + Express!" });
+  res.status(200).json({ data: "Hello from test route!" });
 });
 
 // after all routes defined

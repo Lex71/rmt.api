@@ -8,8 +8,8 @@ const start = async () => {
     throw new Error("Error on database connection");
   }
   const port = config.PORT;
-  app.listen(port, () => {
-    console.log(`Server is running on http://localhost:${port.toString()}`);
+  app.listen(port, "0.0.0.0", () => {
+    console.log(`Server is running on port: ${port.toString()}`);
   });
 };
 

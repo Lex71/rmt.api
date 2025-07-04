@@ -72,6 +72,15 @@ export const userSchema = yup.object({
   // .min(8, "Password must be at least 8 characters"),
 });
 
+export const userRegisterSchema = userSchema.shape({
+  passwordConfirm: yup
+    .string()
+    .matches(
+      PASSWORD_REGEX,
+      "Password must contain at least 1 UPPERCASE char, 1 number and 1 special char: !.@#$%^&*",
+    ),
+});
+
 // const authSchema = yup.object({
 //   email: yup
 //     .string()
@@ -97,6 +106,41 @@ const facilitySchema = yup.object({
     .max(100, "Too Long!")
     .required("Required name"),
 });
+
+const passwordSchema = yup.object({
+  currentPassword: yup
+    .string()
+    .min(2, "Too Short!")
+    .max(100, "Too Long!")
+    .required("Required current password"),
+  // .matches(
+  //   PASSWORD_REGEX,
+  //   "Password must contain at least 1 UPPERCASE char, 1 number and 1 special char: !.@#$%^&*",
+  // ),
+  email: yup
+    .string()
+    //.email("Invalid email")
+    .required("Email is required")
+    .matches(EMAIL_REGEX, "Invalid email format"),
+  newPassword: yup
+    .string()
+    .min(2, "Too Short!")
+    .max(100, "Too Long!")
+    .required("Required old password")
+    .matches(
+      PASSWORD_REGEX,
+      "Password must contain at least 1 UPPERCASE char, 1 number and 1 special char: !.@#$%^&*",
+    ),
+});
+
+const forgotPasswordSchema = yup.object({
+  email: yup
+    .string()
+    .email("Invalid email address")
+    .required("Email is required")
+    .matches(EMAIL_REGEX, "Invalid email format"),
+});
+const resetPasswordSchema = yup.object({});
 
 const reservationSchema = yup.object({
   date: yup
@@ -145,19 +189,23 @@ const tableSchema = yup.object({
 // } as Record<string, yup.ObjectSchema<yup.AnyObject>>;
 export default {
   patch: {
-    "facilities/(.*)": facilitySchema.clone().partial(),
-    "reservations/(.*)": reservationSchema.clone().partial(),
-    "tables/(.*)": tableSchema.clone().partial(),
+    "facilities/(.+)": facilitySchema.clone().partial(),
+    "reservations/(.+)": reservationSchema.clone().partial(),
+    "tables/(.+)": tableSchema.clone().partial(),
   },
   post: {
-    auth: userSchema,
+    "auth/change-password": passwordSchema,
+    "auth/register": userRegisterSchema,
     facilities: facilitySchema,
+    "forgot-password/(.+)/(.+)": resetPasswordSchema,
+    // eslint-disable-next-line perfectionist/sort-objects
+    "forgot-password": forgotPasswordSchema,
     reservations: reservationSchema.clone().omit(["status"]),
     tables: tableSchema,
   },
   put: {
-    "facilities/(.*)": facilitySchema,
-    "reservations/(.*)": reservationSchema,
-    "tables/(.*)": tableSchema,
+    "facilities/(.+)": facilitySchema,
+    "reservations/(.+)": reservationSchema,
+    "tables/(.+)": tableSchema,
   },
 } as Record<string, Record<string, yup.ObjectSchema<yup.AnyObject>>>;

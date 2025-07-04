@@ -18,13 +18,23 @@ export enum Role {
 }
 
 export interface IUser /* extends Document */ {
-  _id: string;
+  // _id: string;
   email: string;
   // roles: Role[];
   role: Role;
   name: string;
   password: string;
   facility?: Types.ObjectId;
+}
+
+export interface UserSearchOptionsType {
+  // query?: Partial<QueryOptions<ITable>>; // Optional search query, all searchable fields except _id
+  // query?: Partial<QueryOptions<IQueryTable>>; // Optional search query, all searchable fields except _id
+  page?: number; // Optional page number for pagination
+  sortBy?: string; // Optional field to sort by
+  pageSize?: number; // Optional page size for pagination
+  sortOrder?: "asc" | "desc"; // Optional sort order, ascending or descending
+  query?: Partial<Omit<QueryOptions<IUser>, "_id">>; // Optional search query, all searchable fields except _id
 }
 
 interface IUserMethods {
