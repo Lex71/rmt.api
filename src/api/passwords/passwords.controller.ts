@@ -60,12 +60,12 @@ export const sendPasswordResetEmail = async (
       next(new ApplicationError(400, err.message));
       return;
     } else {
-      next(new ApplicationError(404, "No user with that email"));
+      next(new ApplicationError(400, "No user with that email"));
       return;
     }
   }
   if (!user) {
-    next(new ApplicationError(404, "No user with that email"));
+    next(new ApplicationError(400, "No user with that email"));
     return;
   }
   const token = usePasswordHashToMakeToken(user);
@@ -107,7 +107,7 @@ export const setNewPassword = async (
   let user = await User.findOne({ _id: userId });
 
   if (!user) {
-    next(new ApplicationError(404, "User not found"));
+    next(new ApplicationError(400, "User not found"));
     return;
   }
 
@@ -176,13 +176,13 @@ export const validatePasswordResetToken = async (
 
   const user = await User.findOne({ _id: userId });
   if (!user) {
-    next(new ApplicationError(404, "User not found"));
+    next(new ApplicationError(400, "User not found"));
     return;
   }
 
   if (!verifyRefreshTokenNotExpired(token)) {
     // it is expired
-    next(new ApplicationError(400, "1 Hour Token expired"));
+    next(new ApplicationError(403, "1 Hour Token expired"));
     return;
   }
 
@@ -191,11 +191,11 @@ export const validatePasswordResetToken = async (
   // const payload = jwt.decode(token, { complete: true })
   try {
     if (!jwt.verify(token, secret)) {
-      next(new ApplicationError(400, "Invalid token"));
+      next(new ApplicationError(403, "Invalid token"));
       return;
     }
   } catch {
-    next(new ApplicationError(400, "Invalid token"));
+    next(new ApplicationError(403, "Invalid token"));
     return;
   }
 
