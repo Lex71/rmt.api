@@ -177,7 +177,7 @@ const tableSchema = yup.object({
     .min(2, "Too Short!")
     .max(50, "Too Long!")
     .required("Required name")
-    .matches(/^[a-zA-Z]+$/, "Invalid name format"),
+    .matches(/^[a-zA-Z0-9]+$/, "Invalid name format"),
   seats: yup.number().min(2, "Too Short!").required("Required seats"),
 });
 
