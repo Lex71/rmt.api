@@ -182,7 +182,7 @@ export async function changePassword(
 
   if (req.user && !(req.user.email === email)) {
     next(
-      new ApplicationError(403, "The email is not the same as the user email"),
+      new ApplicationError(400, "The email is not the same as the user email"),
     );
     return;
   }
