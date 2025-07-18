@@ -1,63 +1,111 @@
-/* const assert = require("assert");
+import dotenv from "dotenv";
+// import { MongoClient } from "mongodb";
 
-const MongoClient = require("mongodb").MongoClient;
+// if (process.env.NODE_ENV !== "production") {
+//   dotenv.config();
+//   const dbname = process.env.MONGO_INITDB_DATABASE ?? "reserve-my-table";
+//   const url = process.env.MONGODB_URL ?? "mongodb://localhost:27017";
+//   MongoClient.connect(url)
+//     .then((client) => {
+//       console.log("Connected successfully to server");
+//       const db = client.db(dbname);
 
-const url = "mongodb://localhost:27017"; // MongoDB connection URL
-const dbName = "reserve-my-table"; // Database name
+//       // db.createUser({
+//       //   user: "root",
+//       //   pwd: "password",
+//       //   roles: [
+//       //     {
+//       //       role: "readWrite",
+//       //       db: dbname,
+//       //     },
+//       //   ],
+//       // });
+//       // db.command({
+//       //   createUser: "root",
+//       //   pwd: "password",
+//       //   roles: [
+//       //     {
+//       //       role: "readWrite",
+//       //       db: dbname,
+//       //     },
+//       //   ],
+//       // });
+//       db.admin().command({
+//         createUser: "root",
+//         pwd: "password",
+//         roles: [
+//           {
+//             role: "readWrite",
+//             db: dbname,
+//           },
+//         ],
+//       });
 
-// @ts-ignore
-MongoClient.connect(url, function (err, client) {
-  assert.equal(null, err);
-  console.log("Connected successfully to server");
+//       // db = new Mongo().getDB("testDB");
+//       db.createCollection("facilities", { capped: false });
+//       db.createCollection("users", { capped: false });
+//       db.createCollection("tables", { capped: false });
+//       db.createCollection("reservations", { capped: false });
+//       // db.createCollection("test", { capped: false });
 
-  const db = client.db(dbName);
+//       // db.users.insert([
+//       //   {
+//       //     name: "Administrator",
+//       //     email: process.env.ADMIN_EMAIL ?? "admin@rmt.com",
+//       //     password:
+//       //       "$2b$10$fyrt.SNdlPL8JdzfbhktEeq6c6fy2fG0LwzPXw7mXzY9KpwEzgUhy",
+//       //     role: "admin",
+//       //   },
+//       // ]);
+//       db.collection("users").insertOne([
+//         {
+//           name: "Administrator",
+//           email: process.env.ADMIN_EMAIL ?? "admin@rmt.com",
+//           password:
+//             "$2b$10$fyrt.SNdlPL8JdzfbhktEeq6c6fy2fG0LwzPXw7mXzY9KpwEzgUhy",
+//           role: "admin",
+//         },
+//       ]);
 
+//       // ... rest of your code
+//     })
+//     .catch((err) => {
+//       console.log(err);
+//     });
+// }
+if (process.env.NODE_ENV !== "production") {
+  dotenv.config();
+  const dbname = process.env.MONGO_INITDB_DATABASE ?? "reserve-my-table";
+  const adminEmail = process.env.ADMIN_EMAIL ?? "admin@rmt.com";
+  const adminPassword =
+    "$2b$10$fyrt.SNdlPL8JdzfbhktEeq6c6fy2fG0LwzPXw7mXzY9KpwEzgUhy"; // hashed "admin"
+  // database user
   db.createUser({
     user: "root",
     pwd: "password",
     roles: [
       {
         role: "readWrite",
-        db: dbName,
+        db: dbname,
       },
     ],
   });
 
-  // Create a collection
-  db.createCollection("users", function (err, res) {
-    assert.equal(null, err);
-    console.log("Collection created");
-    client.close();
-  });
-}); */
-
-// database user
-db.createUser({
-  user: "root",
-  pwd: "password",
-  roles: [
+  // db = new Mongo().getDB("testDB");
+  db.createCollection("facilities", { capped: false });
+  db.createCollection("users", { capped: false });
+  db.createCollection("tables", { capped: false });
+  db.createCollection("reservations", { capped: false });
+  // create administrator
+  db.users.insert([
     {
-      role: "readWrite",
-      db: "reserve-my-table",
+      name: "Administrator",
+      email: adminEmail,
+      password: adminPassword,
+      role: "admin",
     },
-  ],
-});
-
-// db = new Mongo().getDB("testDB");
-db.createCollection("facilities", { capped: false });
-db.createCollection("users", { capped: false });
-db.createCollection("tables", { capped: false });
-db.createCollection("reservations", { capped: false });
-// db.createCollection("test", { capped: false });
-
-db.users.insert([
-  {
-    name: "Administrator",
-    email: "admin@rmt.com",
-    password: "$2b$10$fyrt.SNdlPL8JdzfbhktEeq6c6fy2fG0LwzPXw7mXzY9KpwEzgUhy",
-    role: "admin",
-  },
-]);
+  ]);
+}
 
 /* db.getCollection("facilities").insertOne({
   name: "Facility 1",
