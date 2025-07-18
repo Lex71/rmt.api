@@ -57,7 +57,7 @@ export const find = async (searchOptions?: ReservationSearchOptionsType) => {
       }
     }
     query = query.sort({ date: 1, time: 1 });
-    return await query.exec();
+    return await query.populate<{ tables: Types.ObjectId[] }>("tables").exec();
   } catch (err) {
     if (err instanceof mongoose.MongooseError) {
       console.log(err.message);
