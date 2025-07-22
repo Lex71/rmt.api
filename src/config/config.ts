@@ -8,6 +8,8 @@ const MONGODB_URL = process.env.MONGODB_URL ?? "";
 // const SESSION_SECRET = process.env.SESSION_SECRET ?? "mysecret";
 const AVERAGE_STAYING_TIME = +(process.env.AVERAGE_STAYING_TIME ?? 90);
 const JWT_SECRET = process.env.JWT_SECRET ?? "verystrongkey";
+const ACCESS_TOKEN_EXPIRATION = process.env.ACCESS_TOKEN_EXPIRATION ?? "1d";
+const REFRESH_TOKEN_EXPIRATION = process.env.REFRESH_TOKEN_EXPIRATION ?? "30d";
 const RMT_APP_BASE_URL =
   process.env.RMT_APP_BASE_URL ?? "http://localhost:5173";
 const SMTP_HOST = process.env.SMTP_HOST ?? "smtp.mailtrap.io";
@@ -21,7 +23,9 @@ export default {
   MONGODB_URL,
   PORT,
   // SESSION_SECRET,
+  ACCESS_TOKEN_EXPIRATION,
   JWT_SECRET,
+  REFRESH_TOKEN_EXPIRATION,
   RMT_APP_BASE_URL,
   SMTP_FROM,
   SMTP_HOST,

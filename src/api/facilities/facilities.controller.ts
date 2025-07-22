@@ -47,13 +47,13 @@ export const getById = async (
       if (err instanceof Error) {
         next(new ApplicationError(404, err.message));
       } else {
-        next(new ApplicationError(404, "Facility non exists"));
+        next(new ApplicationError(404, "Facility not exists"));
       }
     } else {
       if (err instanceof Error) {
         next(new ApplicationError(500, err.message));
       } else {
-        next(new ApplicationError(500, "Cannot update facility"));
+        next(new ApplicationError(500, "Error updating facility"));
       }
     }
   }
@@ -70,7 +70,7 @@ export const create = async (
     const newFacility = await FacilityService.create({ address, name });
     res.status(201).json({ data: newFacility });
   } catch {
-    next(new ApplicationError(500, "Error creating Facility"));
+    next(new ApplicationError(500, "Error creating facility"));
   }
 };
 
@@ -95,13 +95,13 @@ export const update = async (
       if (err instanceof Error) {
         next(new ApplicationError(404, err.message));
       } else {
-        next(new ApplicationError(404, "Facility non exists"));
+        next(new ApplicationError(404, "Facility not exists"));
       }
     } else {
       if (err instanceof Error) {
         next(new ApplicationError(500, err.message));
       } else {
-        next(new ApplicationError(500, "Cannot update facility"));
+        next(new ApplicationError(500, "Error updating facility"));
       }
     }
   }
@@ -119,12 +119,12 @@ export const patch = async (
     res.status(200).json({ data: table });
   } catch (err: unknown) {
     if (table == null) {
-      next(new ApplicationError(404, "Facility non exists"));
+      next(new ApplicationError(404, "Facility not exists"));
     } else {
       if (err instanceof Error) {
         next(new ApplicationError(500, err.message));
       } else {
-        next(new ApplicationError(500, "Cannot update facility"));
+        next(new ApplicationError(500, "Cannot patch facility"));
       }
     }
   }
@@ -152,7 +152,7 @@ export const remove = async (
       if (err instanceof Error) {
         next(new ApplicationError(404, err.message));
       } else {
-        next(new ApplicationError(404, "Facility non exists"));
+        next(new ApplicationError(404, "Facility not exists"));
       }
     }
   }

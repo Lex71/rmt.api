@@ -110,7 +110,7 @@ export const create = async (
     });
     res.status(201).json({ data: newReservation });
   } catch {
-    next(new ApplicationError(500, "Cannot create reservation"));
+    next(new ApplicationError(500, "Error creating reservation"));
   }
 };
 
@@ -211,7 +211,7 @@ export const update = async (
 ) => {
   let reservation = null;
   try {
-    // cannot update facility
+    // Error updating facility
     const { date, name, phone, seats, status, tables, time } =
       req.body as Partial<IReservation>;
     reservation = await ReservationService.update(req.params.id, {
@@ -229,12 +229,12 @@ export const update = async (
     res.status(200).json({ data: reservation });
   } catch (err: unknown) {
     if (reservation == null) {
-      next(new ApplicationError(404, "Reservation non exists"));
+      next(new ApplicationError(404, "Reservation not exists"));
     } else {
       if (err instanceof Error) {
         next(new ApplicationError(500, err.message));
       } else {
-        next(new ApplicationError(500, "Cannot update reservation"));
+        next(new ApplicationError(500, "Error updating reservation"));
       }
     }
   }
@@ -252,12 +252,12 @@ export const patch = async (
     res.status(200).json({ data: reservation });
   } catch (err: unknown) {
     if (reservation == null) {
-      next(new ApplicationError(404, "Reservation non exists"));
+      next(new ApplicationError(404, "Reservation not exists"));
     } else {
       if (err instanceof Error) {
         next(new ApplicationError(500, err.message));
       } else {
-        next(new ApplicationError(500, "Cannot update reservation"));
+        next(new ApplicationError(500, "Error updating reservation"));
       }
     }
   }
@@ -285,7 +285,7 @@ export const remove = async (
       if (err instanceof Error) {
         next(new ApplicationError(404, err.message));
       } else {
-        next(new ApplicationError(404, "Reservation non exists"));
+        next(new ApplicationError(404, "Reservation not exists"));
       }
     }
   }

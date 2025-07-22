@@ -69,6 +69,8 @@ export const create = async (
   res: Response,
   next: NextFunction,
 ) => {
+  // next(new ApplicationError(403, "Test Error"));
+  // return;
   const { description, name, seats } = req.body as Partial<ITable>;
   // get facility from req.user.facility
   // const facility = req.user?.facility;
@@ -94,7 +96,7 @@ export const create = async (
     if (err instanceof Error) {
       next(new ApplicationError(500, err.message));
     } else {
-      next(new ApplicationError(500, "Error creating Table"));
+      next(new ApplicationError(500, "Error creating table"));
     }
   }
 };
@@ -120,7 +122,7 @@ export const remove = async (
       if (err instanceof Error) {
         next(new ApplicationError(404, err.message));
       } else {
-        next(new ApplicationError(404, "Table non exists"));
+        next(new ApplicationError(404, "Table not exists"));
       }
     }
   }
@@ -147,13 +149,13 @@ export const update = async (
       if (err instanceof Error) {
         next(new ApplicationError(500, err.message));
       } else {
-        next(new ApplicationError(500, "Cannot update table"));
+        next(new ApplicationError(500, "Error updating table"));
       }
     } else {
       if (err instanceof Error) {
         next(new ApplicationError(500, err.message));
       } else {
-        next(new ApplicationError(500, "Table non exists"));
+        next(new ApplicationError(500, "Table not exists"));
       }
     }
   }
@@ -171,12 +173,12 @@ export const patch = async (
     res.status(200).json({ data: table });
   } catch (err: unknown) {
     if (table == null) {
-      next(new ApplicationError(404, "Reservation non exists"));
+      next(new ApplicationError(404, "Table not exists"));
     } else {
       if (err instanceof Error) {
         next(new ApplicationError(500, err.message));
       } else {
-        next(new ApplicationError(500, "Cannot update reservation"));
+        next(new ApplicationError(500, "Error updating table"));
       }
     }
   }

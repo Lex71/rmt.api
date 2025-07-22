@@ -70,7 +70,7 @@ export const sendPasswordResetEmail = async (
   }
   const token = usePasswordHashToMakeToken(user);
   if (!token) {
-    next(new ApplicationError(500, "Cannot create reset password token"));
+    next(new ApplicationError(500, "Error creating  reset password token"));
     return;
   }
   const url = getPasswordResetURL(user, token);

@@ -1,5 +1,5 @@
 import bcrypt from "bcrypt";
-import jwt, { JwtPayload } from "jsonwebtoken";
+import jwt, { JwtPayload, SignOptions } from "jsonwebtoken";
 import config from "../config/config";
 import { Role } from "../models/user";
 
@@ -39,11 +39,15 @@ const issueAccessToken = (payload: {
   role: Role;
   facility?: string;
 }): string => {
-  return jwt.sign(payload, config.JWT_SECRET, { expiresIn: "15m" });
+  return jwt.sign(payload, config.JWT_SECRET, {
+    expiresIn: config.ACCESS_TOKEN_EXPIRATION,
+  } as SignOptions);
 };
 
 const issueRefreshToken = (payload: { id: string }) => {
-  return jwt.sign(payload, config.JWT_SECRET, { expiresIn: "1h" });
+  return jwt.sign(payload, config.JWT_SECRET, {
+    expiresIn: config.REFRESH_TOKEN_EXPIRATION,
+  } as SignOptions);
 };
 
 export {

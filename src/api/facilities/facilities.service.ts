@@ -56,7 +56,7 @@ export const create = async (body: IFacility) => {
       throw new Error(err.message);
     }
     console.log(err);
-    throw new Error("Cannot create Facility");
+    throw new Error("Error creating  facility");
   }
 };
 
@@ -69,7 +69,7 @@ export const update = async (id: string, body: Partial<IFacility>) => {
       throw new Error(err.message);
     }
     console.log(err);
-    throw new Error("Cannot update facility");
+    throw new Error("Error updating facility");
   }
 };
 

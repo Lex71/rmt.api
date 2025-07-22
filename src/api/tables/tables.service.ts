@@ -111,7 +111,7 @@ export const create = async (body: Partial<ITable>) => {
       throw new Error(err.message);
     }
     console.log(err);
-    throw new Error("Cannot create Table");
+    throw new Error("Error creating  table");
   } finally {
     await session.endSession();
   }
@@ -127,7 +127,7 @@ export const update = async (id: string, body: Partial<ITable>) => {
       throw new Error(err.message);
     }
     console.log(err);
-    throw new Error("Cannot update table");
+    throw new Error("Error updating table");
   }
 };
 

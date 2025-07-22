@@ -77,7 +77,7 @@ export const create = async (
       name,
       password,
       role,
-    }); //.catch(() => { throw new Error("Cannot create user"); });
+    }); //.catch(() => { throw new Error("Error creating  user"); });
     // res.redirect(`user/${newTable._id.toString()}`);
     res.status(201).json({ data: newUser });
   } catch (err) {
@@ -109,13 +109,13 @@ export const create = async (
       if (err instanceof Error) {
         next(new ApplicationError(500, err.message));
       } else {
-        next(new ApplicationError(500, "Cannot update user"));
+        next(new ApplicationError(500, "Error updating user"));
       }
     } else {
       if (err instanceof Error) {
         next(new ApplicationError(500, err.message));
       } else {
-        next(new ApplicationError(500, "User non exists"));
+        next(new ApplicationError(500, "User not exists"));
       }
     }
   }
@@ -142,7 +142,7 @@ export const remove = async (
       if (err instanceof Error) {
         next(new ApplicationError(500, err.message));
       } else {
-        next(new ApplicationError(500, "User non exists"));
+        next(new ApplicationError(500, "User not exists"));
       }
     }
   }

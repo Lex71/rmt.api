@@ -205,7 +205,7 @@ export const create = async (body: Partial<IReservation>) => {
       throw new Error(err.message);
     }
     console.log(err);
-    throw new Error("Cannot create Reservation");
+    throw new Error("Error creating  reservation");
   }
 };
 
@@ -220,7 +220,7 @@ export const update = async (id: string, body: Partial<IReservation>) => {
       throw new Error(err.message);
     }
     console.log(err);
-    throw new Error("Cannot update reservation");
+    throw new Error("Error updating reservation");
   }
 };
 

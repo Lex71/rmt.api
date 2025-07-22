@@ -70,7 +70,7 @@ export const create = async (user: Partial<IUser>) => {
       throw new Error(err.message);
     }
     console.log(err);
-    throw new Error("Cannot create User");
+    throw new Error("Error creating  user");
   }
 };
 
