@@ -5,30 +5,51 @@ import {
   HydratedDocument,
   Model,
   model,
+  QueryOptions,
   Schema,
   Types,
 } from "mongoose";
 
 import { comparePassword, hashPassword } from "../utils/helpers";
 
-enum Role {
+export enum Role {
   ADMIN = "admin",
   USER = "user",
 }
 
 export interface IUser /* extends Document */ {
+  // _id: string;
   email: string;
   // roles: Role[];
   role: Role;
   name: string;
   password: string;
   facility?: Types.ObjectId;
-  // tokens: { token: string }[];
+}
+
+export interface UserSearchOptionsType {
+  // query?: Partial<QueryOptions<ITable>>; // Optional search query, all searchable fields except _id
+  // query?: Partial<QueryOptions<IQueryTable>>; // Optional search query, all searchable fields except _id
+  page?: number; // Optional page number for pagination
+  sortBy?: string; // Optional field to sort by
+  pageSize?: number; // Optional page size for pagination
+  sortOrder?: "asc" | "desc"; // Optional sort order, ascending or descending
+  query?: Partial<Omit<QueryOptions<IUser>, "_id">>; // Optional search query, all searchable fields except _id
 }
 
 interface IUserMethods {
   // generateAuthToken(): Promise<string>;
   toJSON(): Partial<IUser>;
+}
+
+export interface UserSearchOptionsType {
+  // query?: Partial<QueryOptions<IFacility>>; // Optional search query, all searchable fields except _id
+  // query?: Partial<QueryOptions<IQueryFacility>>; // Optional search query, all searchable fields except _id
+  page?: number; // Optional page number for pagination
+  sortBy?: string; // Optional field to sort by
+  pageSize?: number; // Optional page size for pagination
+  sortOrder?: "asc" | "desc"; // Optional sort order, ascending or descending
+  query?: Partial<Omit<QueryOptions<IUser>, "_id">>; // Optional search query, all searchable fields except _id
 }
 
 interface UserModel extends Model<IUser, object, IUserMethods> {
@@ -45,7 +66,6 @@ const userSchema = new Schema<IUser, UserModel, IUserMethods>(
     name: { required: true, trim: true, type: String },
     password: { required: true, type: String },
     role: { default: Role.USER, enum: Object.values(Role), type: String },
-    // tokens: [{ token: { type: String, required: true } }],
   },
   { timestamps: true },
 );

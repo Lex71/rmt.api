@@ -1,127 +1,72 @@
+import { Request } from "express";
 import { PassportStatic } from "passport";
-import { IVerifyOptions, Strategy, VerifyFunction } from "passport-local";
+import {
+  ExtractJwt,
+  Strategy as JwtStrategy,
+  VerifyCallback,
+} from "passport-jwt";
+import config from "../config/config";
+import User, { IUser } from "../models/user";
 
-import { IUser } from "../models/user";
-import { comparePassword } from "../utils/helpers";
-// const PassportJWT = require("passport-jwt");
-const LocalStrategy = Strategy;
+const cookieExtractor = (req: Request) => {
+  let token = null;
+  console.log(`cookies: ${JSON.stringify(req.cookies.accessToken)}`);
+  console.log(
+    `signedCookies: ${JSON.stringify(req.signedCookies.accessToken)}`,
+  );
+  if (req.signedCookies.accessToken) {
+    token = req.signedCookies.accessToken as string;
+  } else if (req.cookies.accessToken) {
+    token = req.cookies.accessToken as string;
+  }
+  return token;
+  // return req.cookies.accessToken as string;
+};
 
-function initialize(
-  passport: PassportStatic,
-  getUserByEmail: (email: string) => Promise<IUser | null>,
-  getUserById: (id: string) => Promise<IUser | null>,
-) {
-  const authenticateUser: VerifyFunction = (
-    email: string,
-    password: string,
-    done: (
-      error: unknown,
-      user?: Express.User | false,
-      options?: IVerifyOptions,
-    ) => void, // (error, user, message)
-  ): void => {
-    getUserByEmail(email)
-      .then((user) => {
-        if (user == null) {
-          done(null, false, { message: "No user with that email" });
-          return;
-        } else {
-          comparePassword(password, user.password)
-            .then((isMatch) => {
-              if (isMatch) {
-                done(null, user as unknown as Express.User);
-                return;
-              } else {
-                done(null, false, { message: "Password incorrect" });
-                return;
-              }
-            })
-            .catch((e: unknown) => {
-              done(e);
-              return;
-            });
-        }
-      })
-      .catch((e: unknown) => {
-        done(e);
-        return;
-      });
+const bearerExtractor = (req: Request) => {
+  let token = null;
+  if (req.headers.authorization) {
+    const parts = req.headers.authorization.split(" ");
+    if (parts.length === 2 && parts[0] === "Bearer") {
+      token = parts[1];
+    }
+  }
+  return token;
+};
 
-    // (async () => {
-    //   const user = await getUserByEmail(email);
-    //   if (user == null) {
-    //     done(null, false, { message: "No user with that email" });
-    //     return;
-    //   }
-
-    // if (await comparePassword(password, user.password)) {
-    //   done(null, user as Express.User);
-    //   return;
-    // } else {
-    //   done(null, false, { message: "Password incorrect" });
-    //   return;
-    // }
-
-    // })()
-    //   .then(() => {
-    //     return;
-    //   })
-    //   .catch(() => {
-    //     return;
-    //   });
-  };
-
-  passport.use(new LocalStrategy({ usernameField: "email" }, authenticateUser));
-  passport.serializeUser((user, done) => {
-    done(null, user.id);
-  });
-  /* passport.deserializeUser(async (id, done) =>
-    { done(null, await getUserById(id)); },
-  ); */
-
-  passport.deserializeUser((id: string, done) => {
-    getUserById(id)
-      .then((user) => {
-        done(null, user as unknown as Express.User);
-      })
-      .catch((err: unknown) => {
-        done(err);
-      });
-  });
-  // passport.deserializeUser(async (id, done) => {
-  //   console.log("DESERIALIZING....");
-  //   console.log(`id: ${id}`);
-  //   const user = await getUserById(id);
-  //   console.log(user);
-  //   return done(null, user);
-  // });
-}
-
-/* // TODO use this for passport-jwt strategy
 const options = {
-  jwtFromRequest: PassportJWT.ExtractJwt.fromAuthHeaderAsBearerToken(),
-  secretOrKey: config.SESSION_SECRET,
+  jwtFromRequest: ExtractJwt.fromExtractors([bearerExtractor, cookieExtractor]),
+  secretOrKey: config.JWT_SECRET,
 };
 
 function initialize(
   passport: PassportStatic,
-  getUserById: Function,
+  getUserByEmail: (email: string) => Promise<IUser | null>,
 ) {
-  const authenticateUser = async (payload: any, done: Function) => {
-    try {
-      const user = getUserById(payload.id); // await User.findOne({ _id: payload.id });
-      if (user) {
-        return done(null, user);
-      } else {
-        return done(null, false);
-      }
-    } catch (error) {
-      return done(error);
-    }
-  }
-  passport.use(
-    new PassportJWT.Strategy(options, authenticateUser),
-  );
-} */
+  const authenticateUser: VerifyCallback = (
+    jwt_payload: { email: string; password: string }, // payload
+    done: (error: unknown, user?: IUser | false, options?: unknown) => void, // (error, user, message)
+  ) => {
+    // email = 'test1@rmt.com'
+    // exp = 1745072138
+    // iat = 1745071238
+    // id = '67eaee3d08d4dabed5ab1a0a'
+    // role = 'user'
+    console.log(`authenticateUser: ${JSON.stringify(jwt_payload)}`);
+    getUserByEmail(jwt_payload.email)
+      .then((user) => {
+        if (user == null) {
+          done(null, false, { message: "No user with that email" });
+        } else {
+          done(null, new User(user).toJSON());
+        }
+      })
+      .catch((e: unknown) => {
+        done(e);
+      });
+  };
+
+  passport.use(new JwtStrategy(options, authenticateUser));
+}
 
 export default initialize;

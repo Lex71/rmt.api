@@ -1,40 +1,59 @@
 import bcrypt from "bcrypt";
-// import config from "./config";
-// const jwt = require("jsonwebtoken");
-// const { v4: uuidv4 } = require("uuid");
-// import RefreshToken from "../models/RefreshToken";
+import jwt, { JwtPayload, SignOptions } from "jsonwebtoken";
+import config from "../config/config";
+import { Role } from "../models/user";
 
 const saltRounds = 10;
 
-async function comparePassword(password: string, hashPassword: string) {
+async function comparePassword(
+  password: string,
+  hashPassword: string,
+): Promise<boolean> {
   return await bcrypt.compare(password, hashPassword);
 }
 
-async function hashPassword(password: string) {
+async function hashPassword(password: string): Promise<string> {
   const salt = await bcrypt.genSalt(saltRounds);
   const passwordHash = await bcrypt.hash(password, salt);
   return passwordHash;
 }
 
-// function issueAccessToken(payload) {
-//   return jwt.sign(payload, config.SESSION_SECRET, { expiresIn: 60 * 2 }); //2 mins validity
-// // }
+function verifyRefreshTokenNotExpired(token: string): boolean {
+  let stillValid = false;
+  const decodedToken = jwt.decode(token, { complete: true })
+    ?.payload as JwtPayload;
+  console.log(`##### decodedToken: ${JSON.stringify(decodedToken)}`);
+  if (decodedToken.exp) {
+    const expirationDate = new Date(decodedToken.exp * 1000);
+    stillValid = expirationDate.getTime() > new Date().getTime();
+    console.log(
+      `##### refreshToken is still valid: ${stillValid ? "YES" : "NO"}`,
+    );
+  }
+  return stillValid;
+}
 
-// async function createRefreshToken(userId) {
-//   let expiryDate = new Date();
-//   expiryDate.setSeconds(60 * 60 * 24); //24 hours validity
+const issueAccessToken = (payload: {
+  email: string;
+  id: string;
+  role: Role;
+  facility?: string;
+}): string => {
+  return jwt.sign(payload, config.JWT_SECRET, {
+    expiresIn: config.ACCESS_TOKEN_EXPIRATION,
+  } as SignOptions);
+};
 
-//   const token = uuidv4();
-//   const refreshToken = await RefreshToken.create({
-//     token,
-//     user: userId,
-//     expiryDate: expiryDate.getTime(),
-//   });
-//   return refreshToken.token;
-// }
+const issueRefreshToken = (payload: { id: string }) => {
+  return jwt.sign(payload, config.JWT_SECRET, {
+    expiresIn: config.REFRESH_TOKEN_EXPIRATION,
+  } as SignOptions);
+};
 
-// function verifyRefreshTokenExpiration(token) {
-//   return token.expiryDate.getTime() < new Date().getTime();
-// }
-
-export { comparePassword, hashPassword };
+export {
+  comparePassword,
+  hashPassword,
+  issueAccessToken,
+  issueRefreshToken,
+  verifyRefreshTokenNotExpired,
+};

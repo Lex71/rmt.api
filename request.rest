@@ -1,51 +1,246 @@
-POST http://localhost:3000/auth/new
-content-type: application/json
+@hostname = localhost
+@port = 3000
+@host = {{hostname}}:{{port}}/api
+@contentType = application/json
+@nonExistingEmail = pippo@rmt.com
+@existingEmail = admin@rmt.com
 
+###
+# @name test
+GET http://{{host}}/test HTTP/1.1
+Content-Type: {{contentType}}
+
+###
+# @name misc-test-only
+GET http://{{host}}/free
+Content-Type: {{contentType}}
+
+###
+GET http://{{host}}/free2
+Content-Type: {{contentType}}
+
+###
+GET http://{{host}}/free3
+Content-Type: {{contentType}}
+
+###
+# @name registerAPI
+POST http://{{host}}/auth/register
+Content-Type: {{contentType}}
+
+# {
+#   "name": "Test3",
+#   "email": "test3@rmt.com",
+#   "password": "Test3!!!"
+# }
+# existing facility  
+# "facility": "6841a1552bffd75c87efe4f4"
 {
-  "name": "a",
-  "email": "a@a",
-  "password": "a"
+  "name": "Test3",
+  "email": "test3@rmt.com",
+  "password": "Test3!!!",
+  "facility": "123"
 }
 
 ###
-
-POST http://localhost:3000/auth/login
-content-type: application/json
+# @name loginAPI
+POST http://{{host}}/auth/login
+Content-Type: {{contentType}}
 
 {
-  "email": "test1@mail.com",
-  "password": "Test1!!!"
+  "email": "admin@rmt.com",
+  "password": "admin"
+}
+
+# {
+#   "email": "user1@rmt.com",
+#   "password": "User1!!!"
+# }
+
+###
+@accessToken = {{loginAPI.response.body.data.accessToken}}
+@cookie = {{loginAPI.response.headers.Set-Cookie}}
+
+@user.facility = {{loginAPI.response.body.data.user?.facility ?? ''}}
+###
+
+# @name logoutAPI
+DELETE http://{{host}}/auth/logout
+Authorization: Bearer {{accessToken}}
+
+###
+
+# @name forgot-password
+POST http://{{host}}/forgot-password
+Content-Type: {{contentType}}
+
+{
+  "email": "{{existingEmail}}"
 }
 
 ###
-GET http://localhost:3000/facilities?address=1&pippo=5
+# 684dc93a21a3bff46c69e328/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODRkYzkzYTIxYTNiZmY0NmM2OWUzMjgiLCJpYXQiOjE3NDk5MzI3ODMsImV4cCI6MTc0OTkzNjM4M30.Kl5YU7nmFuHV1-zhikmDCnOAPM2hKniV5clf0GFebOk
+# @name validate-reset-token
+GET http://{{host}}/forgot-password/684dc93a21a3bff46c69e328/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODRkYzkzYTIxYTNiZmY0NmM2OWUzMjgiLCJpYXQiOjE3NDk5MzI3ODMsImV4cCI6MTc0OTkzNjM4M30.Kl5YU7nmFuHV1-zhikmDCnOAPM2hKniV5clf0GFebOk
+Content-Type: {{contentType}}
 
 ###
-
-POST http://localhost:3000/users
-Content-Type: application/json
+# @name reset-password
+POST http://{{host}}/forgot-password/684dc93a21a3bff46c69e328/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODRkYzkzYTIxYTNiZmY0NmM2OWUzMjgiLCJpYXQiOjE3NDk5MzI3ODMsImV4cCI6MTc0OTkzNjM4M30.Kl5YU7nmFuHV1-zhikmDCnOAPM2hKniV5clf0GFebOk
+Content-Type: {{contentType}}
 
 {
-  "name": "Kyle",
-  "password": "password"
+  "password": "aaa",
+  "passwordConfirm": "aaa"
 }
 
 ###
-
-POST http://localhost:3000/users/login
-Content-Type: application/json
+# @name change-password
+POST http://{{host}}/auth/change-password
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}
 
 {
-  "name": "Kyle",
-  "password": "password"
+  "currentPassword": "admin",
+  "newPassword": "Admin123!",
+  "email": "admin@rmt.com"
 }
 
 ###
+# @name whoami
+GET http://{{host}}/auth/whoami
+Authorization: Bearer {{accessToken}}
 
+###
+# @name refreshToken
+GET http://{{host}}/token/refresh
+Content-Type: {{contentType}}
+Set-Cookie: {{cookie}}
+
+###
+# @name revokeToken
+POST http://{{host}}/token/revoke
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}
+
+{
+  "email": "test@rmt.com"
+}
+
+###
+# return a list of recently added (facilities/tables) depending on user's role (admin/user respectively)
+# @name home
+GET http://{{host}}/home
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}
+
+###
+# @name getAllFacilities
+GET http://{{host}}/facilities
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}
+
+###
+# @name createFacility
+POST http://{{host}}/facilities
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}
+
+{
+  "name": "facility 1",
+  "address": "Address 1"
+}
+
+###
+# @name getFacilityById
+GET http://{{host}}/facilities/6841a1552bffd75c87efe4f4
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}
+
+###
+# @name updateFacility
+PUT http://{{host}}/facilities/685faa88c9c6bf7678073561
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}
+
+{
+  "name": "Facility One"
+}
+
+###
+# @name patchFacility
+PATCH http://{{host}}/facilities/685faa88c9c6bf7678073561
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}
+
+{
+  "name": "Facility One"
+}
+
+###
+# @name deleteFacility
+DELETE http://{{host}}/facilities/681ca6577df7428a810c6d0a
+Authorization: Bearer {{accessToken}}
+
+###
+# @name getAllTables
+GET http://{{host}}/tables
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}
+
+###
+# @name createTable
+POST http://{{host}}/tables
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}
+
+{
+  "name": "t1",
+  "description": "smally",
+  "seats": 2
+}
+
+###
+# @name getTableById
+GET http://{{host}}/tables/6862a6c47cf734092264b062
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}
+
+###
+# @name updateTable
+PUT http://{{host}}/tables/6862a6c47cf734092264b062
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}
+
+{
+  "description": "Mid-Big"
+}
+
+###
+# @name getAvailableTables
 # reservation.time = 16:00
 # tables: t6# DELAY: 90
 # until 17:30, table t6 is busy
 # adjust: 0 -> no busy tables
 # adjust: 15 -> t6 busy table
-GET http://localhost:3000/reservations/tables?date=2025-04-04&time=17:30&adjust=1facility=67ead7c4c8c556d2c551e945
-Content-Type: application/json
+
+# since admin is not bound to a facility
+# can to pass it as query param
+GET http://{{host}}/reservations/tables?date=2025-04-04&time=18:30&adjust=1&facility=685faa88c9c6bf7678073561
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}
+
+###
+# @name createReservation
+POST http://{{host}}/reservations
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}
+
+{
+  "name": "Roberto",
+  "phone": "0399909223",
+  "date": "2025-06-05",
+  "time": "20:00",
+  "seats": 2,
+  "tables": ["6841ac56795fc7b139917020"]
+}

@@ -60,6 +60,7 @@ export const userSchema = yup.object({
     //.email("Invalid email")
     .required("Email is required")
     .matches(EMAIL_REGEX, "Invalid email format"),
+  facility: yup.string().required("Required Facility"),
   name: yup.string().min(3, "Name must be at least 3 characters"),
   password: yup
     .string()
@@ -69,6 +70,15 @@ export const userSchema = yup.object({
     ),
   // .required("Password is required"),
   // .min(8, "Password must be at least 8 characters"),
+});
+
+export const userRegisterSchema = userSchema.shape({
+  passwordConfirm: yup
+    .string()
+    .matches(
+      PASSWORD_REGEX,
+      "Password must contain at least 1 UPPERCASE char, 1 number and 1 special char: !.@#$%^&*",
+    ),
 });
 
 // const authSchema = yup.object({
@@ -97,6 +107,41 @@ const facilitySchema = yup.object({
     .required("Required name"),
 });
 
+const passwordSchema = yup.object({
+  currentPassword: yup
+    .string()
+    .min(2, "Too Short!")
+    .max(100, "Too Long!")
+    .required("Required current password"),
+  // .matches(
+  //   PASSWORD_REGEX,
+  //   "Password must contain at least 1 UPPERCASE char, 1 number and 1 special char: !.@#$%^&*",
+  // ),
+  email: yup
+    .string()
+    //.email("Invalid email")
+    .required("Email is required")
+    .matches(EMAIL_REGEX, "Invalid email format"),
+  newPassword: yup
+    .string()
+    .min(2, "Too Short!")
+    .max(100, "Too Long!")
+    .required("Required old password")
+    .matches(
+      PASSWORD_REGEX,
+      "Password must contain at least 1 UPPERCASE char, 1 number and 1 special char: !.@#$%^&*",
+    ),
+});
+
+const forgotPasswordSchema = yup.object({
+  email: yup
+    .string()
+    .email("Invalid email address")
+    .required("Email is required")
+    .matches(EMAIL_REGEX, "Invalid email format"),
+});
+const resetPasswordSchema = yup.object({});
+
 const reservationSchema = yup.object({
   date: yup
     .string()
@@ -111,10 +156,14 @@ const reservationSchema = yup.object({
     .max(50, "Too Long!")
     .required("Required name")
     .matches(/^[a-zA-Z]+$/, "Invalid name format"),
+  phone: yup
+    .string()
+    .matches(/^\+?\d{1,3}[- ]?\d{1,3}[- ]?\d{3}[- ]?\d{4}$/, "Invalid phone"),
   status: yup
     .mixed<Status>()
     .oneOf(Object.values(Status), "Invalid status")
     .required("Status required"),
+  tables: yup.array().min(1, "Too Short!").required("Required tables"),
   time: yup
     .string()
     .required("Required time")
@@ -128,7 +177,7 @@ const tableSchema = yup.object({
     .min(2, "Too Short!")
     .max(50, "Too Long!")
     .required("Required name")
-    .matches(/^[a-zA-Z]+$/, "Invalid name format"),
+    .matches(/^[a-zA-Z0-9]+$/, "Invalid name format"),
   seats: yup.number().min(2, "Too Short!").required("Required seats"),
 });
 
@@ -140,19 +189,23 @@ const tableSchema = yup.object({
 // } as Record<string, yup.ObjectSchema<yup.AnyObject>>;
 export default {
   patch: {
-    "facilities/(.*)": facilitySchema.clone().partial(),
-    "reservations/(.*)": reservationSchema.clone().partial(),
-    "tables/(.*)": tableSchema.clone().partial(),
+    "facilities/(.+)": facilitySchema.clone().partial(),
+    "reservations/(.+)": reservationSchema.clone().partial(),
+    "tables/(.+)": tableSchema.clone().partial(),
   },
   post: {
-    auth: userSchema,
+    "auth/change-password": passwordSchema,
+    "auth/register": userRegisterSchema,
     facilities: facilitySchema,
+    "forgot-password/(.+)/(.+)": resetPasswordSchema,
+    // eslint-disable-next-line perfectionist/sort-objects
+    "forgot-password": forgotPasswordSchema,
     reservations: reservationSchema.clone().omit(["status"]),
     tables: tableSchema,
   },
   put: {
-    "facilities/(.*)": facilitySchema,
-    "reservations/(.*)": reservationSchema,
-    "tables/(.*)": tableSchema,
+    "facilities/(.+)": facilitySchema,
+    "reservations/(.+)": reservationSchema,
+    "tables/(.+)": tableSchema,
   },
 } as Record<string, Record<string, yup.ObjectSchema<yup.AnyObject>>>;

@@ -1,8 +1,0 @@
-<h2 class="page-header">Edit Facility</h2>
-<form action="/facilities/<%= data._id %>/?_method=PUT" method="POST">
-  <%- include('_form-fields') %>
-  <div class="form-row form-row-end btn-row">
-    <button class="btn btn-primary" type="submit">Update</button>
-    <a class="btn btn-danger" href="/facilities/<%= data._id %>">Cancel</a>
-  </div>
-</form>

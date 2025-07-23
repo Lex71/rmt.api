@@ -14,35 +14,6 @@ export enum Status {
   RESCHEDULED = "rescheduled", // The booking has been moved to a different date or time (NOTE: remarkable for auditing purposes, to be treated as a confirmed booking).
 }
 
-/**
- * ### Booking Flow
- * 1. Customer makes a reservation
- *  1.1. By Phone
- *    1.1.1. Operator is provided with a set of available tables, depending on the number of seats, date and time
- *      The list is composed by:
- *        - all tables having the desired amount of seats (filtered client side) and that are not yet included in any reservation
- *        - tables included in reservations for that date having a status PAID or NOSHOW or CANCELLED
- *        - tables included in reservations for that date having a status CONFIRMED or RESCHEDULED or CHECKEDIN and a time past the booking time + DELAY
- *          NOTE: DELAY is a configurable parameter representing customer's average staying time, in minutes
- *           EXAMPLE:
- *             If the DELAY is 90 minutes, and the new booking time is 14:00, then a table whose status is CONFIRMED or CHECKEDIN that has been reserved for 12:00, will be included in the list (because the customer will probably pay at 13:30, so table is free)
- *             If the DELAY is 90 minutes, and the new booking time is 14:00, then a table whose status is CONFIRMED or CHECKEDIN that has been reserved for 13:00, will not be included in the list (because the customer will probably pay at 13:30, so table is still busy)
- *    1.1.2. Operator selects a table
- *      The reservation is marked with status CONFIRMED
- *
- *  1.2. By Web App (coming soon)
- *
- * 2. Operator manages the reservation
- *  2.1. Customer shows up at the restaurant in time
- *    The reservation is marked with status CHECKEDIN
- *  2.2. After some time, customer still didn't show up
- *      The reservation is marked with status NOSHOW
- *
- *
- * 3. Customer pays for the reservation
- *  The reservation is marked with status PAID
- */
-
 // 1. Create an interface representing a document in MongoDB.
 export interface IReservation /* extends Document */ {
   date: string;
@@ -51,6 +22,7 @@ export interface IReservation /* extends Document */ {
   phone: string;
   seats: number;
   status: Status;
+  // _id: Types.ObjectId;
   facility: Types.ObjectId;
   tables: PopulatedDoc<ITable>[];
 }

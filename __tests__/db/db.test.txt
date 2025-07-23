@@ -1,0 +1,26 @@
+import { Connection } from "mongoose";
+import { connectDB, disconnectDB } from "../../src/db/db";
+// import Facility from "../../src/models/facility";
+
+// import * as FacilityService from "../../src/services/facilityService";
+describe("Connection", () => {
+  let conn: boolean | Connection;
+
+  beforeAll(async () => {
+    conn = await connectDB();
+  });
+  test("connection established", () => {
+    expect(conn).toBeTruthy();
+  });
+
+  // test("Facilitty.findById", async () => {
+  //   const id = "67ead7c4c8c556d2c551e945";
+  //   // const facility = await FacilityService.findById(id);
+  //   const facility = await Facility.findById(id);
+  //   expect(facility?.name).toBe("Facility 1");
+  // });
+
+  afterAll(async () => {
+    await disconnectDB();
+  });
+});

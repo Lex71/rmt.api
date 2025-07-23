@@ -13,8 +13,9 @@ import {
 export interface ITable /*  extends Document */ {
   name: string;
   seats: number;
-  description?: string;
+  // _id: Types.ObjectId;
   facility: Types.ObjectId;
+  description?: string | null;
 }
 
 export interface TableSearchOptionsType {

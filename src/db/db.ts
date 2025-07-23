@@ -32,10 +32,22 @@ const connectDB = async () => {
     const session = await db.startSession();
     console.log("session started", session);
     await session.endSession(); */
-    return;
+    return db;
   } catch (error) {
-    console.log(error);
+    console.error(error);
+    return false;
   }
 };
 
-export default connectDB;
+const disconnectDB = async () => {
+  try {
+    await mongoose.disconnect();
+    console.log("MongoDB disconnected");
+    return true;
+  } catch (error) {
+    console.error(error);
+    return false;
+  }
+};
+
+export { connectDB, disconnectDB };
