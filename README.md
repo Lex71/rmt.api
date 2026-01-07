@@ -53,6 +53,21 @@ The default admin's password can be changed with the _forgot password_ flow.
 In production environment, depending on your case, you may want a mongodb cloud service,
 so this setup may require some tweaks.
 
+### Use mongosh
+
+```bash
+docker exec -it rmtapi-db-1 mongosh -u root -p
+
+show databases
+
+use reserve-my-table
+
+show tables
+
+# explain queries
+db.facilities.find({name: "Facility One"}).explain("executionStats")
+```
+
 ### Backup DB Volume
 
 ```bash

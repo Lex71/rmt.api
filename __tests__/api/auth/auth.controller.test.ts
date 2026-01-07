@@ -327,7 +327,7 @@ describe("logoutUser method", () => {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     expect(res.status).toHaveBeenCalledWith(200);
     expect(res.json).toHaveBeenCalledWith({
-      data: req.user,
+      message: "Logged out successfully",
     });
   });
 });

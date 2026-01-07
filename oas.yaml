@@ -132,7 +132,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/User"
+                $ref: "#/components/schemas/Message"
         "401":
           description: Unauthorized
   /auth/change-password:
@@ -1007,6 +1007,16 @@ components:
           description: "The address of the facility"
       example:
         name: "Facility name"
+    Message:
+      type: object
+      properties:
+        message:
+          type: string
+          description: "The message."
+      required:
+        - message
+      example:
+        message: "Hello world!"
     User:
       type: object
       properties:

@@ -14,7 +14,8 @@ import {
 export const logoutUser = (req: Request, res: Response) => {
   res.clearCookie("refreshToken", { httpOnly: true, path: "/" });
   // res.status(200).json({ message: "Logged out successfully" });
-  res.status(200).json({ data: req.user });
+  // res.status(200).json({ data: req.user });
+  res.status(200).json({ message: "Logged out successfully" });
 };
 
 export async function registerUser(

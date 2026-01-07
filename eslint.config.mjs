@@ -45,7 +45,15 @@ export default tseslint.config(
       parserOptions: {
         // projectService: true,
         projectService: {
-          allowDefaultProject: ["eslint.config.mjs", "dist/*.js"],
+          allowDefaultProject: [
+            "eslint.config.mjs",
+            "__tests__/*.ts",
+            "__tests__/api/auth/*.ts",
+            "__tests__/api/facilities/*.ts",
+            "__tests__/api/reservations/*.ts",
+            "__tests__/db/*.ts",
+            "__tests__/integration/*.ts",
+          ],
           defaultProject: "tsconfig.json",
         },
         tsconfigRootDir: import.meta.dirname,

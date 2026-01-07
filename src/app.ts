@@ -4,6 +4,22 @@ import { Types } from "mongoose";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import passport from "passport";
+//TODO: add morgan logging
+// const morgan = require('morgan');
+
+/*
+const morganMiddleware = morgan(
+  ':method :url :status :res[content-length] - :response-time ms',
+  {
+    immediate: true, // write before response is sent
+    stream: {
+      write: (message) => console.log(message.trim()),
+    },
+  }
+);
+*/
+
+// app.use(morganMiddleware);
 
 // OR use this for jwt authentication instead
 // const passport = require("./middlewares/passport"); // if integration inside passport-config doesn't work

@@ -17,7 +17,6 @@
     "dev:staging": "tsx --watch --env-file .env.staging src/server.ts",
     "dev:prod": "tsx --watch --env-file .env.production src/server.ts",
     "start": "node dist/server.js",
-    "build-old": "tsc",
     "build": "tsc -p tsconfig.build.json",
     "coverage": "vitest run --coverage",
     "type-check": "tsc --noEmit",
