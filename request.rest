@@ -244,3 +244,9 @@ Authorization: Bearer {{accessToken}}
   "seats": 2,
   "tables": ["6841ac56795fc7b139917020"]
 }
+
+###
+# @name createOrder
+POST http://{{host}}/orders
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}

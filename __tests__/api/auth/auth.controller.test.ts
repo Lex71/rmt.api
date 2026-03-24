@@ -18,10 +18,13 @@ import {
   issueRefreshToken,
 } from "../../../src/utils/helpers";
 
+import { findByEmail } from "../../../src/api/users/users.service";
+
 jest.mock("../../../src/models/user");
 jest.mock("../../../src/models/facility");
 jest.mock("../../../src/models/refreshToken");
 jest.mock("../../../src/utils/helpers");
+jest.mock("../../../src/api/users/users.service");
 
 const mockRequest = () => {
   return {
@@ -71,9 +74,10 @@ describe("registerUser method", () => {
     const res = mockResponse();
     const next = mockNext();
     const user: IUser = new User({
-      email: "test@example.com",
+      email: "Test@Example.com",
     });
-    (User.findOne as jest.Mock).mockResolvedValue(user);
+    // (User.findOne as jest.Mock).mockResolvedValue(user);
+    (findByEmail as jest.Mock).mockResolvedValue(user);
     await registerUser(req, res, next);
     expect(next).toHaveBeenCalledWith(
       new ApplicationError(
@@ -95,7 +99,8 @@ describe("registerUser method", () => {
       password: "password",
     });
 
-    (User.findOne as jest.Mock).mockResolvedValue(null);
+    // (User.findOne as jest.Mock).mockResolvedValue(null);
+    (findByEmail as jest.Mock).mockResolvedValue(null);
     (User.create as jest.Mock).mockResolvedValue(user);
     (Facility.exists as jest.Mock).mockRejectedValue(
       new ApplicationError(400, "Not Valid Facility ObjectId"),
@@ -121,7 +126,8 @@ describe("registerUser method", () => {
       password: "password",
     });
 
-    (User.findOne as jest.Mock).mockResolvedValue(null);
+    // (User.findOne as jest.Mock).mockResolvedValue(null);
+    (findByEmail as jest.Mock).mockResolvedValue(null);
     (User.create as jest.Mock).mockResolvedValue(user);
     (Facility.exists as jest.Mock).mockResolvedValue(false);
     // jest.spyOn(User, "create").mockReturnValueOnce(Promise.resolve(user));
@@ -148,7 +154,8 @@ describe("registerUser method", () => {
     (req.body as Partial<IUser> & { passwordConfirm: string }).passwordConfirm =
       "wrongPassword";
 
-    (User.findOne as jest.Mock).mockResolvedValue(null);
+    // (User.findOne as jest.Mock).mockResolvedValue(null);
+    (findByEmail as jest.Mock).mockResolvedValue(null);
     (User.create as jest.Mock).mockResolvedValue(user);
     (Facility.exists as jest.Mock).mockResolvedValue(true);
     // jest.spyOn(User, "create").mockReturnValueOnce(Promise.resolve(user));
@@ -178,7 +185,8 @@ describe("registerUser method", () => {
     //   name: "name 1",
     // });
 
-    (User.findOne as jest.Mock).mockResolvedValue(null);
+    // (User.findOne as jest.Mock).mockResolvedValue(null);
+    (findByEmail as jest.Mock).mockResolvedValue(null);
     (User.create as jest.Mock).mockResolvedValue(user);
     (Facility.exists as jest.Mock).mockResolvedValue(true);
     // jest.spyOn(User, "create").mockReturnValueOnce(Promise.resolve(user));
@@ -196,25 +204,25 @@ describe("loginUser method", () => {
     // restore the spy created with spyOn
     jest.restoreAllMocks();
   });
-  it("should return error 401 if email is missing", async () => {
+  it("should return error 400 if email is missing", async () => {
     const req = mockLoginRequest();
     delete (req.body as Partial<IUser>).email;
     const res = mockResponse();
     const next = mockNext();
     await loginUser(req, res, next);
     expect(next).toHaveBeenCalledWith(
-      new ApplicationError(401, "Missing Email"),
+      new ApplicationError(400, "Missing Email"),
     );
   });
 
-  it("should return error 401 if password is missing", async () => {
+  it("should return error 400 if password is missing", async () => {
     const req = mockLoginRequest();
     delete (req.body as Partial<IUser>).password;
     const res = mockResponse();
     const next = mockNext();
     await loginUser(req, res, next);
     expect(next).toHaveBeenCalledWith(
-      new ApplicationError(401, "Missing Password"),
+      new ApplicationError(400, "Missing Password"),
     );
   });
 
@@ -222,10 +230,11 @@ describe("loginUser method", () => {
     const req = mockLoginRequest();
     const res = mockResponse();
     const next = mockNext();
-    (User.findOne as jest.Mock).mockResolvedValue(null);
+    // (User.findOne as jest.Mock).mockResolvedValue(null);
+    (findByEmail as jest.Mock).mockResolvedValue(null);
     await loginUser(req, res, next);
     expect(next).toHaveBeenCalledWith(
-      new ApplicationError(401, "Invalid email"),
+      new ApplicationError(401, "Invalid Email"),
     );
   });
 
@@ -234,7 +243,8 @@ describe("loginUser method", () => {
     const res = mockResponse();
     const next = mockNext();
     const user = new User(req.body);
-    (User.findOne as jest.Mock).mockResolvedValue(user);
+    // (User.findOne as jest.Mock).mockResolvedValue(user);
+    (findByEmail as jest.Mock).mockResolvedValue(user);
     (comparePassword as jest.Mock).mockResolvedValue(false);
     await loginUser(req, res, next);
     expect(next).toHaveBeenCalledWith(
@@ -255,7 +265,8 @@ describe("loginUser method", () => {
       role: "role",
     } as Partial<IUser>;
     // const userToJSON: IUser = new User(user).toJSON();
-    (User.findOne as jest.Mock).mockResolvedValue(user);
+    // (User.findOne as jest.Mock).mockResolvedValue(user);
+    (findByEmail as jest.Mock).mockResolvedValue(user);
     (comparePassword as jest.Mock).mockResolvedValue(true);
     (issueAccessToken as jest.Mock).mockReturnValue("accessToken");
     (issueRefreshToken as jest.Mock).mockReturnValue("refreshToken");

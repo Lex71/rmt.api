@@ -35,7 +35,8 @@ export const findById = async (id: string): Promise<IUser | null> => {
 
 export const findByEmail = async (email: string): Promise<IUser | null> => {
   try {
-    return await User.findOne({ email });
+    const re = new RegExp(email, "i");
+    return await User.findOne({ email: { $regex: re } });
   } catch (err) {
     if (err instanceof mongoose.MongooseError) {
       console.log(err.message);

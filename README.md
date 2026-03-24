@@ -109,11 +109,11 @@ npm run test
 
 ```
 
-### Booking Flow (Client Side)
+## Booking Flow (Client Side)
 
-#### 1. Customer makes a reservation
+### 1. Customer makes a reservation
 
-##### 1.1. By Phone
+#### 1.1. By Phone
 
 A customer calls the restaurant, and provides information to the operator:
 
@@ -121,7 +121,7 @@ A customer calls the restaurant, and provides information to the operator:
 - reservation time
 - number of guests
 
-###### 1.1.1. Operator is provided with a set of available tables, depending on date and time
+##### 1.1.1. Operator is provided with a set of available tables, depending on date and time
 
 The operator searches for tables availabilty (async all to server), and if no tables are found tries with a slightly different time.
 
@@ -139,13 +139,13 @@ Tables in the result come from:
 >  DELAY is 90 minutes, and the new booking time is 14:00, then a table whose status is CONFIRMED or CHECKEDIN that has been reserved for 12:00, will be included in the list (because the customer will probably pay at 13:30, so table is free)  
 >  DELAY is 90 minutes, and the new booking time is 14:00, then a table whose status is CONFIRMED or CHECKEDIN that has been reserved for 13:00, will not be included in the list (because the customer will probably pay at 13:30, so table is still busy)
 
-###### 1.1.2. Operator selects a table
+##### 1.1.2. Operator selects a table
 
     When there are some available tables, operator marks the one(s) suitable for the number of guests.
 
 > NOTE: if each available table has less than the desired number of guest, the operator can mark more tables.
 
-##### 1.1.3 Registration
+#### 1.1.3 Registration
 
     Operator asks for further information in order to finalize the booking process:
     - customer name
@@ -153,26 +153,103 @@ Tables in the result come from:
 
     A new reservation for such table(s) is now stored into database, with status "confirmed".
 
-##### 1.2. By Web App
+#### 1.2. By Web App
 
     (coming soon)
 
-#### 2. Operator manages the reservation
+### 2. Operator manages the reservation
 
-##### 2.1. Customer shows up at the restaurant in time
+#### 2.1. Customer shows up at the restaurant in time
 
     Operator updates the reservation with status CHECKEDIN
 
-##### 2.2. After some time, customer still didn't show up
+#### 2.2. After some time, customer still didn't show up
 
     Operator can update the reservation with status NOSHOW, freeing its related table(s).
 
-#### 3. Customer pays the check
+### 3. Customer pays the check
 
     Operator updates the reservation with status PAID
 
 > NOTE: a reservation can also have RESCHEDULED status, though it is going to be hanlded as CONFIRMED.  
 > This status could be useful for audit purposes.
+
+## Microservices (refactor)
+
+[ref: Medium](https://medium.com/@azizmarzouki/mastering-microservices-with-node-js-a-step-by-step-guide-0aa0020cd27a)
+
+Looking forward to extend functionalities other than table reservations, e.g. in-facility orders or online takeaways and so on, project could be refactored creating a higher folder level inside the git repository:
+
+- booking-service/, where to move (actual) reservations project files
+- order-service/, where add orders related project files
+- other-service
+- communicator
+
+The communicator module is going to handle inter-process communication
+
+```js
+// communicator/index.js
+const axios = require("axios");
+
+class Communicator {
+  constructor() {
+    this.userServiceClient = axios.create({
+      baseURL: "http://localhost:3001/api",
+    });
+    this.productServiceClient = axios.create({
+      baseURL: "http://localhost:3002/api",
+    });
+    this.orderServiceClient = axios.create({
+      baseURL: "http://localhost:3003/api",
+    });
+  }
+  async getTables() {
+    const response = await this.userServiceClient.get("/tables");
+    return response.data;
+  }
+  async getProducts() {
+    const response = await this.productServiceClient.get("/products");
+    return response.data;
+  }
+  async getOrders() {
+    const response = await this.orderServiceClient.get("/orders");
+    return response.data;
+  }
+}
+module.exports = new Communicator();
+```
+
+The communicator can be used inside our microservices' controllers, for example /api/orders could neet to fetch the products and the users
+
+```js
+// order-service/src/api/orders/orders.controller.ts
+
+const communicator = require("../../communicator");
+
+app.get("/api/orders", async (req, res) => {
+  try {
+    const orders = await communicator.getOrders();
+    const users = await communicator.getUsers();
+    const products = await communicator.getProducts();
+
+    const detailedOrders = orders.orders.map((order) => {
+      const user = users.users.find((u) => u.id === order.user_id);
+      const product = products.products.find((p) => p.id === order.product_id);
+      return { ...order, user, product };
+    });
+
+    res.json({ orders: detailedOrders });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch data" });
+  }
+});
+```
+
+## Order Flow (TBD)
+
+Any allowed operator can fill the order based on the reservation's table.
+
+First, define a Products model, like:
 
 ## Open API
 

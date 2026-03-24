@@ -88,8 +88,10 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/LoggedUser"
+        "400":
+          description: Missing Email (or Password)
         "401":
-          description: Depending on the error, the message will be different
+          description: Invalid email (or password)
         "500":
           description: Internal server error
   /auth/register:

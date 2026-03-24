@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 
 import RefreshToken from "../../models/refreshToken";
 import User, { IUser } from "../../models/user";
+import { findByEmail } from "../users/users.service"; // import findByEmail from "../users/users.service";
 
 import Facility from "../../models/facility";
 import { ApplicationError } from "../../utils/errors";
@@ -28,7 +29,13 @@ export async function registerUser(
       passwordConfirm: string;
     };
   // check email is not used
-  if (await User.findOne({ email })) {
+  // if (await User.findOne({ email })) {
+  if (!email) {
+    next(new ApplicationError(400, "Missing email"));
+    return;
+  }
+  const found = await findByEmail(email);
+  if (found !== null) {
     next(
       new ApplicationError(
         400,
@@ -96,17 +103,17 @@ export async function loginUser(
 ) {
   const { email, password } = req.body as Partial<IUser>;
   if (!email) {
-    next(new ApplicationError(401, "Missing Email"));
+    next(new ApplicationError(400, "Missing Email"));
     return;
   }
   if (!password) {
-    next(new ApplicationError(401, "Missing Password"));
+    next(new ApplicationError(400, "Missing Password"));
     return;
   }
 
-  const user = await User.findOne({ email });
+  const user = await findByEmail(email);
   if (!user) {
-    next(new ApplicationError(401, "Invalid email"));
+    next(new ApplicationError(401, "Invalid Email"));
     return;
   }
 
