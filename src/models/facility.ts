@@ -15,7 +15,7 @@
 
  */
 
-import { model, PopulatedDoc, Schema } from "mongoose";
+import { model, PopulatedDoc, Schema, Types } from "mongoose";
 
 import { QueryOptions } from "../types/index";
 import { ITable } from "./table";
@@ -30,8 +30,14 @@ export interface FacilitySearchOptionsType {
   query?: Partial<Omit<QueryOptions<IFacility>, "_id">>; // Optional search query, all searchable fields except _id
 }
 
+interface BaseEntity {
+  createdAt?: Date;
+  updatedAt?: Date;
+  _id?: Types.ObjectId;
+}
+
 // 1. Create an interface representing a document in MongoDB.
-export interface IFacility {
+export interface IFacility extends BaseEntity {
   name: string;
   address: string;
   // _id?: Types.ObjectId;

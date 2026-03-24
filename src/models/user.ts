@@ -17,9 +17,15 @@ export enum Role {
   USER = "user",
 }
 
-export interface IUser /* extends Document */ {
-  // _id: string;
+interface BaseEntity {
+  createdAt?: Date;
+  updatedAt?: Date;
+  _id: Types.ObjectId;
+}
+
+export interface IUser /* extends Document */ extends BaseEntity {
   email: string;
+  // _id: Types.ObjectId;
   // roles: Role[];
   role: Role;
   name: string;

@@ -14,8 +14,14 @@ export enum Status {
   RESCHEDULED = "rescheduled", // The booking has been moved to a different date or time (NOTE: remarkable for auditing purposes, to be treated as a confirmed booking).
 }
 
+interface BaseEntity {
+  createdAt?: Date;
+  updatedAt?: Date;
+  _id?: Types.ObjectId;
+}
+
 // 1. Create an interface representing a document in MongoDB.
-export interface IReservation /* extends Document */ {
+export interface IReservation /* extends Document */ extends BaseEntity {
   date: string;
   name: string;
   time: string;

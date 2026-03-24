@@ -9,8 +9,14 @@ import {
   Types,
 } from "mongoose";
 
+interface BaseEntity {
+  createdAt?: Date;
+  updatedAt?: Date;
+  _id?: Types.ObjectId;
+}
+
 // 1. Create an interface representing a document in MongoDB.
-export interface ITable /*  extends Document */ {
+export interface ITable /*  extends Document */ extends BaseEntity {
   name: string;
   seats: number;
   // _id: Types.ObjectId;
