@@ -1,78 +1,27 @@
+/**
+ *
+ *
+ * The db variable in a MongoDB Docker docker-entrypoint-initdb.d/ script is automatically available and refers to the database specified by the MONGO_INITDB_DATABASE environment variable during container initialization.
+ *
+ * Declaration: The db variable is not explicitly declared in the script. It is a built-in global variable in the MongoDB shell (used by mongosh or mongo in older versions) that represents the current database context.
+ *
+ * Database Context: The database context is determined by:
+ *  - The MONGO_INITDB_DATABASE environment variable (if set).
+ *  - If MONGO_INITDB_DATABASE is not set, the default database used is test.
+ *
+ * Usage: Within your .js script (e.g., init.js), you can use db to perform operations like creating collections or inserting documents:
+ * // Example: Create a collection and insert a document
+ *
+ * db.createCollection("users");
+ * db.users.insertOne({ name: "Alice", role: "admin" });
+ *
+ * Important Note: The script runs in the context of the database specified by MONGO_INITDB_DATABASE.
+ * If you need to switch databases within the script, you can use use <databaseName>
+ *
+ *
+ */
 import dotenv from "dotenv";
-// import { MongoClient } from "mongodb";
 
-// if (process.env.NODE_ENV !== "production") {
-//   dotenv.config();
-//   const dbname = process.env.MONGO_INITDB_DATABASE ?? "reserve-my-table";
-//   const url = process.env.MONGODB_URL ?? "mongodb://localhost:27017";
-//   MongoClient.connect(url)
-//     .then((client) => {
-//       console.log("Connected successfully to server");
-//       const db = client.db(dbname);
-
-//       // db.createUser({
-//       //   user: "root",
-//       //   pwd: "password",
-//       //   roles: [
-//       //     {
-//       //       role: "readWrite",
-//       //       db: dbname,
-//       //     },
-//       //   ],
-//       // });
-//       // db.command({
-//       //   createUser: "root",
-//       //   pwd: "password",
-//       //   roles: [
-//       //     {
-//       //       role: "readWrite",
-//       //       db: dbname,
-//       //     },
-//       //   ],
-//       // });
-//       db.admin().command({
-//         createUser: "root",
-//         pwd: "password",
-//         roles: [
-//           {
-//             role: "readWrite",
-//             db: dbname,
-//           },
-//         ],
-//       });
-
-//       // db = new Mongo().getDB("testDB");
-//       db.createCollection("facilities", { capped: false });
-//       db.createCollection("users", { capped: false });
-//       db.createCollection("tables", { capped: false });
-//       db.createCollection("reservations", { capped: false });
-//       // db.createCollection("test", { capped: false });
-
-//       // db.users.insert([
-//       //   {
-//       //     name: "Administrator",
-//       //     email: process.env.ADMIN_EMAIL ?? "admin@rmt.com",
-//       //     password:
-//       //       "$2b$10$fyrt.SNdlPL8JdzfbhktEeq6c6fy2fG0LwzPXw7mXzY9KpwEzgUhy",
-//       //     role: "admin",
-//       //   },
-//       // ]);
-//       db.collection("users").insertOne([
-//         {
-//           name: "Administrator",
-//           email: process.env.ADMIN_EMAIL ?? "admin@rmt.com",
-//           password:
-//             "$2b$10$fyrt.SNdlPL8JdzfbhktEeq6c6fy2fG0LwzPXw7mXzY9KpwEzgUhy",
-//           role: "admin",
-//         },
-//       ]);
-
-//       // ... rest of your code
-//     })
-//     .catch((err) => {
-//       console.log(err);
-//     });
-// }
 if (process.env.NODE_ENV !== "production") {
   dotenv.config();
   const dbname = process.env.MONGO_INITDB_DATABASE ?? "reserve-my-table";
@@ -80,6 +29,7 @@ if (process.env.NODE_ENV !== "production") {
   const adminPassword =
     "$2b$10$fyrt.SNdlPL8JdzfbhktEeq6c6fy2fG0LwzPXw7mXzY9KpwEzgUhy"; // hashed "admin"
   // database user
+  // @ts-ignore
   db.createUser({
     user: "root",
     pwd: "password",
@@ -92,11 +42,16 @@ if (process.env.NODE_ENV !== "production") {
   });
 
   // db = new Mongo().getDB("testDB");
+  // @ts-ignore
   db.createCollection("facilities", { capped: false });
+  // @ts-ignore
   db.createCollection("users", { capped: false });
+  // @ts-ignore
   db.createCollection("tables", { capped: false });
+  // @ts-ignore
   db.createCollection("reservations", { capped: false });
   // create administrator
+  // @ts-ignore
   db.users.insert([
     {
       name: "Administrator",
