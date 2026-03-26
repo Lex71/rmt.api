@@ -3,6 +3,7 @@ import { Request, Response } from "express";
 // import app from "../../src/app"; // Assuming app.ts initializes Express
 import { Types } from "mongoose";
 import {
+  changePassword,
   loginUser,
   logoutUser,
   registerUser,
@@ -51,6 +52,32 @@ const mockLoginRequest = () => {
     body: {
       email: "test@example.com",
       password: "password",
+    },
+  } as unknown as Request;
+};
+
+const mockChangePasswordRequest = () => {
+  return {
+    body: {
+      currentPassword: "password",
+      email: "test@example.com",
+      newPassword: "newPassword",
+    },
+    user: {
+      email: "test@example.com",
+    },
+  } as unknown as Request;
+};
+
+const mockHackedChangePasswordRequest = () => {
+  return {
+    body: {
+      currentPassword: "password",
+      email: "another.test@example.com",
+      newPassword: "newPassword",
+    },
+    user: {
+      email: "test@example.com",
     },
   } as unknown as Request;
 };
@@ -262,7 +289,7 @@ describe("loginUser method", () => {
       ...req.body,
       _id: userId,
       facility: { _id: facilityId },
-      role: "role",
+      role: "user",
     } as Partial<IUser>;
     // const userToJSON: IUser = new User(user).toJSON();
     // (User.findOne as jest.Mock).mockResolvedValue(user);
@@ -340,5 +367,71 @@ describe("logoutUser method", () => {
     expect(res.json).toHaveBeenCalledWith({
       message: "Logged out successfully",
     });
+  });
+});
+
+describe("changePassword method", () => {
+  afterEach(() => {
+    // restore the spy created with spyOn
+    jest.restoreAllMocks();
+  });
+
+  it("should return error 400 email is not found", async () => {
+    const req = mockChangePasswordRequest();
+    const res = mockResponse();
+    const next = mockNext();
+    // (findByEmail as jest.Mock).mockResolvedValueOnce(null);
+
+    await changePassword(req, res, next);
+
+    expect(next).toHaveBeenCalledWith(
+      new ApplicationError(401, "Invalid Email"),
+    );
+  });
+
+  it("should return 400 if submitted email is not the same as the user", async () => {
+    const req = mockHackedChangePasswordRequest();
+    const res = mockResponse();
+    const next = mockNext();
+    const facilityId: Types.ObjectId = new Types.ObjectId();
+    const userId: Types.ObjectId = new Types.ObjectId();
+    const user = {
+      ...req.user,
+      _id: userId,
+      facility: { _id: facilityId },
+    } as Partial<IUser>;
+    // (findByEmail as jest.Mock).mockResolvedValue(user);
+    (User.findOne as jest.Mock).mockResolvedValue(user);
+
+    await changePassword(req, res, next);
+
+    expect(next).toHaveBeenCalledWith(
+      new ApplicationError(400, "The email is not the same as the user email"),
+    );
+  });
+
+  it("should return 200 and user if successful", async () => {
+    const req = mockChangePasswordRequest();
+    const res = mockResponse();
+    const next = mockNext();
+    const mockSave = jest.spyOn(User.prototype, "save");
+    const user: IUser = new User({
+      email: "test@example.com",
+      facility: "123",
+      name: "test",
+      role: "user",
+    });
+
+    // (findByEmail as jest.Mock).mockResolvedValue(user);
+    (User.findOne as jest.Mock).mockResolvedValue(user);
+    (comparePassword as jest.Mock).mockResolvedValue(true);
+    mockSave.mockResolvedValue(user);
+
+    await changePassword(req, res, next);
+
+    expect(mockSave).toHaveBeenCalled();
+    // eslint-disable-next-line @typescript-eslint/unbound-method
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.json).toHaveBeenCalledWith({ data: user });
   });
 });

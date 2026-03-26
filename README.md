@@ -254,3 +254,7 @@ First, define a Products model, like:
 ## Open API
 
 View the [OAS](./oas.yaml) source file.
+
+TODO:
+
+- create unit test for users.service's findByEmail() function

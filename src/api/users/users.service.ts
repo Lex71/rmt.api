@@ -1,6 +1,9 @@
 import mongoose from "mongoose";
 import RefreshToken from "../../models/refreshToken";
-import User, { IUser, UserSearchOptionsType } from "../../models/user";
+import User, {
+  type IUser,
+  type UserSearchOptionsType,
+} from "../../models/user";
 
 export const find = async (
   searchOptions: UserSearchOptionsType,

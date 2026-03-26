@@ -160,9 +160,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/User"
         "400":
-          description: Depending on the error, the message will be different
+          description: The email is not the same as the user email || Current and New passwords cannot be the same. Please choose a different password
         "401":
-          description: Unauthorized
+          description: Invalid Email || Invalid Current Password
         "500":
           description: Internal server error
   /forgot-password:
