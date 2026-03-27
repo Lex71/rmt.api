@@ -1,4 +1,4 @@
-import mongoose, { Types } from "mongoose";
+import mongoose, { HydratedDocument, Types } from "mongoose";
 
 // import config from "../config/config";
 import Facility from "../../models/facility";
@@ -8,7 +8,9 @@ import Table, {
   TableSearchOptionsType,
 } from "../../models/table";
 
-export const findById = async (id: string) => {
+export const findById = async (
+  id: string,
+): Promise<HydratedDocument<ITable> | null> => {
   try {
     return await Table.findById(id).orFail();
   } catch (err) {
@@ -21,7 +23,9 @@ export const findById = async (id: string) => {
   }
 };
 
-export const find = async (searchOptions?: TableSearchOptionsType) => {
+export const find = async (
+  searchOptions?: TableSearchOptionsType,
+): Promise<HydratedDocument<ITable>[]> => {
   try {
     let query = Table.find();
     if (
@@ -84,7 +88,9 @@ export const find = async (searchOptions?: TableSearchOptionsType) => {
   });
 }
  */
-export const create = async (body: Partial<ITable>) => {
+export const create = async (
+  body: Partial<ITable>,
+): Promise<HydratedDocument<ITable> | null> => {
   // const newTable = new Table(body);
 
   const facility = body.facility; // the ._id of the facility model
@@ -117,7 +123,10 @@ export const create = async (body: Partial<ITable>) => {
   }
 };
 
-export const update = async (id: string, body: Partial<ITable>) => {
+export const update = async (
+  id: string,
+  body: Partial<ITable>,
+): Promise<HydratedDocument<ITable> | null> => {
   try {
     // const filter = { facility: body.facility, id };
     return await Table.findByIdAndUpdate(id, body, { new: true }).orFail();
@@ -131,7 +140,9 @@ export const update = async (id: string, body: Partial<ITable>) => {
   }
 };
 
-export const remove = async (id: string) => {
+export const remove = async (
+  id: string,
+): Promise<HydratedDocument<ITable> | null> => {
   try {
     return await Table.findByIdAndDelete(id);
     // return await Table.deleteOne({ id });

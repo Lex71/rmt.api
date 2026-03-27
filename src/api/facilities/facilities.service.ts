@@ -1,11 +1,13 @@
-import mongoose from "mongoose";
+import mongoose, { HydratedDocument } from "mongoose";
 import Facility, {
   FacilitySearchOptionsType,
   IFacility,
 } from "../../models/facility";
 import { ITable } from "../../models/table";
 
-export const findById = async (id: string): Promise<IFacility> => {
+export const findById = async (
+  id: string,
+): Promise<HydratedDocument<IFacility> | null> => {
   try {
     return await Facility.findById(id)
       .populate<{ tables: ITable[] }>("tables")
@@ -20,7 +22,9 @@ export const findById = async (id: string): Promise<IFacility> => {
   }
 };
 
-export const find = async (searchOptions?: FacilitySearchOptionsType) => {
+export const find = async (
+  searchOptions?: FacilitySearchOptionsType,
+): Promise<HydratedDocument<IFacility>[]> => {
   try {
     let query = Facility.find();
     // add regex filters to query
@@ -45,7 +49,9 @@ export const find = async (searchOptions?: FacilitySearchOptionsType) => {
   }
 };
 
-export const create = async (body: IFacility) => {
+export const create = async (
+  body: IFacility,
+): Promise<HydratedDocument<IFacility> | null> => {
   const { address, name } = body;
 
   try {
@@ -60,7 +66,10 @@ export const create = async (body: IFacility) => {
   }
 };
 
-export const update = async (id: string, body: Partial<IFacility>) => {
+export const update = async (
+  id: string,
+  body: Partial<IFacility>,
+): Promise<HydratedDocument<IFacility> | null> => {
   try {
     return await Facility.findByIdAndUpdate(id, body, { new: true }).orFail();
   } catch (err) {
@@ -73,7 +82,9 @@ export const update = async (id: string, body: Partial<IFacility>) => {
   }
 };
 
-export const remove = async (id: string) => {
+export const remove = async (
+  id: string,
+): Promise<HydratedDocument<IFacility> | null> => {
   try {
     // return await Facility.deleteOne({ _id: id });
     return await Facility.findByIdAndDelete(id);

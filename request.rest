@@ -47,15 +47,15 @@ Content-Type: {{contentType}}
 POST http://{{host}}/auth/login
 Content-Type: {{contentType}}
 
-{
-  "email": "admin@rmt.com",
-  "password": "admin"
-}
-
 # {
-#   "email": "user1@rmt.com",
-#   "password": "User1!!!"
+#   "email": "admin@rmt.com",
+#   "password": "admin"
 # }
+
+{
+  "email": "user1@rmt.com",
+  "password": "User1!!!"
+}
 
 ###
 @accessToken = {{loginAPI.response.body.data.accessToken}}
@@ -226,7 +226,7 @@ Authorization: Bearer {{accessToken}}
 
 # since admin is not bound to a facility
 # can to pass it as query param
-GET http://{{host}}/reservations/tables?date=2025-04-04&time=18:30&adjust=1&facility=685faa88c9c6bf7678073561
+GET http://{{host}}/reservations/tables?date=2025-04-04&time=18:30&adjust=1&facility=687a5d34243994dc0b4b9a5b
 Content-Type: {{contentType}}
 Authorization: Bearer {{accessToken}}
 

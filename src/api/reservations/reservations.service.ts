@@ -1,5 +1,10 @@
 import moment from "moment";
-import mongoose, { MongooseError, Types } from "mongoose";
+import mongoose, {
+  HydratedDocument,
+  MongooseError,
+  // PopulatedDoc,
+  Types,
+} from "mongoose";
 
 import config from "../../config/config";
 import Facility from "../../models/facility";
@@ -11,12 +16,17 @@ import Reservation, {
 } from "../../models/reservation";
 import Table, { ITable } from "../../models/table";
 
-export const findById = async (id: string) => {
+export const findById = async (
+  id: string,
+): Promise<HydratedDocument<unknown> | null> => {
+  // ): Promise<HydratedDocument<IReservation> | null> => {
+  // ): Promise<HydratedDocument<unknown, unknown, IReservation> & IReservation & { tables: Types.ObjectId[] } | null> => {
   try {
     // return await Reservation.findById(id);
-    return await Reservation.findById(id)
+    const reservation = await Reservation.findById(id)
       .populate<{ tables: Types.ObjectId[] }>("tables")
       .orFail();
+    return reservation;
   } catch (err) {
     if (err instanceof mongoose.MongooseError) {
       console.log(err.message);
@@ -27,7 +37,9 @@ export const findById = async (id: string) => {
   }
 };
 
-export const find = async (searchOptions?: ReservationSearchOptionsType) => {
+export const find = async (
+  searchOptions?: ReservationSearchOptionsType,
+): Promise<HydratedDocument<unknown>[] | null> => {
   try {
     let query = Reservation.find();
     // add regex filters to query

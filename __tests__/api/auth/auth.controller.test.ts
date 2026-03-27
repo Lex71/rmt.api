@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 // import request from "supertest";
 // import app from "../../src/app"; // Assuming app.ts initializes Express
-import { Types } from "mongoose";
+import { /*  HydratedDocument, */ Types } from "mongoose";
 import {
   changePassword,
   loginUser,
@@ -376,11 +376,11 @@ describe("changePassword method", () => {
     jest.restoreAllMocks();
   });
 
-  it("should return error 400 email is not found", async () => {
+  it("should return error 401 if email is not found", async () => {
     const req = mockChangePasswordRequest();
     const res = mockResponse();
     const next = mockNext();
-    // (findByEmail as jest.Mock).mockResolvedValueOnce(null);
+    (findByEmail as jest.Mock).mockResolvedValue(null);
 
     await changePassword(req, res, next);
 
@@ -400,8 +400,8 @@ describe("changePassword method", () => {
       _id: userId,
       facility: { _id: facilityId },
     } as Partial<IUser>;
-    // (findByEmail as jest.Mock).mockResolvedValue(user);
-    (User.findOne as jest.Mock).mockResolvedValue(user);
+    (findByEmail as jest.Mock).mockResolvedValue(user);
+    // (User.findOne as jest.Mock).mockResolvedValue(user);
 
     await changePassword(req, res, next);
 
@@ -415,21 +415,32 @@ describe("changePassword method", () => {
     const res = mockResponse();
     const next = mockNext();
     const mockSave = jest.spyOn(User.prototype, "save");
-    const user: IUser = new User({
+
+    const user = new User({
       email: "test@example.com",
-      facility: "123",
+      // facility: "123",
       name: "test",
       role: "user",
     });
 
-    // (findByEmail as jest.Mock).mockResolvedValue(user);
-    (User.findOne as jest.Mock).mockResolvedValue(user);
+    // simple object doesn't work!
+    // const user = {
+    //   email: "test@example.com",
+    //   // facility: "123",
+    //   name: "test",
+    //   role: "user",
+    // };
+
+    (findByEmail as jest.Mock).mockResolvedValue(user);
+    // (User.findOne as jest.Mock).mockResolvedValue(user);
+
     (comparePassword as jest.Mock).mockResolvedValue(true);
     mockSave.mockResolvedValue(user);
 
     await changePassword(req, res, next);
 
     expect(mockSave).toHaveBeenCalled();
+    // expect(user.save).toHaveBeenCalled();
     // eslint-disable-next-line @typescript-eslint/unbound-method
     expect(res.status).toHaveBeenCalledWith(200);
     expect(res.json).toHaveBeenCalledWith({ data: user });

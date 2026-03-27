@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, { HydratedDocument } from "mongoose";
 import RefreshToken from "../../models/refreshToken";
 import User, {
   type IUser,
@@ -7,7 +7,8 @@ import User, {
 
 export const find = async (
   searchOptions: UserSearchOptionsType,
-): Promise<IUser[]> => {
+  // ): Promise<IUser[]> => {
+): Promise<HydratedDocument<IUser>[]> => {
   // TODO crreate the corresponding type
   // return facilities;
   try {
@@ -22,7 +23,9 @@ export const find = async (
   }
 };
 
-export const findById = async (id: string): Promise<IUser | null> => {
+export const findById = async (
+  id: string,
+): Promise<HydratedDocument<IUser> | null> => {
   try {
     // return await Facility.findById(id);
     return await User.findById(id).orFail();
@@ -36,7 +39,9 @@ export const findById = async (id: string): Promise<IUser | null> => {
   }
 };
 
-export const findByEmail = async (email: string): Promise<IUser | null> => {
+export const findByEmail = async (
+  email: string,
+): Promise<HydratedDocument<IUser> | null> => {
   try {
     const re = new RegExp(email, "i");
     return await User.findOne({ email: { $regex: re } });
@@ -50,7 +55,9 @@ export const findByEmail = async (email: string): Promise<IUser | null> => {
   }
 };
 
-export const create = async (user: Partial<IUser>) => {
+export const create = async (
+  user: Partial<IUser>,
+): Promise<HydratedDocument<IUser> | null> => {
   const { email, name, password } = user;
   if (!name || !email || !password) {
     // return {
@@ -78,7 +85,9 @@ export const create = async (user: Partial<IUser>) => {
   }
 };
 
-export const remove = async (id: string) => {
+export const remove = async (
+  id: string,
+): Promise<HydratedDocument<IUser> | null> => {
   try {
     // return await User.deleteOne({ _id: id });
     await RefreshToken.deleteMany({ user: id });

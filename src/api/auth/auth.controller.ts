@@ -264,11 +264,11 @@ export const changePassword = async (
   //   next(new ApplicationError(400, "An user with that email not exists"));
   //   return;
   // }
-  // const user = await findByEmail(email);
+  const user = await findByEmail(email);
 
   // I need the object returned by User.findOne, so I can call .save()...
-  const re = new RegExp(email, "i");
-  const user = await User.findOne({ email: { $regex: re } });
+  // const re = new RegExp(email, "i");
+  // const user = await User.findOne({ email: { $regex: re } });
 
   if (!user) {
     next(new ApplicationError(401, "Invalid Email"));
