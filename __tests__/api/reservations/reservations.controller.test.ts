@@ -24,7 +24,7 @@ jest.mock("../../../src/api/reservations/reservations.service");
 //   } as unknown as Request;
 // };
 
-const mocketReservableTablesRequest = () => {
+const mockReservableTablesRequest = () => {
   return {
     query: {
       date: "2023-05-01",
@@ -51,7 +51,7 @@ describe("getReservableTables method", () => {
     jest.restoreAllMocks();
   });
   it("should return empty array if no tables are available", async () => {
-    const req = mocketReservableTablesRequest();
+    const req = mockReservableTablesRequest();
     const res = mockResponse();
     const next = mockNext();
 

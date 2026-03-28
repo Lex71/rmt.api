@@ -1,5 +1,6 @@
 import bcrypt from "bcrypt";
 import jwt, { JwtPayload, SignOptions } from "jsonwebtoken";
+import moment from "moment";
 import config from "../config/config";
 import { Role } from "../models/user";
 
@@ -50,10 +51,40 @@ const issueRefreshToken = (payload: { id: string }) => {
   } as SignOptions);
 };
 
+const timeOverlaps = (
+  reservation_time: string,
+  booking_time: string,
+  adjust: number,
+  delay: number,
+): boolean => {
+  try {
+    const time = moment(reservation_time, "HH:mm");
+    const b_time = moment(booking_time, "HH:mm").add(adjust, "minutes");
+    // time conditions:
+    // booking_time == time ||
+    // booking_time == time+DELAY ||
+    // booking_time < time && booking_time+DELAY > time ||
+    // booking_time > time && booking_time < time+DELAY
+    const condition1 = b_time.isSame(time);
+    const condition2 = b_time.isSame(time.clone().add(delay, "minutes"));
+    const condition3 =
+      b_time.isBefore(time) && b_time.add(delay, "minutes").isAfter(time);
+    const condition4 =
+      b_time.isAfter(time) &&
+      b_time.isBefore(time.clone().add(delay, "minutes"));
+    return condition1 || condition2 || condition3 || condition4;
+  } catch (e) {
+    console.log(e);
+    // if there is an error with time parsing, return true so that the reservation cannot be made
+    return true;
+  }
+};
+
 export {
   comparePassword,
   hashPassword,
   issueAccessToken,
   issueRefreshToken,
+  timeOverlaps,
   verifyRefreshTokenNotExpired,
 };

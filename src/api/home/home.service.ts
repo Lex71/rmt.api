@@ -1,6 +1,6 @@
-import { Types } from "mongoose";
-import Facility from "../../models/facility";
-import Table from "../../models/table";
+import { type HydratedDocument, Types } from "mongoose";
+import Facility, { IFacility } from "../../models/facility";
+import Table, { ITable } from "../../models/table";
 
 /* function wait(t: number) {
   return new Promise((resolve, reject) => {
@@ -19,7 +19,7 @@ import Table from "../../models/table";
 export const fetchIndexData = async (
   facility: Types.ObjectId | undefined,
   isAdmin: boolean,
-) => {
+): Promise<HydratedDocument<IFacility | ITable>[] | null> => {
   // let facilities : IFacility[] = [];
 
   let query = isAdmin ? Facility.find() : Table.find();

@@ -1,4 +1,4 @@
-import moment from "moment";
+// import moment from "moment";
 import mongoose, {
   HydratedDocument,
   MongooseError,
@@ -15,6 +15,7 @@ import Reservation, {
   reservationSchema,
 } from "../../models/reservation";
 import Table, { ITable } from "../../models/table";
+import { timeOverlaps } from "../../utils/helpers";
 
 export const findById = async (
   id: string,
@@ -138,33 +139,18 @@ export const findAvailableTables = async (
 
     // if (!booking_time) throw new Error("Missing time query parameter");
     const reservations = await query.populate("tables").exec();
-    /* const r = await Reservation.find({
-      date: { $eq: "2025-04-02" }, // "2025-04-02",
-      facility: new Types.ObjectId(searchOptions?.query?.facility),
-    }); //.populate<{ tables: ITable[] }>("tables");
-    console.log(r); */
     const allTables: (ITable & { _id: Types.ObjectId })[] = await Table.find({
       facility: searchOptions?.query?.facility,
     });
-
-    // return await query.exec();
     const busyTablesIds: string[] = [];
 
     reservations.forEach((reservation) => {
-      const time = moment(reservation.time, "HH:mm");
-      const b_time = moment(booking_time, "HH:mm").add(adjust, "minutes");
-      // time conditions:
-      // booking_time == time ||
-      // booking_time == time+DELAY ||
-      // booking_time < time && booking_time+DELAY > time ||
-      // booking_time > time && booking_time < time+DELAY
-      const condition1 = b_time.isSame(time);
-      const condition2 = b_time.isSame(time.clone().add(DELAY, "minutes"));
-      const condition3 =
-        b_time.isBefore(time) && b_time.add(DELAY, "minutes").isAfter(time);
-      const condition4 =
-        b_time.isAfter(time) &&
-        b_time.isBefore(time.clone().add(DELAY, "minutes"));
+      // if time values are "empty" (for unknown reasons), set isOverlapping equals true
+      // this way, the reservation will be considered "busy"
+      const isOverlapping: boolean =
+        reservation.time && booking_time
+          ? timeOverlaps(reservation.time, booking_time, adjust, DELAY)
+          : true;
 
       const busyTables = reservation.tables.filter(() => {
         return (
@@ -174,7 +160,7 @@ export const findAvailableTables = async (
           [Status.CHECKEDIN, Status.CONFIRMED, Status.RESCHEDULED].includes(
             reservation.status,
           ) &&
-          (condition1 || condition2 || condition3 || condition4)
+          isOverlapping
         );
       });
       busyTablesIds.push(...busyTables.map((t) => t._id.toString()));
