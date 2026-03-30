@@ -80,6 +80,7 @@ describe("getReservableTables method", () => {
     // (Table.find as jest.Mock).mockResolvedValue(tables);
     // (Reservation.find as jest.Mock).mockResolvedValue(reservations);
     (findAvailableTables as jest.Mock).mockResolvedValue(tables);
+
     await getReservableTables(req, res, next);
     expect(res.json).toHaveBeenCalledWith({ data: [] });
   });

@@ -37,9 +37,7 @@ describe("findAvailableTables method", () => {
       },
     };
 
-    const reservations:
-      | (IReservation & { _id: Types.ObjectId })[]
-      | IReservation[] = [
+    const reservations: IReservation[] = [
       {
         _id: new Types.ObjectId(),
         date: "2023-05-01",

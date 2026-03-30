@@ -63,44 +63,19 @@ export interface IFacility extends BaseEntity {
   { timestamps: true },
 ); */
 
-const facilitySchema = new Schema(
+export const facilitySchema = new Schema(
   {
     address: { required: true, type: String },
     name: { required: true, type: String },
-    tables: [{ ref: "Table", type: Schema.Types.ObjectId }],
-    // tables: { ref: "Table", type: [Schema.Types.ObjectId] },
+    tables: [
+      {
+        default: [],
+        ref: "Table",
+        type: Schema.Types.ObjectId,
+      },
+    ],
   },
   {
-    // methods: {
-    //   toJSON() {
-    //     const facility = this as HydratedDocument<IFacility> & IFacility;
-    //     const facilityObject = facility.toObject();
-    //     // delete facilityObject._id;
-    //     return facilityObject;
-    //   },
-    // },
-    /* pre: {
-      // check for existing reference on Table before 'remove'
-      deleteOne: function (next: CallbackWithoutResultAndOptionalError) {
-        Table.find(
-          {
-            facility: (
-              this as unknown as HydratedDocument<IFacility> & IFacility
-            ).id,
-          },
-          // (err: CallbackError | undefined, tables: HydratedDocument<ITable>[]) => {
-          (err: CallbackError | undefined, tables: ITable[]) => {
-            if (err) {
-              next(err);
-            } else if (tables.length > 0) {
-              next(new Error("This facility has tables still"));
-            } else {
-              next();
-            }
-          },
-        );
-      },
-    }, */
     timestamps: true,
   },
 );

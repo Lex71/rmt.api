@@ -121,15 +121,15 @@ A customer calls the restaurant, and provides information to the operator:
 - reservation time
 - number of guests
 
-##### 1.1.1. Operator is provided with a set of available tables, depending on date and time
+##### 1.1.1. Operator finds a set of available tables, depending on date and time
 
-The operator searches for tables availabilty (async all to server), and if no tables are found tries with a slightly different time.
+The operator searches for available tables, matching the date and the desired number of guests. If no tables are found, he can try with a slightly different time until a match is found.
 
-> NOTE: this can be quickly achieved by changing the _adjust_ parameter, adding/subtracting 15 minutes each time, then searches again (another async call to server), until tables are found.
+> NOTE: this can be quickly achieved by changing the _adjust_ parameter, adding/subtracting 15 minutes each time, then searching again, until tables are found.
 
-Tables in the result come from:
+Match criteria:
 
-- all tables that are not yet included in any reservation
+- tables that are not yet included in any reservation
 - tables included in reservations for that date having a status PAID or NOSHOW or CANCELLED
 - tables included in reservations for that date having a status CONFIRMED or RESCHEDULED or CHECKEDIN and range (time, time + DELAY) not overlapping with range (booking_time, booking_time + DELAY)
 
@@ -141,35 +141,38 @@ Tables in the result come from:
 
 ##### 1.1.2. Operator selects a table
 
-    When there are some available tables, operator marks the one(s) suitable for the number of guests.
+When there are some available tables, operator marks the one(s) suitable for the number of guests.
 
 > NOTE: if each available table has less than the desired number of guest, the operator can mark more tables.
 
+> NOTE: At client side, found tables get filtered by seats (by default as greater or equal to the number of guests), but such default can be disabled, allowing an optimized composition of tables to fit the number of guests.
+
 #### 1.1.3 Registration
 
-    Operator asks for further information in order to finalize the booking process:
-    - customer name
-    - customer phone
+Operator asks for further information in order to finalize the booking process:
 
-    A new reservation for such table(s) is now stored into database, with status "confirmed".
+- customer name
+- customer phone
+
+A new reservation for such table(s) is now stored into database, with status "confirmed".
 
 #### 1.2. By Web App
 
     (coming soon)
 
-### 2. Operator manages the reservation
+### 2. Reservation management
 
 #### 2.1. Customer shows up at the restaurant in time
 
-    Operator updates the reservation with status CHECKEDIN
+Operator updates the reservation with status CHECKEDIN
 
 #### 2.2. After some time, customer still didn't show up
 
-    Operator can update the reservation with status NOSHOW, freeing its related table(s).
+Operator can update the reservation with status NOSHOW, freeing its related table(s).
 
 ### 3. Customer pays the check
 
-    Operator updates the reservation with status PAID
+Operator updates the reservation with status PAID
 
 > NOTE: a reservation can also have RESCHEDULED status, though it is going to be hanlded as CONFIRMED.  
 > This status could be useful for audit purposes.
@@ -254,7 +257,3 @@ First, define a Products model, like:
 ## Open API
 
 View the [OAS](./oas.yaml) source file.
-
-TODO:
-
-- create unit test for users.service's findByEmail() function
