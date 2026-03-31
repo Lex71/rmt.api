@@ -103,6 +103,10 @@ export const reservationSchema = new Schema(
   },
 }); */
 
+// compound index
+// eslint-disable-next-line perfectionist/sort-objects
+reservationSchema.index({ facility: 1, date: 1 });
+
 const Reservation = model("Reservation", reservationSchema);
 
 export default Reservation;

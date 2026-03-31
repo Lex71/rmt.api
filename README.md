@@ -15,7 +15,7 @@ One server instance can handle all configured facilities for the organization.
 - login, logout, change password flows for all users
 - JWT authentication and http-only cookie for refresh token flow
 - forgot password flow, with 1-hour-expire token, sent as clickable link by email
-- api payloads validation
+- validation middleware with Yup schemas
 - _facilities_ CRUD by admin only
 - _tables_ CRUD by staff users
 - _reservations_ handling by staff users, based on status
@@ -34,7 +34,7 @@ Entities in this project are:
 
 ### Users
 
-Users are the operators working at a given facility, plus the administrator.
+Users are the operators working at a given facility, along with the administrator.
 
 ### Facilities
 
@@ -112,6 +112,9 @@ show tables
 
 # explain queries
 db.facilities.find({name: "Facility One"}).explain("executionStats")
+
+# terminate
+exit
 ```
 
 ### Backup DB Volume
