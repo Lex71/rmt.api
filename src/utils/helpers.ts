@@ -63,15 +63,19 @@ const timeOverlaps = (
     // time conditions:
     // booking_time == time ||
     // booking_time == time+DELAY ||
-    // booking_time < time && booking_time+DELAY > time ||
-    // booking_time > time && booking_time < time+DELAY
+    // booking_time < time && booking_time+DELAY >= time ||
+    // booking_time > time && booking_time <= time+DELAY
     const condition1 = b_time.isSame(time);
     const condition2 = b_time.isSame(time.clone().add(delay, "minutes"));
     const condition3 =
-      b_time.isBefore(time) && b_time.add(delay, "minutes").isAfter(time);
+      b_time.isBefore(time) &&
+      b_time.clone().add(delay, "minutes").isSameOrAfter(time);
     const condition4 =
       b_time.isAfter(time) &&
-      b_time.isBefore(time.clone().add(delay, "minutes"));
+      b_time.isSameOrBefore(time.clone().add(delay, "minutes"));
+    // console.log(
+    //   `condition1: ${condition1.toString()}, condition2: ${condition2.toString()}, condition3: ${condition3.toString()}, condition4: ${condition4.toString()}`,
+    // );
     return condition1 || condition2 || condition3 || condition4;
   } catch (e) {
     console.log(e);

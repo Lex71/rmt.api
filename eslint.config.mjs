@@ -53,6 +53,7 @@ export default tseslint.config(
             "__tests__/api/reservations/*.ts",
             "__tests__/db/*.ts",
             "__tests__/integration/*.ts",
+            "__tests__/utils/*.ts",
           ],
           defaultProject: "tsconfig.json",
         },
