@@ -1,15 +1,16 @@
 # Reserve My Table (rmt.api)
 
-rmt.api is a RESTful API server built with Express, MongoDB and TypeScript.  
-The main goal is to allow an organization's facility to manage customer's bookings through a web app, as a replacement for traditional paper "book of reservations".
+    rmt.api is a RESTful API server built with Express, MongoDB and TypeScript.
 
-One server instance can handle all configured restaurants for the organization.
-Basic case is an organization with just one restaurant.
+This server is aimed for use within an organization with one or more facilities, esp. restaurants.
+The main goal is the management of customer's table reservation, as a replacement for the traditional paper "book of reservations".
+
+One server instance can handle all configured facilities for the organization.
 
 ## Features
 
 - predefined admin user for the organization
-- definition of one or more _facilitiies_ (by admin user only)
+- definition of one or more _facilities_ (by admin user only)
 - registration flow for staff users, bound to a specific _facility_
 - login, logout, change password flows for all users
 - JWT authentication and http-only cookie for refresh token flow
@@ -21,6 +22,51 @@ Basic case is an organization with just one restaurant.
 - available tables forecast (\*)
 
 > (\*) for tables already reserved, we try to predict if a table will be available, say for the given booking time, by applying a configurable "average staying time" then matching the busy time interval against the booking time interval.
+
+## Entities
+
+Entities in this project are:
+
+- users
+- facilities
+- tables
+- reservations
+
+### Users
+
+Users are the operators working at a given facility, plus the administrator.
+
+### Facilities
+
+Facilities represent the restaurants, and have relations with both users and tables
+
+### Tables
+
+Tables are the reservable items, defined by a name and a number of seats
+
+### Reservations
+
+Reservations keep all useful informations about the booking process, like date, time, number of guests, customer name/phone, allocated table(s) and a status.
+
+## Reservation Status
+
+The reservation has its own status:
+
+- CONFIRMED: The booking has been successfully made and it's confirmed by the restaurant.
+- CHECKEDIN: The customer has arrived at the restaurant
+- NOSHOW: The customer did not show up for the booked reservation (NOTE: remarkable for auditing purposes, to be treated as a cancellation).
+- CANCELLED: The booking has been canceled by either the customer or the restaurant.
+- RESCHEDULED: The booking has been moved to a different date or time (NOTE: remarkable for auditing purposes, to be treated as a confirmed booking).
+- PAID: The booking has been confirmed and payment has been received (NOTE: tables are free).
+
+In the future, by adding more services like online booking or payment, other statuses would be introduced, for example:
+
+- PENDING: The booking request has been received but it's awaiting confirmation from the restaurant.
+- AWAITINGPAYMENT: The booking is confirmed but payment is still pending.
+
+## Table Status
+
+The table status (available/busy) is a dynamic value that depends on the date and time of the ongoing booking with respect to the reservations already present in the same period of time.
 
 ## Setup
 
@@ -109,7 +155,7 @@ npm run test
 
 ```
 
-## Booking Flow (Client Side)
+## Booking Flow (Client Side Story)
 
 ### 1. Customer makes a reservation
 
@@ -136,8 +182,8 @@ Match criteria:
 > NOTE: DELAY is a configurable parameter representing customer's average staying time, in minutes.
 
 > EXAMPLES  
->  DELAY is 90 minutes, and the new booking time is 14:00, then a table whose status is CONFIRMED or CHECKEDIN that has been reserved for 12:00, will be included in the list (because the customer will probably pay at 13:30, so table is free)  
->  DELAY is 90 minutes, and the new booking time is 14:00, then a table whose status is CONFIRMED or CHECKEDIN that has been reserved for 13:00, will not be included in the list (because the customer will probably pay at 13:30, so table is still busy)
+>  DELAY is 90 minutes, and the new booking time is 14:00, then a table whose status is CONFIRMED or CHECKEDIN that has been reserved for 12:00, will be included in the list (because the customer will probably pay soon after 13:30, so table is free)  
+>  DELAY is 90 minutes, and the new booking time is 14:00, then a table whose status is CONFIRMED or CHECKEDIN that has been reserved for 13:00, will not be included in the list (because the customer will probably pay soon after 14:30, so table is still busy)
 
 ##### 1.1.2. Operator selects a table
 
@@ -145,7 +191,7 @@ When there are some available tables, operator marks the one(s) suitable for the
 
 > NOTE: if each available table has less than the desired number of guest, the operator can mark more tables.
 
-> NOTE: At client side, found tables get filtered by seats (by default as greater or equal to the number of guests), but such default can be disabled, allowing an optimized composition of tables to fit the number of guests.
+> NOTE: At client side, found tables get filtered by seats (by default, when seats are greater or equal to the number of guests), but such default can be disabled, allowing an optimized composition of tables to fit the number of guests, when there aren't big enough single tables.
 
 #### 1.1.3 Registration
 
@@ -154,7 +200,7 @@ Operator asks for further information in order to finalize the booking process:
 - customer name
 - customer phone
 
-A new reservation for such table(s) is now stored into database, with status "confirmed".
+A new reservation for such table(s) is now stored into database, with status "CONFIRMED".
 
 #### 1.2. By Web App
 
