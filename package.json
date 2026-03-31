@@ -18,7 +18,7 @@
     "dev:prod": "tsx --watch --env-file .env.production src/server.ts",
     "start": "node dist/server.js",
     "build": "tsc -p tsconfig.build.json",
-    "coverage": "vitest run --coverage",
+    "coverage": "jest --coverage",
     "type-check": "tsc --noEmit",
     "lint": "eslint .",
     "lint:fix": "eslint --fix .",

@@ -23,13 +23,9 @@ function verifyRefreshTokenNotExpired(token: string): boolean {
   let stillValid = false;
   const decodedToken = jwt.decode(token, { complete: true })
     ?.payload as JwtPayload;
-  console.log(`##### decodedToken: ${JSON.stringify(decodedToken)}`);
   if (decodedToken.exp) {
     const expirationDate = new Date(decodedToken.exp * 1000);
     stillValid = expirationDate.getTime() > new Date().getTime();
-    console.log(
-      `##### refreshToken is still valid: ${stillValid ? "YES" : "NO"}`,
-    );
   }
   return stillValid;
 }
