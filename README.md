@@ -78,7 +78,7 @@ The table status (available/busy) is a dynamic value that depends on the date an
 ## Setup
 
 Copy env.example to .env  
-In order to work with MongoDB, you first need to have a MondoDB server running.  
+In order to work with MongoDB, you first need to have a MongoDB server running.  
 For convenience, you can build and spin up a container as defined in docker-compose.yaml file:
 
 ```bash
