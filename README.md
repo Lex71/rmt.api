@@ -1,27 +1,34 @@
 # Reserve My Table (rmt.api)
 
-    rmt.api is a RESTful API server built with Express, MongoDB and TypeScript.
+    rmt.api is a RESTful API server built with Express, MongoDB, TypeScript
 
-This server is aimed for use within an organization with one or more facilities, esp. restaurants.
+## Goal
+
+rmt.api is a web server to be used by a company with one or more facilities, esp. restaurants.
 The main goal is the management of customer's table reservation, as a replacement for the traditional paper "book of reservations".
 
-One server instance can handle all configured facilities for the organization.
+> Note: a single server instance can handle all configured facilities of the company.
 
 ## Features
 
-- predefined admin user for the organization
+- predefined admin user for the company
 - definition of one or more _facilities_ (by admin user only)
 - registration flow for staff users, bound to a specific _facility_
 - login, logout, change password flows for all users
 - JWT authentication and http-only cookie for refresh token flow
+
 - forgot password flow, with 1-hour-expire token, sent as clickable link by email
-- validation middleware with Yup schemas
 - _facilities_ CRUD by admin only
 - _tables_ CRUD by staff users
 - _reservations_ handling by staff users, based on status
 - available tables forecast (\*)
+- validation middleware with yup schemas (\*\*)
+- tests with jest
+- pre-commit by husky
 
 > (\*) for tables already reserved, we try to predict if a table will be available, say for the given booking time, by applying a configurable "average staying time" then matching the busy time interval against the booking time interval.
+
+> (\*\*) ready to migrate towards zod, but I stick to yup until zod will be missing a native, built-in feature equivalent to yup's abortEarly
 
 ## Entities
 
@@ -38,7 +45,7 @@ Users are the operators working at a given facility, along with the administrato
 
 ### Facilities
 
-Facilities represent the restaurants, and have relations with both users and tables
+Facilities represent the restaurants, in relation with both users and tables
 
 ### Tables
 
@@ -46,7 +53,7 @@ Tables are the reservable items, defined by a name and a number of seats
 
 ### Reservations
 
-Reservations keep all useful informations about the booking process, like date, time, number of guests, customer name/phone, allocated table(s) and a status.
+Reservations keep all useful informations about the booking process, like date and time, number of guests, customer name and phone, reserved table(s) and a status.
 
 ## Reservation Status
 

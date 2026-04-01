@@ -1,9 +1,9 @@
 /**
  *
- * FUTURE: maybe I'll be using Zod, but not now unitl feature like yup.abortEarly is missing
+ * FUTURE: maybe I'll be using Zod, but not now until feature like yup.abortEarly is missing
  *  https://github.com/colinhacks/zod/issues/127
  * 
- * The implementation hoever works, just lacks to format error like I do for yup:
+ * The implementation however works, just lacks to format error like I do for yup:
  * {
     "email": "Invalid email format",
     "name": "Name must be at least 3 characters",
